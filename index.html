@@ -35,13 +35,8 @@
           </div>
         </div>
 
-        <!-- BLOCCO TEMPO REALE & COUNTDOWN -->
+        <!-- BLOCCO COUNTDOWN -->
         <div class="header-time-block">
-          <div class="header-today-badge">
-            <span class="today-dot"></span>
-            <span class="today-label">Oggi:</span>
-            <span id="header-current-date">—</span>
-          </div>
           <div class="countdown-strip">
             <span class="countdown-intro">Al Grande Giorno</span>
             <div class="countdown-counter">
@@ -53,45 +48,30 @@
         </div>
       </div>
 
-      <!-- NAVIGAZIONE A SCHEDE & AZIONI RAPIDE -->
+      <!-- NAVIGAZIONE A SCHEDE -->
       <div class="header-nav-row">
         <nav class="atelier-nav">
           <button class="nav-link-btn active" data-tab="overview">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Quadro d'Insieme
+            <span>Quadro<br>d'Insieme</span>
           </button>
           <button class="nav-link-btn" data-tab="expenses">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            Voci & Servizi
+            <span>Voci &<br>Servizi</span>
           </button>
           <button class="nav-link-btn" data-tab="savings">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h.5c1.4 0 2.5-1.1 2.5-2.5C23 8.9 21.6 5 19 5z"/></svg>
-            Piano di Copertura
+            <span>Piano di<br>Copertura</span>
           </button>
           <button class="nav-link-btn" data-tab="balance">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-            Bilancio di Coppia
+            <span>Bilancio<br>di Coppia</span>
           </button>
           <button class="nav-link-btn" data-tab="guests">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Ospiti & Doni
+            <span>Ospiti &<br>Doni</span>
           </button>
         </nav>
-
-        <div class="atelier-actions">
-          <button class="btn-noble btn-noble-secondary" id="btn-print" title="Stampa o Salva PDF">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Stampa Fascicolo
-          </button>
-          <button class="btn-noble btn-noble-secondary" id="btn-export-csv" title="Esporta documento di riepilogo">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Esporta Riepilogo (.csv)
-          </button>
-          <button class="btn-noble btn-noble-primary" id="btn-new-expense">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Aggiungi Servizio
-          </button>
-        </div>
       </div>
     </header>
 
@@ -529,6 +509,10 @@
         <div class="archive-vault-desc">I tuoi dati sono protetti e memorizzati nel browser di questo dispositivo.</div>
       </div>
       <div class="vault-actions-group">
+        <button class="btn-noble btn-noble-secondary" id="btn-export-csv" title="Esporta documento di riepilogo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Esporta CSV
+        </button>
         <button class="btn-noble btn-noble-secondary" id="btn-export-json">
           Salva Archivio (JSON)
         </button>
@@ -536,12 +520,17 @@
           Importa Archivio
           <input type="file" id="file-import-json" accept=".json" class="file-input-hidden">
         </label>
+        <button class="btn-noble btn-noble-secondary" id="btn-print" title="Stampa o Salva PDF">
+          Stampa Fascicolo
+        </button>
         <button class="btn-noble btn-noble-secondary" id="btn-change-pin" type="button">
           🔒 Modifica PIN
         </button>
         <button class="btn-noble btn-noble-secondary text-accent-terracotta" id="btn-reset-data">
           ↺ Ripristina Dati Iniziali
         </button>
+        <span id="header-current-date" class="is-hidden"></span>
+        <button id="btn-new-expense" class="is-hidden"></button>
       </div>
     </div>
 
