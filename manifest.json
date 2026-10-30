@@ -1,0 +1,18 @@
+{
+  "name": "Nozze Michele & Miriana",
+  "short_name": "Nozze M&M",
+  "description": "Atelier Privato e Gestione Finanziaria del Matrimonio",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FBF9F5",
+  "theme_color": "#9E7D50",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'><rect width='512' height='512' fill='%23FBF9F5'/><circle cx='256' cy='256' r='220' stroke='%239E7D50' stroke-width='8' fill='%23F7F4EE'/><circle cx='256' cy='256' r='200' stroke='%23ECE5DA' stroke-width='4' fill='none'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Georgia, serif' font-style='italic' font-size='160' fill='%239E7D50'>M&amp;M</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
