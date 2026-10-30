@@ -143,6 +143,13 @@ window.WeddingApp.Repositories = (function () {
         estimatedGuests: effectiveGuestCount
       };
 
+      // Aggiornamento dinamico automatico del Catering in base al numero esatto di invitati (150€ + 10% IVA = 165€ a persona)
+      const cateringExpense = expenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
+      if (cateringExpense) {
+        cateringExpense.item = `Banchetto & Catering (150€ + IVA 10% × ${effectiveGuestCount} ospiti)`;
+        cateringExpense.budget = Math.round(150 * 1.1 * effectiveGuestCount);
+      }
+
       return {
         couple: raw.couple || {},
         details,

@@ -162,6 +162,16 @@ window.WeddingApp.Domain = (function () {
       const totalRosteredGuests = guestsCountMichele + guestsCountMiriana + guestsCountBoth;
       const effectiveTotalGuests = totalRosteredGuests > 0 ? totalRosteredGuests : Number(safeDetails.estimatedGuests ?? 100);
 
+      // Aggiorna dinamicamente la voce Catering in base al numero esatto di ospiti (150€ + 10% IVA = 165€ a persona)
+      const cateringExp = safeExpenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
+      if (cateringExp) {
+        cateringExp.item = `Banchetto & Catering (150€ + IVA 10% × ${effectiveTotalGuests} ospiti)`;
+        cateringExp.budget = Math.round(150 * 1.1 * effectiveTotalGuests);
+        if (!cateringExp.notes.includes('165€')) {
+          cateringExp.notes = `Menù 150€ + IVA 10% (165€ a persona tutto compreso). ${cateringExp.notes}`;
+        }
+      }
+
       // Rapporto Ospiti per ripartizione spese proporzionali
       const micheleEffectiveGuests = guestsCountMichele + (guestsCountBoth / 2);
       const micheleGuestRatio = effectiveTotalGuests > 0 ? (micheleEffectiveGuests / effectiveTotalGuests) : 0.5;
