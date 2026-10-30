@@ -135,9 +135,17 @@ window.WeddingApp.Repositories = (function () {
         weddingGifts: { ...(seedSavings.weddingGifts || {}), ...(rawSavings.weddingGifts || {}) }
       };
 
+      // Calcola il numero effettivo degli ospiti se ci sono ospiti registrati
+      const effectiveGuestCount = guests.length > 0 ? guests.length : (raw.details?.estimatedGuests || this.seedData?.details?.estimatedGuests || 105);
+      const details = {
+        ...(this.seedData?.details || {}),
+        ...(raw.details || {}),
+        estimatedGuests: effectiveGuestCount
+      };
+
       return {
         couple: raw.couple || {},
-        details: raw.details || {},
+        details,
         savingsPlan,
         categories,
         expenses,
