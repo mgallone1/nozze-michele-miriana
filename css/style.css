@@ -1,66 +1,66 @@
 /* ==========================================================================
    MICHELE & MIRIANA — 2 LUGLIO 2027
-   ESTETICA EDITORIALE DI LUSSO / ATELIER PRIVATO
+   ESTETICA EDITORIALE DI LUSSO / ATELIER PRIVATO — VISIONE 2027
    Design: Tipografia d'alta moda, palette naturale lino & bronzo, zero cliché AI
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
 
 :root {
-  /* Tavolozza Cromatica Silenziosa & Raffinata */
-  --canvas-bg: #FBF9F5;
-  --surface-pure: #FFFFFF;
-  --surface-tint: #F7F4EE;
-  --surface-warm: #F2ECE3;
+  /* Tavolozza Cromatica Silenziosa & Raffinata (Visione 2027: Lino di Seta & Sabbia Calda) */
+  --canvas-bg: #FAF8F5;
+  --surface-pure: rgba(255, 255, 255, 0.88);
+  --surface-tint: #F5F1E9;
+  --surface-warm: #EFE9DE;
 
-  /* Linee e Cornici Sottili */
-  --border-hairline: #ECE5DA;
-  --border-subtle: #DFD7C9;
+  /* Linee e Cornici Ultra-Sottili (Hairline di Precisione) */
+  --border-hairline: rgba(158, 125, 80, 0.14);
+  --border-subtle: rgba(158, 125, 80, 0.22);
   --border-focus: #9E7D50;
 
-  /* Tipografia Editoriale */
-  --ink-primary: #1C1A18;
-  --ink-secondary: #5C564F;
-  --ink-muted: #8F877E;
-  --ink-light: #B8B0A5;
+  /* Tipografia Sartoriale */
+  --ink-primary: #1F1C19;
+  --ink-secondary: #524C46;
+  --ink-muted: #877F76;
+  --ink-light: #BDB5AA;
 
   /* Accenti Sartoriali Nobili */
   --accent-bronze: #9E7D50;
-  --accent-bronze-light: #F7F2E9;
-  --accent-bronze-border: #E5D7C0;
+  --accent-bronze-light: #F7F3EB;
+  --accent-bronze-border: #E2D5C0;
 
   --accent-terracotta: #8C4E40;
   --accent-terracotta-soft: #F9EFEB;
 
-  --accent-sage: #4A6354;
-  --accent-sage-soft: #EEF4F0;
+  --accent-sage: #456151;
+  --accent-sage-soft: #EDF3EF;
 
-  /* Tag Personali Muted (non sgargianti) */
-  --person-michele: #375366;
-  --person-michele-bg: #EEF3F7;
-  --person-michele-border: #D1DFE8;
+  /* Tag Personali Delicati (Eleganza Sussurrata) */
+  --person-michele: #354E5F;
+  --person-michele-bg: #EEF4F8;
+  --person-michele-border: #D0DEE7;
 
-  --person-miriana: #7A4554;
-  --person-miriana-bg: #F7EDF1;
-  --person-miriana-border: #E8D1DA;
+  --person-miriana: #754251;
+  --person-miriana-bg: #F8EDF2;
+  --person-miriana-border: #E9D2DC;
 
   /* Font Families */
   --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Ombre Atmosferiche Calde & Sartoriali (Haute Couture) */
-  --shadow-soft: 0 2px 8px rgba(35, 25, 15, 0.025);
-  --shadow-card: 0 4px 20px -2px rgba(35, 25, 15, 0.035), 0 1px 3px rgba(35, 25, 15, 0.02);
-  --shadow-hover: 0 12px 32px -4px rgba(158, 125, 80, 0.09), 0 4px 10px -2px rgba(35, 25, 15, 0.03);
-  --shadow-elevation: 0 20px 44px -8px rgba(35, 25, 15, 0.08), 0 4px 14px -2px rgba(35, 25, 15, 0.03);
-  --shadow-modal: 0 32px 80px -16px rgba(25, 20, 15, 0.25), 0 0 0 1px rgba(158, 125, 80, 0.15);
+  --shadow-soft: 0 2px 10px rgba(31, 28, 25, 0.025);
+  --shadow-card: 0 6px 24px -2px rgba(31, 28, 25, 0.04), 0 1px 3px rgba(31, 28, 25, 0.015);
+  --shadow-hover: 0 12px 36px -4px rgba(158, 125, 80, 0.1), 0 3px 8px rgba(31, 28, 25, 0.02);
+  --shadow-elevation: 0 20px 48px -8px rgba(31, 28, 25, 0.08), 0 4px 14px -2px rgba(31, 28, 25, 0.03);
+  --shadow-modal: 0 32px 80px -16px rgba(25, 20, 15, 0.28), 0 0 0 1px rgba(158, 125, 80, 0.15);
   --shadow-bronze-glow: 0 0 0 3px rgba(158, 125, 80, 0.14);
 
   /* Curve e Spazi */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-lg: 22px;
   --radius-full: 9999px;
 
   --ease-smooth: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);

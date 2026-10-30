@@ -178,7 +178,7 @@ window.WeddingApp.UI = (function () {
           payerBadges += `<span class="pill-person miriana">Miriana: ${CurrencyFormatter.format(exp.paidMiriana)}</span>`;
         }
         if (!payerBadges) {
-          payerBadges = `<span class="badge-unpaid">Da definire</span>`;
+          payerBadges = `<span class="badge-unpaid">In attesa</span>`;
         } else {
           payerBadges = `<div class="payer-badges-stack">${payerBadges}</div>`;
         }

@@ -175,7 +175,7 @@
         <!-- Colonna Bilanciamento Intimo -->
         <div class="couple-intimate-balance">
           <div class="intimate-balance-header">
-            <span class="intimate-balance-title">Quote Anticipate</span>
+            <span class="intimate-balance-title">Contributi Sostenuti</span>
             <div class="intimate-balance-pills">
               <span class="pill-person michele">Michele</span>
               <span class="pill-person miriana">Miriana</span>
@@ -234,15 +234,15 @@
             </select>
 
             <select id="filter-payer" class="ledger-select">
-              <option value="all">Tutti i Pagatori</option>
+              <option value="all">Tutti i Contributi</option>
               <option value="michele">Curato da Michele</option>
               <option value="miriana">Curato da Miriana</option>
-              <option value="both">Condiviso 50/50</option>
+              <option value="both">Insieme (50/50)</option>
               <option value="unpaid">Da definire</option>
             </select>
 
             <select id="filter-status" class="ledger-select">
-              <option value="all">Tutti gli Stati</option>
+              <option value="all">Tutti gli Accordi</option>
               <option value="pianificato">In pianificazione</option>
               <option value="acconto">Acconto versato</option>
               <option value="saldato">Completato</option>
@@ -259,12 +259,12 @@
           <table class="ledger-table">
             <thead>
               <tr>
-                <th class="col-item">Servizio / Voce</th>
+                <th class="col-item">Servizio & Dettaglio</th>
                 <th class="col-investment">Investimento</th>
-                <th class="col-advanced">Anticipato</th>
+                <th class="col-advanced">Anticipi Curati</th>
                 <th class="col-remaining">Rimanente</th>
-                <th class="col-status">Stato</th>
-                <th class="col-notes">Dettagli & Note</th>
+                <th class="col-status">Accordo</th>
+                <th class="col-notes">Accordi & Note</th>
                 <th class="col-actions"></th>
               </tr>
             </thead>
@@ -377,8 +377,8 @@
         <div class="balance-duo-panel">
           <div class="reserve-panel-header">
             <div>
-              <h3 class="reserve-panel-title">Anticipato da Michele</h3>
-              <div class="balance-panel-sub" id="balance-michele-pct">—% delle spese correnti</div>
+              <h3 class="reserve-panel-title">Curato da Michele</h3>
+              <div class="balance-panel-sub" id="balance-michele-pct">—% degli anticipi correnti</div>
             </div>
             <span class="pill-person michele" id="badge-count-michele">0 voci</span>
           </div>
@@ -391,8 +391,8 @@
         <div class="balance-duo-panel">
           <div class="reserve-panel-header">
             <div>
-              <h3 class="reserve-panel-title">Anticipato da Miriana</h3>
-              <div class="balance-panel-sub" id="balance-miriana-pct">—% delle spese correnti</div>
+              <h3 class="reserve-panel-title">Curato da Miriana</h3>
+              <div class="balance-panel-sub" id="balance-miriana-pct">—% degli anticipi correnti</div>
             </div>
             <span class="pill-person miriana" id="badge-count-miriana">0 voci</span>
           </div>
@@ -479,24 +479,24 @@
 
           <!-- Quote Versate -->
           <div class="modal-advances-box">
-            <label class="form-label-noble mb-xs">Quote Già Anticipate</label>
+            <label class="form-label-noble mb-xs">Accordi & Anticipi già Sostenuti</label>
             
             <div class="form-grid-2">
               <div class="form-group-noble mb-xs">
-                <label class="form-label-noble text-michele">Quota Michele (€)</label>
+                <label class="form-label-noble text-michele">Contributo di Michele (€)</label>
                 <input type="number" id="expense-paid-michele" class="form-input-noble num" step="10" min="0" value="0">
               </div>
 
               <div class="form-group-noble mb-xs">
-                <label class="form-label-noble text-miriana">Quota Miriana (€)</label>
+                <label class="form-label-noble text-miriana">Contributo di Miriana (€)</label>
                 <input type="number" id="expense-paid-miriana" class="form-input-noble num" step="10" min="0" value="0">
               </div>
             </div>
 
             <div class="quick-split-bar">
-              <button type="button" class="split-tag-btn" id="split-5050">Ripartizione Equa 50/50</button>
-              <button type="button" class="split-tag-btn" id="split-all-michele">Quota Michele</button>
-              <button type="button" class="split-tag-btn" id="split-all-miriana">Quota Miriana</button>
+              <button type="button" class="split-tag-btn" id="split-5050">Insieme 50/50</button>
+              <button type="button" class="split-tag-btn" id="split-all-michele">Curato da Michele</button>
+              <button type="button" class="split-tag-btn" id="split-all-miriana">Curato da Miriana</button>
               <button type="button" class="split-tag-btn" id="split-reset">Azzera</button>
             </div>
           </div>
@@ -688,7 +688,6 @@
         <button type="button" class="pin-key" data-key="0">0</button>
         <button type="button" class="pin-key pin-key-action" id="btn-pin-back" title="Indietro">⌫</button>
       </div>
-      <div class="pin-hint-note">Codice iniziale di sicurezza: data delle nozze (<strong>0207</strong>)</div>
     </div>
   </div>
 
