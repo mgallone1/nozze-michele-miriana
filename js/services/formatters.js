@@ -190,7 +190,7 @@ window.WeddingApp.Services = (function () {
     static PIN_STORAGE_KEY = 'matrimonio_mm_pin_hash';
     static SESSION_AUTH_KEY = 'matrimonio_mm_auth_active';
     // Hash SHA-256 predefinito per il PIN iniziale di sicurezza "0207" (data nozze 2 Luglio)
-    static DEFAULT_HASH = '1e5e01ad47a82987eb6375a34db549e37609756184852c0ecbc28080f58547ca';
+    static DEFAULT_HASH = '2e3c969e2e9b367ade00279743f88ea0e32f283152223e3d9aaf1c14669d7cbe';
 
     static async hashPin(pin) {
       const msgBuffer = new TextEncoder().encode(String(pin).trim());
