@@ -30,7 +30,7 @@
               <span class="meta-divider">•</span>
               <span>Tenuta Tana di Volpe</span>
               <span class="meta-divider">•</span>
-              <span>100 Ospiti</span>
+              <span id="header-guests-count">100 Ospiti</span>
             </div>
           </div>
         </div>
@@ -71,6 +71,10 @@
           <button class="nav-link-btn" data-tab="balance">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
             Bilancio di Coppia
+          </button>
+          <button class="nav-link-btn" data-tab="guests">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Ospiti & Doni
           </button>
         </nav>
 
@@ -373,6 +377,43 @@
          ====================================================================== -->
     <div id="view-balance" class="app-view-tab is-hidden">
       
+      <!-- QUADRO DI RIPARTIZIONE ACCORDI & RESPONSABILITÀ -->
+      <section class="settlement-hero-panel">
+        <div class="settlement-card">
+          <span class="stat-eyebrow">Ripartizione Teorica Spese</span>
+          <div class="settlement-comparison-row">
+            <div>
+              <span class="pill-person michele">Michele</span>
+              <div class="settlement-amount amount" id="balance-owed-michele">—</div>
+              <small class="settlement-sub">Quota di competenza</small>
+            </div>
+            <div class="settlement-vs">VS</div>
+            <div>
+              <span class="pill-person miriana">Miriana</span>
+              <div class="settlement-amount amount" id="balance-owed-miriana">—</div>
+              <small class="settlement-sub">Quota di competenza</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="settlement-card">
+          <span class="stat-eyebrow">Anticipi Effettivamente Versati</span>
+          <div class="settlement-comparison-row">
+            <div>
+              <span class="pill-person michele">Michele</span>
+              <div class="settlement-amount amount text-positive" id="balance-paid-michele-hero">—</div>
+              <small class="settlement-sub">Anticipati ad oggi</small>
+            </div>
+            <div class="settlement-vs">VS</div>
+            <div>
+              <span class="pill-person miriana">Miriana</span>
+              <div class="settlement-amount amount text-positive" id="balance-paid-miriana-hero">—</div>
+              <small class="settlement-sub">Anticipati ad oggi</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div class="balance-duo-cards">
         <div class="balance-duo-panel">
           <div class="reserve-panel-header">
@@ -412,6 +453,73 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ======================================================================
+         VISTA 5: OSPITI & DONI RICEVUTI
+         ====================================================================== -->
+    <div id="view-guests" class="is-hidden">
+      <!-- HERO OSPITI & DONI -->
+      <section class="guests-hero-panel">
+        <div class="guests-stat-card">
+          <span class="stat-eyebrow">Ospiti Complessivi</span>
+          <div class="stat-hero-number amount" id="guests-total-count">0</div>
+          <div class="stat-caption">
+            <span id="guests-breakdown-sub">—</span>
+          </div>
+        </div>
+
+        <div class="guests-stat-card">
+          <span class="stat-eyebrow">Ripartizione Presenze</span>
+          <div class="guests-ratio-bar">
+            <div class="ratio-segment michele" id="ratio-seg-michele"></div>
+            <div class="ratio-segment miriana" id="ratio-seg-miriana"></div>
+          </div>
+          <div class="guests-ratio-legend">
+            <span>Lato Michele: <strong id="ratio-pct-michele">—%</strong></span>
+            <span>Lato Miriana: <strong id="ratio-pct-miriana">—%</strong></span>
+          </div>
+        </div>
+
+        <div class="guests-stat-card">
+          <span class="stat-eyebrow">Monte Regali / Buste</span>
+          <div class="stat-hero-number amount" id="guests-total-gifts">—</div>
+          <div class="stat-caption">
+            Già ricevuti: <strong id="guests-gifts-received" class="text-settled amount">—</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- BARRA AZIONI E FILTRI OSPITI -->
+      <div class="guests-toolbar">
+        <div class="filter-controls-group">
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-guests" class="search-field" placeholder="Cerca invitato per nome o nota...">
+          </div>
+          <select id="filter-guests-party" class="filter-select-noble">
+            <option value="all">Tutti i Lati (Michele, Miriana, Comuni)</option>
+            <option value="michele">Invitati di Michele</option>
+            <option value="miriana">Invitati di Miriana</option>
+            <option value="both">Invitati Comuni</option>
+          </select>
+          <select id="filter-guests-gift" class="filter-select-noble">
+            <option value="all">Tutti i Regali</option>
+            <option value="received">Regalo Ricevuto</option>
+            <option value="pending">Regalo in Sospeso</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-noble btn-noble-primary" id="btn-add-guest">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuovo Invitato
+        </button>
+      </div>
+
+      <!-- LISTA DEGLI INVITATI A CARD ERGONOMICHE -->
+      <div class="guests-grid" id="guests-grid-container">
+        <!-- Generato dinamicamente -->
+      </div>
     </div>
 
     <!-- ARCHIVIO PERSONALE & SINCRONIZZAZIONE -->
@@ -475,6 +583,17 @@
               <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
               <input type="number" id="expense-budget" class="form-input-noble num" step="10" min="0" placeholder="0">
             </div>
+          </div>
+
+          <!-- Ripartizione Responsabilità Economica (Chi deve sostenerla) -->
+          <div class="form-group-noble">
+            <label class="form-label-noble" for="expense-split-type">Competenza Economica (A carico di)</label>
+            <select id="expense-split-type" class="form-select-noble">
+              <option value="equal">Spesa Comune (Divisa 50% e 50%)</option>
+              <option value="michele">Personale di Michele (100% Michele)</option>
+              <option value="miriana">Personale di Miriana (100% Miriana)</option>
+              <option value="guests">Proporzionale agli Invitati (% Ospiti)</option>
+            </select>
           </div>
 
           <!-- Quote Versate -->
@@ -639,9 +758,18 @@
                 <input type="number" id="sp-family-advanced" class="form-input-noble" min="0" step="50" required>
               </div>
             </div>
+            <div class="form-grid-row">
+              <div class="form-group-noble">
+                <label class="form-label-noble" for="sp-guests-count">Numero Ospiti Previsti</label>
+                <input type="number" id="sp-guests-count" class="form-input-noble" min="1" max="500" step="1" required>
+              </div>
+              <div class="form-group-noble">
+                <label class="form-label-noble" for="sp-gifts-estimated">Stima Doni / Buste (€)</label>
+                <input type="number" id="sp-gifts-estimated" class="form-input-noble" min="0" step="100" required>
+              </div>
+            </div>
             <div class="form-group-noble form-group-last">
-              <label class="form-label-noble" for="sp-gifts-estimated">Stima Regali / Buste Invitati (€)</label>
-              <input type="number" id="sp-gifts-estimated" class="form-input-noble" min="0" step="100" required>
+              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato).</div>
             </div>
           </div>
 
@@ -650,6 +778,76 @@
         <div class="modal-sheet-footer">
           <button type="button" class="btn-noble btn-noble-secondary" id="cancel-savings-btn">Annulla</button>
           <button type="submit" class="btn-noble btn-noble-primary">Salva Parametri</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODALE INSERIMENTO / MODIFICA OSPITE
+       ====================================================================== -->
+  <div class="modal-overlay" id="guest-modal">
+    <div class="modal-sheet">
+      <div class="modal-sheet-header">
+        <h3 class="modal-sheet-title" id="guest-modal-title">Nuovo Invitato</h3>
+        <button class="modal-close-icon" id="guest-modal-close-btn">&times;</button>
+      </div>
+
+      <form id="guest-form">
+        <div class="modal-sheet-body">
+          <div class="form-group-noble">
+            <label class="form-label-noble" for="guest-name">Nome / Famiglia *</label>
+            <input type="text" id="guest-name" class="form-input-noble" required placeholder="Es. Famiglia Rossi, Marco Bianchi...">
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="guest-party">Parte / Lato</label>
+              <select id="guest-party" class="form-select-noble">
+                <option value="both">Ospite Comune (Entrambi)</option>
+                <option value="michele">Lato Michele</option>
+                <option value="miriana">Lato Miriana</option>
+              </select>
+            </div>
+
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="guest-count">Numero Persone (Coperti)</label>
+              <div class="stepper-input-wrap">
+                <button type="button" class="btn-stepper-touch" id="btn-guest-dec">-</button>
+                <input type="number" id="guest-count" class="form-input-noble num" min="1" max="20" step="1" value="1" required>
+                <button type="button" class="btn-stepper-touch" id="btn-guest-inc">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-advances-box">
+            <label class="form-label-noble mb-xs">Regalo / Busta Economica</label>
+            <div class="form-grid-2">
+              <div class="form-group-noble mb-xs">
+                <label class="form-label-noble" for="guest-gift">Valore Regalo Previsto (€)</label>
+                <input type="number" id="guest-gift" class="form-input-noble num" step="50" min="0" value="100">
+              </div>
+
+              <div class="form-group-noble mb-xs">
+                <label class="form-label-noble" for="guest-gift-status">Stato Ricezione</label>
+                <select id="guest-gift-status" class="form-select-noble">
+                  <option value="pending">In attesa / Non ancora ricevuto</option>
+                  <option value="received">Regalo già ricevuto</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-hint-sub">Calcolato in automatico a 100€ per persona, modificabile in qualsiasi momento.</div>
+          </div>
+
+          <div class="form-group-noble mb-0">
+            <label class="form-label-noble" for="guest-notes">Note, Tavolo o Allergie</label>
+            <textarea id="guest-notes" class="form-textarea-noble" rows="2" placeholder="Es. Tavolo amici, vegetariano, bambini..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-sheet-footer">
+          <button type="button" class="btn-noble btn-noble-secondary" id="guest-modal-cancel-btn">Annulla</button>
+          <button type="submit" class="btn-noble btn-noble-primary" id="guest-modal-save-btn">Salva Invitato</button>
         </div>
       </form>
     </div>

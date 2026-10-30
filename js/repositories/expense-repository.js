@@ -43,7 +43,7 @@ window.WeddingApp.Repositories = (function () {
             icon: c.icon,
             description: c.description
           })),
-          expenses: dataset.expenses.map(e => ({
+          expenses: (dataset.expenses || []).map(e => ({
             id: e.id,
             categoryId: e.categoryId,
             item: e.item,
@@ -53,7 +53,19 @@ window.WeddingApp.Repositories = (function () {
             paidMiriana: e.paidMiriana,
             status: e.status,
             notes: e.notes,
-            dueDate: e.dueDate
+            dueDate: e.dueDate,
+            splitType: e.splitType || 'equal',
+            payer: e.payer || 'both'
+          })),
+          guests: (dataset.guests || []).map(g => ({
+            id: g.id,
+            name: g.name,
+            party: g.party || 'both',
+            count: g.count || 1,
+            gift: g.gift || 0,
+            isGiftReceived: Boolean(g.isGiftReceived),
+            isGiftCustom: Boolean(g.isGiftCustom),
+            notes: g.notes || ''
           }))
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(plainData));
@@ -66,6 +78,10 @@ window.WeddingApp.Repositories = (function () {
 
     updateSavingsPlan(updatedSavingsPlan) {
       const dataset = this.load();
+      if (updatedSavingsPlan && updatedSavingsPlan.estimatedGuests !== undefined) {
+        dataset.details = dataset.details || {};
+        dataset.details.estimatedGuests = Number(updatedSavingsPlan.estimatedGuests) || 100;
+      }
       dataset.savingsPlan = {
         ...(dataset.savingsPlan || {}),
         ...(updatedSavingsPlan || {}),
@@ -97,10 +113,11 @@ window.WeddingApp.Repositories = (function () {
     }
 
     _hydrate(raw) {
-      const { Expense, Category } = window.WeddingApp.Domain;
+      const { Expense, Category, Guest } = window.WeddingApp.Domain;
 
       const categories = (raw.categories || []).map(c => new Category(c));
       const expenses = (raw.expenses || []).map(e => new Expense(e));
+      const guests = (raw.guests || []).map(g => new Guest(g));
 
       const rawSavings = raw.savingsPlan || {};
       const seedSavings = this.seedData?.savingsPlan || {};
@@ -118,7 +135,8 @@ window.WeddingApp.Repositories = (function () {
         details: raw.details || {},
         savingsPlan,
         categories,
-        expenses
+        expenses,
+        guests
       };
     }
   }

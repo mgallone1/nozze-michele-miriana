@@ -35,6 +35,8 @@
     SavingsPlanModalView,
     CoupleBalanceView,
     TimelineView,
+    GuestsView,
+    GuestModalView,
     ToastView
   } = window.WeddingApp.UI;
 
@@ -46,7 +48,11 @@
     filterPayer: 'all',
     filterStatus: 'all',
     editingExpenseId: null,
-    simulatedDate: null
+    simulatedDate: null,
+    // Filtri Ospiti
+    searchGuestsQuery: '',
+    filterGuestsParty: 'all',
+    filterGuestsGift: 'all'
   };
 
   // Istanze Architetturali
@@ -57,6 +63,8 @@
   const exportCsvUseCase = new ExportLedgerCsvUseCase(repository);
   const backupVaultUseCase = new BackupVaultUseCase(repository);
   const updateSavingsPlanUseCase = new UpdateSavingsPlanUseCase(repository);
+  const saveGuestUseCase = new window.WeddingApp.UseCases.SaveGuestUseCase(repository);
+  const deleteGuestUseCase = new window.WeddingApp.UseCases.DeleteGuestUseCase(repository);
 
   // Ciclo Unidirezionale di Aggiornamento
   function refreshAll() {
@@ -116,14 +124,59 @@
       expenses: data.expenses
     });
 
-    // 6. Aggiorna Countdown
+    // 6. Aggiorna Ospiti & Doni
+    renderGuestsList(data.guests || [], summary.finances);
+
+    // 7. Aggiorna Countdown e Dettagli Intestazione
     updateCountdownTick(summary.details, summary.finances.timeline.currentDate);
+  }
+
+  function renderGuestsList(guests = [], finances = null) {
+    const q = (uiState.searchGuestsQuery || '').toLowerCase().trim();
+    const party = uiState.filterGuestsParty;
+    const giftStatus = uiState.filterGuestsGift;
+
+    const filtered = guests.filter(g => {
+      if (q) {
+        const matchName = (g.name || '').toLowerCase().includes(q);
+        const matchNotes = (g.notes || '').toLowerCase().includes(q);
+        if (!matchName && !matchNotes) return false;
+      }
+      if (party !== 'all' && g.party !== party) return false;
+      if (giftStatus === 'received' && !g.isGiftReceived) return false;
+      if (giftStatus === 'pending' && g.isGiftReceived) return false;
+      return true;
+    });
+
+    GuestsView.render({ guests: filtered, finances }, {
+      onEdit: (id) => {
+        const guest = guests.find(g => g.id === id);
+        if (guest) GuestModalView.open(guest);
+      },
+      onDelete: (id) => {
+        const guest = guests.find(g => g.id === id);
+        if (!guest) return;
+        if (window.confirm(`Desideri rimuovere l'invitato "${guest.name}"?`)) {
+          deleteGuestUseCase.execute(id);
+          refreshAll();
+          ToastView.show(`Invitato "${guest.name}" rimosso`);
+        }
+      },
+      onToggleGift: (id) => {
+        const guest = guests.find(g => g.id === id);
+        if (!guest) return;
+        guest.isGiftReceived = !guest.isGiftReceived;
+        saveGuestUseCase.execute(guest);
+        refreshAll();
+        ToastView.show(guest.isGiftReceived ? `Regalo di "${guest.name}" segnato come ricevuto` : `Regalo di "${guest.name}" segnato come in sospeso`);
+      }
+    });
   }
 
   function updateCountdownTick(details, referenceDate = null) {
     if (!details?.date) return;
     const result = CountdownService.calculate(details.date, details.time || '17:00', referenceDate);
-    HeaderView.updateCountdown(result);
+    HeaderView.updateCountdown(result, details);
   }
 
   // Gestione Tab
@@ -134,7 +187,8 @@
       overview: document.getElementById('view-overview'),
       expenses: document.getElementById('view-expenses'),
       savings: document.getElementById('view-savings'),
-      balance: document.getElementById('view-balance')
+      balance: document.getElementById('view-balance'),
+      guests: document.getElementById('view-guests')
     };
 
     tabs.forEach(tab => {
@@ -181,10 +235,12 @@
       document.getElementById('expense-supplier').value = exp.supplier || '';
       document.getElementById('expense-notes').value = exp.notes || '';
       document.getElementById('expense-status').value = exp.status || 'pianificato';
+      document.getElementById('expense-split-type').value = exp.splitType || 'equal';
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
       document.getElementById('expense-status').value = 'pianificato';
+      document.getElementById('expense-split-type').value = 'equal';
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
@@ -221,6 +277,7 @@
     const supplier = document.getElementById('expense-supplier').value.trim();
     const notes = document.getElementById('expense-notes').value.trim();
     const status = document.getElementById('expense-status').value;
+    const splitType = document.getElementById('expense-split-type').value || 'equal';
 
     const payload = {
       id: uiState.editingExpenseId,
@@ -231,7 +288,8 @@
       paidMiriana,
       supplier,
       notes,
-      status
+      status,
+      splitType
     };
 
     const result = saveExpenseUseCase.execute(payload);
@@ -322,7 +380,7 @@
   function openSavingsPlanModal(targetCard = 'all') {
     const data = repository.load();
     const summary = getSummaryUseCase.execute({ referenceDate: uiState.simulatedDate });
-    SavingsPlanModalView.open(data.savingsPlan, targetCard, summary.finances?.timeline);
+    SavingsPlanModalView.open(data.savingsPlan, targetCard, summary.finances?.timeline, summary.details);
   }
 
   // Inizializzazione Eventi
@@ -339,6 +397,49 @@
     const btnOpenSavings = document.getElementById('btn-open-savings-modal');
     if (btnOpenSavings) {
       btnOpenSavings.addEventListener('click', () => openSavingsPlanModal('all'));
+    }
+
+    // Gestione Modale Ospiti
+    GuestModalView.init({
+      onSave: (guestInput) => {
+        const res = saveGuestUseCase.execute(guestInput);
+        if (!res.success) {
+          ToastView.show(res.errors.join(' '));
+          return;
+        }
+        refreshAll();
+        ToastView.show(`Invitato "${guestInput.name}" salvato`);
+      }
+    });
+
+    const btnAddGuest = document.getElementById('btn-add-guest');
+    if (btnAddGuest) {
+      btnAddGuest.addEventListener('click', () => GuestModalView.open());
+    }
+
+    // Filtri e Ricerca Ospiti
+    const searchGuestsInput = document.getElementById('search-guests');
+    if (searchGuestsInput) {
+      searchGuestsInput.addEventListener('input', (e) => {
+        uiState.searchGuestsQuery = e.target.value;
+        refreshAll();
+      });
+    }
+
+    const filterGuestsParty = document.getElementById('filter-guests-party');
+    if (filterGuestsParty) {
+      filterGuestsParty.addEventListener('change', (e) => {
+        uiState.filterGuestsParty = e.target.value;
+        refreshAll();
+      });
+    }
+
+    const filterGuestsGift = document.getElementById('filter-guests-gift');
+    if (filterGuestsGift) {
+      filterGuestsGift.addEventListener('change', (e) => {
+        uiState.filterGuestsGift = e.target.value;
+        refreshAll();
+      });
     }
 
     // Navigazione Tab

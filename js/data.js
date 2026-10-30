@@ -520,5 +520,57 @@ const INITIAL_WEDDING_DATA = {
       notes: "Buffer per emergenze (circa 5% del budget)",
       status: "pianificato"
     }
+  ],
+  guests: [
+    {
+      id: "gst_demo_1",
+      name: "Famiglia Sposo (Michele)",
+      party: "michele",
+      count: 25,
+      gift: 2500,
+      isGiftReceived: false,
+      isGiftCustom: false,
+      notes: "Parenti stretti lato Michele"
+    },
+    {
+      id: "gst_demo_2",
+      name: "Famiglia Sposa (Miriana)",
+      party: "miriana",
+      count: 25,
+      gift: 2500,
+      isGiftReceived: false,
+      isGiftCustom: false,
+      notes: "Parenti stretti lato Miriana"
+    },
+    {
+      id: "gst_demo_3",
+      name: "Amici Storici e Comuni",
+      party: "both",
+      count: 30,
+      gift: 3000,
+      isGiftReceived: false,
+      isGiftCustom: false,
+      notes: "Gruppo amici università e lavoro insieme"
+    },
+    {
+      id: "gst_demo_4",
+      name: "Colleghi di Michele",
+      party: "michele",
+      count: 10,
+      gift: 1000,
+      isGiftReceived: false,
+      isGiftCustom: false,
+      notes: "Team ufficio Michele"
+    },
+    {
+      id: "gst_demo_5",
+      name: "Amiche & Colleghe di Miriana",
+      party: "miriana",
+      count: 10,
+      gift: 1000,
+      isGiftReceived: false,
+      isGiftCustom: false,
+      notes: "Gruppo Miriana"
+    }
   ]
 };

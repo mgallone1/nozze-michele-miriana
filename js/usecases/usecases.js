@@ -16,6 +16,7 @@ window.WeddingApp.UseCases = (function () {
       const data = this.repository.load();
       const finances = window.WeddingApp.Domain.WeddingFinances.calculate({
         expenses: data.expenses,
+        guests: data.guests || [],
         savingsPlan: data.savingsPlan,
         categories: data.categories,
         details: data.details,
@@ -27,6 +28,8 @@ window.WeddingApp.UseCases = (function () {
         details: data.details,
         savingsPlan: data.savingsPlan,
         categories: data.categories,
+        expenses: data.expenses,
+        guests: data.guests || [],
         finances
       };
     }
@@ -168,6 +171,51 @@ window.WeddingApp.UseCases = (function () {
     }
   }
 
+  class SaveGuestUseCase {
+    constructor(repository) {
+      this.repository = repository;
+    }
+
+    execute(guestInput) {
+      const { Guest } = window.WeddingApp.Domain;
+      const data = this.repository.load();
+      data.guests = data.guests || [];
+
+      const guest = new Guest(guestInput);
+      const validation = guest.validate();
+      if (!validation.isValid) {
+        return { success: false, errors: validation.errors };
+      }
+
+      if (guestInput.id) {
+        const index = data.guests.findIndex(g => g.id === guestInput.id);
+        if (index >= 0) {
+          data.guests[index] = guest;
+        } else {
+          data.guests.push(guest);
+        }
+      } else {
+        data.guests.push(guest);
+      }
+
+      this.repository.persist(data);
+      return { success: true, guest };
+    }
+  }
+
+  class DeleteGuestUseCase {
+    constructor(repository) {
+      this.repository = repository;
+    }
+
+    execute(guestId) {
+      const data = this.repository.load();
+      data.guests = (data.guests || []).filter(g => g.id !== guestId);
+      this.repository.persist(data);
+      return { success: true };
+    }
+  }
+
   return {
     GetWeddingSummaryUseCase,
     FilterExpensesUseCase,
@@ -175,6 +223,8 @@ window.WeddingApp.UseCases = (function () {
     DeleteExpenseUseCase,
     ExportLedgerCsvUseCase,
     BackupVaultUseCase,
-    UpdateSavingsPlanUseCase
+    UpdateSavingsPlanUseCase,
+    SaveGuestUseCase,
+    DeleteGuestUseCase
   };
 })();

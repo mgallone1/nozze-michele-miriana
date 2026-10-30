@@ -18,7 +18,9 @@ window.WeddingApp.Domain = (function () {
       paidMiriana = 0,
       status = 'pianificato',
       notes = '',
-      dueDate = ''
+      dueDate = '',
+      splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
+      payer = 'both' // indicativo di chi si occupa del pagamento
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
@@ -30,6 +32,25 @@ window.WeddingApp.Domain = (function () {
       this.status = status || 'pianificato';
       this.notes = (notes || '').trim();
       this.dueDate = dueDate || '';
+      this.splitType = splitType || 'equal';
+      this.payer = payer || 'both';
+    }
+
+    calculateOwed(micheleGuestRatio = 0.5) {
+      const b = this.budget;
+      if (this.splitType === 'michele') {
+        return { micheleOwed: b, mirianaOwed: 0 };
+      }
+      if (this.splitType === 'miriana') {
+        return { micheleOwed: 0, mirianaOwed: b };
+      }
+      if (this.splitType === 'guests') {
+        const m = Math.round(b * micheleGuestRatio * 100) / 100;
+        return { micheleOwed: m, mirianaOwed: Math.round((b - m) * 100) / 100 };
+      }
+      // 'equal' default 50/50
+      const half = Math.round((b / 2) * 100) / 100;
+      return { micheleOwed: half, mirianaOwed: Math.round((b - half) * 100) / 100 };
     }
 
     totalPaid() {
@@ -78,16 +99,78 @@ window.WeddingApp.Domain = (function () {
     }
   }
 
+  class Guest {
+    constructor({
+      id,
+      name,
+      party = 'both', // 'michele', 'miriana', 'both'
+      count = 1,
+      gift = 0,
+      isGiftReceived = false,
+      isGiftCustom = false,
+      notes = ''
+    }) {
+      this.id = id || ('gst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
+      this.name = (name || '').trim();
+      this.party = party || 'both';
+      this.count = Math.max(1, parseInt(count, 10) || 1);
+      this.gift = Math.max(0, Number(gift) || 0);
+      this.isGiftReceived = Boolean(isGiftReceived);
+      this.isGiftCustom = Boolean(isGiftCustom);
+      this.notes = (notes || '').trim();
+    }
+
+    validate() {
+      const errors = [];
+      if (!this.name) errors.push('Il nominativo dell\'ospite è obbligatorio.');
+      if (this.count < 1) errors.push('Il numero di persone deve essere almeno 1.');
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    }
+  }
+
   class WeddingFinances {
-    static calculate({ expenses = [], savingsPlan = {}, categories = [], details = {}, targetDate = null, referenceDate = null } = {}) {
+    static calculate({ expenses = [], guests = [], savingsPlan = {}, categories = [], details = {}, targetDate = null, referenceDate = null } = {}) {
       const safeExpenses = expenses || [];
+      const safeGuests = guests || [];
       const plan = savingsPlan || {};
       const safeCategories = categories || [];
       const safeDetails = details || {};
 
+      // Conteggio Ospiti Nominativi
+      let guestsCountMichele = 0;
+      let guestsCountMiriana = 0;
+      let guestsCountBoth = 0;
+      let giftsTotalReceived = 0;
+      let giftsTotalProjected = 0;
+
+      safeGuests.forEach(g => {
+        const c = Number(g.count) || 1;
+        const giftVal = Number(g.gift) || (c * 100);
+        if (g.party === 'michele') guestsCountMichele += c;
+        else if (g.party === 'miriana') guestsCountMiriana += c;
+        else guestsCountBoth += c;
+
+        giftsTotalProjected += giftVal;
+        if (g.isGiftReceived) {
+          giftsTotalReceived += giftVal;
+        }
+      });
+
+      const totalRosteredGuests = guestsCountMichele + guestsCountMiriana + guestsCountBoth;
+      const effectiveTotalGuests = totalRosteredGuests > 0 ? totalRosteredGuests : Number(safeDetails.estimatedGuests ?? 100);
+
+      // Rapporto Ospiti per ripartizione spese proporzionali
+      const micheleEffectiveGuests = guestsCountMichele + (guestsCountBoth / 2);
+      const micheleGuestRatio = effectiveTotalGuests > 0 ? (micheleEffectiveGuests / effectiveTotalGuests) : 0.5;
+
       let totalBudget = 0;
       let totalPaidMichele = 0;
       let totalPaidMiriana = 0;
+      let totalOwedMichele = 0;
+      let totalOwedMiriana = 0;
 
       const categoryAggregates = {};
       safeCategories.forEach(cat => {
@@ -112,6 +195,16 @@ window.WeddingApp.Domain = (function () {
         totalPaidMichele += pm;
         totalPaidMiriana += pmi;
 
+        if (typeof exp.calculateOwed === 'function') {
+          const owed = exp.calculateOwed(micheleGuestRatio);
+          totalOwedMichele += owed.micheleOwed;
+          totalOwedMiriana += owed.mirianaOwed;
+        } else {
+          const half = Math.round((b / 2) * 100) / 100;
+          totalOwedMichele += half;
+          totalOwedMiriana += (b - half);
+        }
+
         if (categoryAggregates[exp.categoryId]) {
           const c = categoryAggregates[exp.categoryId];
           c.budget += b;
@@ -131,14 +224,17 @@ window.WeddingApp.Domain = (function () {
       const micheleBudgetPct = totalBudget > 0 ? (totalPaidMichele / totalBudget) * 100 : 0;
       const mirianaBudgetPct = totalBudget > 0 ? (totalPaidMiriana / totalBudget) * 100 : 0;
 
-      // Bilancio di Coppia
+      // Bilancio di Coppia Reale (Spese a proprio carico vs Anticipi erogati)
       const diff = totalPaidMichele - totalPaidMiriana;
+      const settlementDiff = totalPaidMichele - totalOwedMichele; // Se positivo, Michele è in credito conguaglio
       const michelePct = totalPaid > 0 ? (totalPaidMichele / totalPaid) * 100 : 50;
       const mirianaPct = totalPaid > 0 ? (totalPaidMiriana / totalPaid) * 100 : 50;
 
       // Numero Ospiti e Formula Doni (formula Excel B15: Ospiti * 100€)
-      const estimatedGuests = Number(safeDetails.estimatedGuests ?? 100);
-      const giftsEstimated = Number((plan.weddingGifts?.isManual ? plan.weddingGifts?.estimated : null) ?? (estimatedGuests * 100));
+      const estimatedGuests = effectiveTotalGuests;
+      const giftsEstimated = safeGuests.length > 0
+        ? giftsTotalProjected
+        : Number((plan.weddingGifts?.isManual ? plan.weddingGifts?.estimated : null) ?? (estimatedGuests * 100));
 
       // Dono Famiglia Amedeo & Anna e Regali
       const famPledged = Number(plan.familyContribution?.totalPledged ?? 10000);
@@ -202,10 +298,23 @@ window.WeddingApp.Domain = (function () {
         coupleBalance: {
           micheleAmount: totalPaidMichele,
           mirianaAmount: totalPaidMiriana,
+          micheleOwed: totalOwedMichele,
+          mirianaOwed: totalOwedMiriana,
+          settlementDiff,
           micheleSharePct: michelePct,
           mirianaSharePct: mirianaPct,
           difference: diff,
-          compensationAdvice: WeddingFinances._buildBalanceAdvice(diff)
+          compensationAdvice: WeddingFinances._buildBalanceAdvice(settlementDiff, totalOwedMichele, totalOwedMiriana, totalPaidMichele, totalPaidMiriana),
+          guestStats: {
+            totalGuests: effectiveTotalGuests,
+            rosteredGuests: totalRosteredGuests,
+            micheleGuests: guestsCountMichele,
+            mirianaGuests: guestsCountMiriana,
+            bothGuests: guestsCountBoth,
+            micheleRatio: micheleGuestRatio,
+            giftsTotalProjected,
+            giftsTotalReceived
+          }
         },
         statements: {
           michele: {
@@ -266,21 +375,25 @@ window.WeddingApp.Domain = (function () {
       };
     }
 
-    static _buildBalanceAdvice(diff) {
-      if (diff > 0) {
+    static _buildBalanceAdvice(settlementDiff, owedM = 0, owedMir = 0, paidM = 0, paidMir = 0) {
+      const absSettlement = Math.abs(Math.round(settlementDiff));
+      if (settlementDiff > 1) {
         return {
-          status: 'michele_ahead',
-          message: `Michele ha attualmente sostenuto una quota di anticipo superiore di circa ${Math.abs(diff).toLocaleString('it-IT')} €. Per riallineare l'armonia al 50%, è consigliabile affidare a Miriana i prossimi acconti previsti per una quota indicativa di ${Math.round(diff / 2).toLocaleString('it-IT')} €.`
+          status: 'michele_credit',
+          diff: settlementDiff,
+          message: `In base alle responsabilità concordate (spese personali, 50/50 e proporzione invitati), Michele ha anticipato ${absSettlement.toLocaleString('it-IT')} € in più rispetto alla sua quota ideale. A conguaglio o nei prossimi pagamenti, Miriana dovrebbe coprire circa ${absSettlement.toLocaleString('it-IT')} €.`
         };
-      } else if (diff < 0) {
+      } else if (settlementDiff < -1) {
         return {
-          status: 'miriana_ahead',
-          message: `Miriana ha attualmente sostenuto una quota di anticipo superiore di circa ${Math.abs(diff).toLocaleString('it-IT')} €. Per riallineare l'armonia al 50%, è consigliabile affidare a Michele i prossimi acconti previsti per una quota indicativa di ${Math.round(Math.abs(diff) / 2).toLocaleString('it-IT')} €.`
+          status: 'miriana_credit',
+          diff: settlementDiff,
+          message: `In base alle responsabilità concordate (spese personali, 50/50 e proporzione invitati), Miriana ha anticipato ${absSettlement.toLocaleString('it-IT')} € in più rispetto alla sua quota ideale. A conguaglio o nei prossimi pagamenti, Michele dovrebbe coprire circa ${absSettlement.toLocaleString('it-IT')} €.`
         };
       }
       return {
         status: 'balanced',
-        message: 'Le quote anticipate tra Michele e Miriana sono in perfetto equilibrio (50% e 50%).'
+        diff: 0,
+        message: 'Le spese e gli anticipi tra Michele e Miriana sono in perfetto equilibrio rispetto ai rispettivi accordi.'
       };
     }
   }
@@ -288,6 +401,7 @@ window.WeddingApp.Domain = (function () {
   return {
     Expense,
     Category,
+    Guest,
     WeddingFinances
   };
 })();

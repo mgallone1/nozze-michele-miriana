@@ -26,7 +26,7 @@ window.WeddingApp.UI = (function () {
   };
 
   class HeaderView {
-    static updateCountdown({ days = 0, hours = 0, minutes = 0, isPassed = false, referenceDate = null } = {}) {
+    static updateCountdown({ days = 0, hours = 0, minutes = 0, isPassed = false, referenceDate = null } = {}, details = null) {
       const d = document.getElementById('countdown-days');
       const h = document.getElementById('countdown-hours');
       const m = document.getElementById('countdown-mins');
@@ -38,6 +38,13 @@ window.WeddingApp.UI = (function () {
       const dateEl = document.getElementById('header-current-date');
       if (dateEl && window.WeddingApp?.Services?.DateService) {
         dateEl.textContent = window.WeddingApp.Services.DateService.formatItalianDate(referenceDate || new Date());
+      }
+
+      if (details) {
+        const guestsEl = document.getElementById('header-guests-count');
+        if (guestsEl && details.estimatedGuests) {
+          guestsEl.textContent = `${details.estimatedGuests} Ospiti`;
+        }
       }
     }
   }
@@ -185,11 +192,25 @@ window.WeddingApp.UI = (function () {
 
         const remainingVal = exp.remaining();
 
+        let splitBadge = '';
+        if (exp.splitType === 'michele') {
+          splitBadge = `<span class="split-type-pill michele">Solo Michele</span>`;
+        } else if (exp.splitType === 'miriana') {
+          splitBadge = `<span class="split-type-pill miriana">Solo Miriana</span>`;
+        } else if (exp.splitType === 'guests') {
+          splitBadge = `<span class="split-type-pill guests">Proporzionale Ospiti</span>`;
+        } else {
+          splitBadge = `<span class="split-type-pill equal">Comune 50/50</span>`;
+        }
+
         html += `
           <tr data-id="${exp.id}">
             <td class="col-item">
               <div class="item-title">${exp.item}</div>
-              ${exp.supplier ? `<div class="item-supplier">${exp.supplier}</div>` : ''}
+              <div class="item-meta-row">
+                ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
+                ${splitBadge}
+              </div>
             </td>
             <td class="col-investment amount">${CurrencyFormatter.format(exp.budget)}</td>
             <td class="col-advanced">${payerBadges}</td>
@@ -520,6 +541,18 @@ window.WeddingApp.UI = (function () {
         });
       };
 
+      const guestsCountInput = document.getElementById('sp-guests-count');
+      const giftsEstInput = document.getElementById('sp-gifts-estimated');
+
+      if (guestsCountInput && giftsEstInput) {
+        guestsCountInput.addEventListener('input', (e) => {
+          const count = parseInt(e.target.value, 10);
+          if (!isNaN(count) && count > 0) {
+            giftsEstInput.value = count * 100;
+          }
+        });
+      }
+
       if (autoCheckbox) {
         autoCheckbox.addEventListener('change', (e) => {
           toggleMonthInputs(e.target.checked);
@@ -542,6 +575,7 @@ window.WeddingApp.UI = (function () {
           e.preventDefault();
           const isAuto = autoCheckbox ? autoCheckbox.checked : true;
           const formData = {
+            estimatedGuests: parseInt(document.getElementById('sp-guests-count')?.value, 10) || 100,
             michele: {
               monthlySavings: parseFloat(document.getElementById('sp-michele-monthly')?.value) || 0,
               initialSavings: parseFloat(document.getElementById('sp-michele-initial')?.value) || 0,
@@ -572,7 +606,7 @@ window.WeddingApp.UI = (function () {
       }
     }
 
-    static open(savingsPlan = {}, targetCard = 'all', timeline = null) {
+    static open(savingsPlan = {}, targetCard = 'all', timeline = null, details = null) {
       const modal = document.getElementById('savings-modal');
       if (!modal) return;
 
@@ -583,6 +617,7 @@ window.WeddingApp.UI = (function () {
 
       const isManual = Boolean(m.isManualMonths || mir.isManualMonths);
       const autoCheckbox = document.getElementById('sp-auto-months-checkbox');
+
       if (autoCheckbox) {
         autoCheckbox.checked = !isManual;
         const monthInputIds = [
@@ -614,6 +649,7 @@ window.WeddingApp.UI = (function () {
         if (el) el.value = (val !== undefined && val !== null) ? val : 0;
       };
 
+      setVal('sp-guests-count', details?.estimatedGuests ?? 100);
       setVal('sp-michele-monthly', m.monthlySavings ?? 740);
       setVal('sp-michele-initial', m.initialSavings ?? 9000);
       setVal('sp-michele-months-done', isManual ? (m.currentMonths ?? defaultElapsed) : defaultElapsed);
@@ -668,10 +704,20 @@ window.WeddingApp.UI = (function () {
       const elPctMir = document.getElementById('balance-miriana-pct');
       const elSuggestion = document.getElementById('balance-suggestion-text');
 
+      const elOwedM = document.getElementById('balance-owed-michele');
+      const elOwedMir = document.getElementById('balance-owed-miriana');
+      const elPaidHeroM = document.getElementById('balance-paid-michele-hero');
+      const elPaidHeroMir = document.getElementById('balance-paid-miriana-hero');
+
+      if (elOwedM) elOwedM.textContent = CurrencyFormatter.format(coupleBalance.micheleOwed || 0);
+      if (elOwedMir) elOwedMir.textContent = CurrencyFormatter.format(coupleBalance.mirianaOwed || 0);
+      if (elPaidHeroM) elPaidHeroM.textContent = CurrencyFormatter.format(coupleBalance.micheleAmount || 0);
+      if (elPaidHeroMir) elPaidHeroMir.textContent = CurrencyFormatter.format(coupleBalance.mirianaAmount || 0);
+
       if (elPaidM) elPaidM.textContent = CurrencyFormatter.format(coupleBalance.micheleAmount || 0);
-      if (elPctM) elPctM.textContent = `${Math.round(coupleBalance.micheleSharePct || 50)}% delle quote anticipate`;
+      if (elPctM) elPctM.textContent = `${Math.round(coupleBalance.micheleSharePct || 50)}% degli anticipi totali`;
       if (elPaidMir) elPaidMir.textContent = CurrencyFormatter.format(coupleBalance.mirianaAmount || 0);
-      if (elPctMir) elPctMir.textContent = `${Math.round(coupleBalance.mirianaSharePct || 50)}% delle quote anticipate`;
+      if (elPctMir) elPctMir.textContent = `${Math.round(coupleBalance.mirianaSharePct || 50)}% degli anticipi totali`;
 
       if (elSuggestion && coupleBalance.compensationAdvice) {
         elSuggestion.textContent = coupleBalance.compensationAdvice.message || '';
@@ -821,6 +867,240 @@ window.WeddingApp.UI = (function () {
     }
   }
 
+  class GuestsView {
+    static render({ guests = [], finances = null } = {}, { onEdit, onDelete, onToggleGift } = {}) {
+      const totalEl = document.getElementById('guests-total-count');
+      const breakdownEl = document.getElementById('guests-breakdown-sub');
+      const segM = document.getElementById('ratio-seg-michele');
+      const segMir = document.getElementById('ratio-seg-miriana');
+      const pctM = document.getElementById('ratio-pct-michele');
+      const pctMir = document.getElementById('ratio-pct-miriana');
+      const totalGiftsEl = document.getElementById('guests-total-gifts');
+      const receivedGiftsEl = document.getElementById('guests-gifts-received');
+      const grid = document.getElementById('guests-grid-container');
+
+      const stats = finances?.coupleBalance?.guestStats || {
+        totalGuests: guests.reduce((sum, g) => sum + (Number(g.count) || 1), 0),
+        micheleGuests: guests.filter(g => g.party === 'michele').reduce((sum, g) => sum + (Number(g.count) || 1), 0),
+        mirianaGuests: guests.filter(g => g.party === 'miriana').reduce((sum, g) => sum + (Number(g.count) || 1), 0),
+        bothGuests: guests.filter(g => g.party === 'both').reduce((sum, g) => sum + (Number(g.count) || 1), 0),
+        giftsTotalProjected: guests.reduce((sum, g) => sum + (Number(g.gift) || (Number(g.count) * 100)), 0),
+        giftsTotalReceived: guests.filter(g => g.isGiftReceived).reduce((sum, g) => sum + (Number(g.gift) || (Number(g.count) * 100)), 0),
+        micheleRatio: 0.5
+      };
+
+      if (totalEl) totalEl.textContent = stats.totalGuests;
+      if (breakdownEl) {
+        breakdownEl.textContent = `${stats.micheleGuests} Michele • ${stats.mirianaGuests} Miriana • ${stats.bothGuests} Insieme`;
+      }
+
+      const pM = Math.round(stats.micheleRatio * 100);
+      const pMir = 100 - pM;
+
+      if (segM) segM.style.width = `${pM}%`;
+      if (segMir) segMir.style.width = `${pMir}%`;
+      if (pctM) pctM.textContent = `${pM}%`;
+      if (pctMir) pctMir.textContent = `${pMir}%`;
+
+      if (totalGiftsEl) totalGiftsEl.textContent = CurrencyFormatter.format(stats.giftsTotalProjected);
+      if (receivedGiftsEl) receivedGiftsEl.textContent = CurrencyFormatter.format(stats.giftsTotalReceived);
+
+      if (!grid) return;
+
+      if (!guests || guests.length === 0) {
+        grid.innerHTML = `
+          <div class="guests-empty-state">
+            <div class="empty-state-title">Nessun invitato presente con i filtri attuali</div>
+            <div class="empty-state-sub">Tocca "+ Nuovo Invitato" per aggiungere persone o famiglie e gestire i doni.</div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = guests.map(g => {
+        const partyLabel = g.party === 'michele' ? 'Lato Michele' : (g.party === 'miriana' ? 'Lato Miriana' : 'Amici Comuni');
+        const partyClass = g.party === 'michele' ? 'michele' : (g.party === 'miriana' ? 'miriana' : 'both');
+        const giftVal = Number(g.gift) || (Number(g.count) * 100);
+        const isReceived = Boolean(g.isGiftReceived);
+
+        return `
+          <div class="guest-card" data-id="${g.id}">
+            <div class="guest-card-header">
+              <div>
+                <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
+                <h4 class="guest-name">${g.name}</h4>
+              </div>
+              <div class="guest-count-badge">${g.count} ${g.count === 1 ? 'persona' : 'persone'}</div>
+            </div>
+
+            <div class="guest-card-body">
+              <div class="guest-gift-row">
+                <div class="guest-gift-info">
+                  <span class="gift-caption">Valore Dono:</span>
+                  <strong class="gift-amount amount">${CurrencyFormatter.format(giftVal)}</strong>
+                </div>
+                <button type="button" class="btn-gift-status ${isReceived ? 'is-received' : 'is-pending'}" data-action="toggle-gift" data-id="${g.id}">
+                  ${isReceived ? '✓ Ricevuto' : 'In Sospeso'}
+                </button>
+              </div>
+              ${g.notes ? `<div class="guest-notes-line">${g.notes}</div>` : ''}
+            </div>
+
+            <div class="guest-card-actions">
+              <button type="button" class="btn-guest-action" data-action="edit" data-id="${g.id}">
+                ${ICONS.edit} <span>Modifica</span>
+              </button>
+              <button type="button" class="btn-guest-action delete" data-action="delete" data-id="${g.id}">
+                ${ICONS.trash} <span>Rimuovi</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Event delegation
+      grid.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const action = btn.dataset.action;
+          const id = btn.dataset.id;
+          if (action === 'edit' && typeof onEdit === 'function') onEdit(id);
+          if (action === 'delete' && typeof onDelete === 'function') onDelete(id);
+          if (action === 'toggle-gift' && typeof onToggleGift === 'function') onToggleGift(id);
+        });
+      });
+    }
+  }
+
+  class GuestModalView {
+    static init({ onSave } = {}) {
+      const modal = document.getElementById('guest-modal');
+      const form = document.getElementById('guest-form');
+      const closeBtn = document.getElementById('guest-modal-close-btn');
+      const cancelBtn = document.getElementById('guest-modal-cancel-btn');
+      const btnDec = document.getElementById('btn-guest-dec');
+      const btnInc = document.getElementById('btn-guest-inc');
+      const countInput = document.getElementById('guest-count');
+      const giftInput = document.getElementById('guest-gift');
+
+      const updateGiftDefault = () => {
+        const c = parseInt(countInput.value, 10) || 1;
+        // Aggiorna valore regalo base solo se non digitato manualmente
+        if (!giftInput.dataset.manual) {
+          giftInput.value = c * 100;
+        }
+      };
+
+      if (btnDec && countInput) {
+        btnDec.addEventListener('click', () => {
+          const val = Math.max(1, (parseInt(countInput.value, 10) || 1) - 1);
+          countInput.value = val;
+          updateGiftDefault();
+        });
+      }
+
+      if (btnInc && countInput) {
+        btnInc.addEventListener('click', () => {
+          const val = Math.min(20, (parseInt(countInput.value, 10) || 1) + 1);
+          countInput.value = val;
+          updateGiftDefault();
+        });
+      }
+
+      if (giftInput) {
+        giftInput.addEventListener('input', () => {
+          giftInput.dataset.manual = 'true';
+        });
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', () => GuestModalView.close());
+      if (cancelBtn) cancelBtn.addEventListener('click', () => GuestModalView.close());
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) GuestModalView.close();
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const id = GuestModalView._currentId;
+          const name = document.getElementById('guest-name').value.trim();
+          const party = document.getElementById('guest-party').value;
+          const count = parseInt(document.getElementById('guest-count').value, 10) || 1;
+          const gift = parseFloat(document.getElementById('guest-gift').value) || (count * 100);
+          const isGiftReceived = document.getElementById('guest-gift-status').value === 'received';
+          const notes = document.getElementById('guest-notes').value.trim();
+
+          if (typeof onSave === 'function') {
+            onSave({
+              id,
+              name,
+              party,
+              count,
+              gift,
+              isGiftReceived,
+              isGiftCustom: Boolean(giftInput.dataset.manual),
+              notes
+            });
+          }
+          GuestModalView.close();
+        });
+      }
+    }
+
+    static open(guest = null) {
+      const modal = document.getElementById('guest-modal');
+      const title = document.getElementById('guest-modal-title');
+      const form = document.getElementById('guest-form');
+      const giftInput = document.getElementById('guest-gift');
+      if (!modal) return;
+
+      GuestModalView._currentId = guest ? guest.id : null;
+
+      if (guest) {
+        if (title) title.textContent = 'Modifica Invitato';
+        document.getElementById('guest-name').value = guest.name || '';
+        document.getElementById('guest-party').value = guest.party || 'both';
+        document.getElementById('guest-count').value = guest.count || 1;
+        document.getElementById('guest-gift').value = guest.gift !== undefined ? guest.gift : (guest.count * 100);
+        document.getElementById('guest-gift-status').value = guest.isGiftReceived ? 'received' : 'pending';
+        document.getElementById('guest-notes').value = guest.notes || '';
+        if (giftInput) giftInput.dataset.manual = guest.isGiftCustom ? 'true' : '';
+      } else {
+        if (title) title.textContent = 'Nuovo Invitato';
+        if (form) form.reset();
+        document.getElementById('guest-count').value = 1;
+        document.getElementById('guest-party').value = 'both';
+        document.getElementById('guest-gift').value = 100;
+        document.getElementById('guest-gift-status').value = 'pending';
+        if (giftInput) delete giftInput.dataset.manual;
+      }
+
+      modal.classList.add('open');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(() => {
+        const nameInput = document.getElementById('guest-name');
+        if (nameInput) {
+          nameInput.focus();
+          nameInput.select();
+        }
+      }, 100);
+    }
+
+    static close() {
+      const modal = document.getElementById('guest-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.classList.remove('active');
+      }
+      document.body.style.overflow = '';
+      GuestModalView._currentId = null;
+    }
+  }
+
   return {
     HeaderView,
     FinancialHeroView,
@@ -830,6 +1110,8 @@ window.WeddingApp.UI = (function () {
     SavingsPlanModalView,
     CoupleBalanceView,
     TimelineView,
+    GuestsView,
+    GuestModalView,
     ToastView
   };
 })();
