@@ -42,9 +42,13 @@ window.WeddingApp.UI = (function () {
 
       if (details) {
         const guestsEl = document.getElementById('header-guests-count');
-        if (guestsEl && details.estimatedGuests) {
-          guestsEl.textContent = `${details.estimatedGuests} Ospiti`;
-        }
+        const heroGuestsEl = document.getElementById('hero-guests-note');
+        const formulaGiftsEl = document.getElementById('formula-gifts-note');
+        const count = details.estimatedGuests || 105;
+
+        if (guestsEl) guestsEl.textContent = `${count} Ospiti`;
+        if (heroGuestsEl) heroGuestsEl.textContent = count;
+        if (formulaGiftsEl) formulaGiftsEl.textContent = `${count} Ospiti × 100 €/busta`;
       }
     }
   }

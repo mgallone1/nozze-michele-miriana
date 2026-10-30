@@ -3,7 +3,7 @@
  * Abilita funzionamento offline 100% su iPhone e caching intelligente
  */
 
-const CACHE_NAME = 'nozze-mm-v1';
+const CACHE_NAME = 'nozze-mm-v2027-3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -19,11 +19,6 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
   self.skipWaiting();
 });
 
@@ -31,31 +26,24 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
+        keys.map((key) => caches.delete(key))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Supporta navigazione e risposte offline
+  // Network-first: prova sempre a prendere la versione fresca dal server (GitHub)
+  // Se sei offline, ripiega sulla cache
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Aggiorna la cache in background (Stale-While-Revalidate)
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-          }
-        }).catch(() => {/* Offline */});
-        return cachedResponse;
+    fetch(event.request).then((networkResponse) => {
+      if (networkResponse && networkResponse.status === 200) {
+        const responseClone = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
       }
-      return fetch(event.request);
+      return networkResponse;
+    }).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
