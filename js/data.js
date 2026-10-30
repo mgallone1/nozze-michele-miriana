@@ -14,7 +14,7 @@ const INITIAL_WEDDING_DATA = {
     date: "2027-07-02",
     time: "17:00",
     venue: "Tenuta Tana di volpe",
-    estimatedGuests: 100,
+    estimatedGuests: 105,
     costPerGuest: 150,
     budgetNote: "Budget stimato per 100 invitati a Tenuta Tana di volpe"
   },
@@ -522,55 +522,1055 @@ const INITIAL_WEDDING_DATA = {
     }
   ],
   guests: [
-    {
-      id: "gst_demo_1",
-      name: "Famiglia Sposo (Michele)",
-      party: "michele",
-      count: 25,
-      gift: 2500,
-      isGiftReceived: false,
-      isGiftCustom: false,
-      notes: "Parenti stretti lato Michele"
-    },
-    {
-      id: "gst_demo_2",
-      name: "Famiglia Sposa (Miriana)",
-      party: "miriana",
-      count: 25,
-      gift: 2500,
-      isGiftReceived: false,
-      isGiftCustom: false,
-      notes: "Parenti stretti lato Miriana"
-    },
-    {
-      id: "gst_demo_3",
-      name: "Amici Storici e Comuni",
-      party: "both",
-      count: 30,
-      gift: 3000,
-      isGiftReceived: false,
-      isGiftCustom: false,
-      notes: "Gruppo amici università e lavoro insieme"
-    },
-    {
-      id: "gst_demo_4",
-      name: "Colleghi di Michele",
-      party: "michele",
-      count: 10,
-      gift: 1000,
-      isGiftReceived: false,
-      isGiftCustom: false,
-      notes: "Team ufficio Michele"
-    },
-    {
-      id: "gst_demo_5",
-      name: "Amiche & Colleghe di Miriana",
-      party: "miriana",
-      count: 10,
-      gift: 1000,
-      isGiftReceived: false,
-      isGiftCustom: false,
-      notes: "Gruppo Miriana"
-    }
-  ]
+  {
+    "id": "gst_1",
+    "name": "Michele",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Coppie • Menù: Adulti • Tavolo: Presidenziale • Stato: CONFERMATO"
+  },
+  {
+    "id": "gst_2",
+    "name": "Miriana",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Coppie • Menù: Adulti • Tavolo: Presidenziale • Stato: CONFERMATO"
+  },
+  {
+    "id": "gst_3",
+    "name": "Vito Gallone",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_4",
+    "name": "Alessia Gallone",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_5",
+    "name": "Amedeo Mercurio",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_6",
+    "name": "Amira Dioletta",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_7",
+    "name": "Anna Landi",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_8",
+    "name": "Chiara Maiellaro",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_9",
+    "name": "Generoso Mercurio",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_10",
+    "name": "Gerardina Boccalupo",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_11",
+    "name": "Giovanni Landi",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_12",
+    "name": "Imma Dell’Università",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_13",
+    "name": "Lorenzo Gallone",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_14",
+    "name": "Maria Salerno",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_15",
+    "name": "Manuel De Sio",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_16",
+    "name": "Maria Maiellaro",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_17",
+    "name": "Nadia Gallone",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_18",
+    "name": "Nicola Scuotto",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_19",
+    "name": "Nonna Lidia",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_20",
+    "name": "Nonno Nicola",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_21",
+    "name": "Zia Lina Landi",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_22",
+    "name": "Zia Isabella",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_23",
+    "name": "Zio Antonio",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_24",
+    "name": "Zio Enzo Maiellaro",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_25",
+    "name": "Zio Valter Gallone",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_26",
+    "name": "Simone Toro",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_27",
+    "name": "Antonio Maiellaro",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_28",
+    "name": "Rocco compagno Chiara",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_29",
+    "name": "Alfonso compagno Maria",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_30",
+    "name": "Mattia Mercurio",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_31",
+    "name": "Dario Landi",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_32",
+    "name": "Dalia Landi",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_33",
+    "name": "Nonna Annamaria Landi",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_34",
+    "name": "Zia Concetta Farina",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_35",
+    "name": "Zio Angelo Mercurio",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_36",
+    "name": "Annamaria Mercurio",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_37",
+    "name": "Pietro Marito Annamaria",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_38",
+    "name": "Vincenzo Figlio Annamaria",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_39",
+    "name": "Noemi Figlia Annamaria",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_40",
+    "name": "Suami Figlia Annamaria",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_41",
+    "name": "Martina Mercurio",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_42",
+    "name": "Mario compagno Martina",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_43",
+    "name": "Maria Sica",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_44",
+    "name": "Lucio Dell’università",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_45",
+    "name": "Giovanni Dell’università",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_46",
+    "name": "Ilaria Dell’università",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_47",
+    "name": "Veronica compagna zio",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_48",
+    "name": "Francesco Dioletta",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_49",
+    "name": "Antonello compagno Nadia",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_50",
+    "name": "Nicola De Sio",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_51",
+    "name": "Manuel De Sio +1",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_52",
+    "name": "Anna Visconti",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_53",
+    "name": "Gianfranco Landi",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_54",
+    "name": "Roberto Landi",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_55",
+    "name": "Jessica Barra",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_56",
+    "name": "Roberto Sabatino",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_57",
+    "name": "Rocco Comandé",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_58",
+    "name": "Silvia Carleo",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_59",
+    "name": "Laura Maiellaro",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_60",
+    "name": "Laura Maiellaro +1",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_61",
+    "name": "Alfredo Pagano",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_62",
+    "name": "Luca Pagano",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_63",
+    "name": "Gemma Luca Leonardi",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_64",
+    "name": "Mirko Unisa",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_65",
+    "name": "Fidanzata Mirko",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_66",
+    "name": "Gerardo Toro",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_67",
+    "name": "Rino Toro",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_68",
+    "name": "Johara",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_69",
+    "name": "Salvatore Johara",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_70",
+    "name": "Alfonsina Della rocca",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_71",
+    "name": "Lucia Rino",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_72",
+    "name": "Christian Landi",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Famiglia Michele • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_73",
+    "name": "Armando Pescosolido",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_74",
+    "name": "Matteo Felici",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_75",
+    "name": "Marilia moglie Matteo",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_76",
+    "name": "Fidanzata Dario Piantarosa",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_77",
+    "name": "Dario Piantarosa",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_78",
+    "name": "Claudia moglie Armando",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_79",
+    "name": "Gabriele Pescosolido figlio Armando",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_80",
+    "name": "Riccardo Pescosolido figlio Armando",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Bambini • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_81",
+    "name": "Giovanni Marino",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_82",
+    "name": "Francesco Di Trio",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_83",
+    "name": "Diletta De deo",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_84",
+    "name": "Diletta 1",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_85",
+    "name": "Matteo Spertino",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_86",
+    "name": "Francesco Minini",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_87",
+    "name": "Vincenzo Vadalà",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_88",
+    "name": "Vincenzo 1",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_89",
+    "name": "Valeria Farinola",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_90",
+    "name": "Valeria 1",
+    "party": "miriana",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Miriana • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_91",
+    "name": "Domenico Zaccaria",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_92",
+    "name": "Francesco di trio 1",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Lavoro Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_93",
+    "name": "Nicola Scuotto +1",
+    "party": "both",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici in comune • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_94",
+    "name": "Riky Schlauch",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_95",
+    "name": "Riky 1",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_96",
+    "name": "Antonio Trivelli",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_97",
+    "name": "Antonio Trivelli + 1",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_98",
+    "name": "Gigino D’Andria",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_99",
+    "name": "Gilda D’Andria",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_100",
+    "name": "Damiano",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_101",
+    "name": "Cristian Crossfit",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_102",
+    "name": "Gabri Crossfit",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_103",
+    "name": "Luca Crossfit",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_104",
+    "name": "Paolo Crossfit Ricambi",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Stato: IN ATTESA"
+  },
+  {
+    "id": "gst_105",
+    "name": "Giordano",
+    "party": "michele",
+    "count": 1,
+    "gift": 100,
+    "isGiftReceived": false,
+    "isGiftCustom": false,
+    "notes": "Gruppo: Amici Michele • Menù: Adulti • Stato: IN ATTESA"
+  }
+]
 };

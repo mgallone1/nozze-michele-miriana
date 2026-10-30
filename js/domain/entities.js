@@ -224,11 +224,36 @@ window.WeddingApp.Domain = (function () {
       const micheleBudgetPct = totalBudget > 0 ? (totalPaidMichele / totalBudget) * 100 : 0;
       const mirianaBudgetPct = totalBudget > 0 ? (totalPaidMiriana / totalBudget) * 100 : 0;
 
-      // Bilancio di Coppia Reale (Spese a proprio carico vs Anticipi erogati)
-      const diff = totalPaidMichele - totalPaidMiriana;
-      const settlementDiff = totalPaidMichele - totalOwedMichele; // Se positivo, Michele è in credito conguaglio
+      // Bilancio di Coppia Reale
+      const diffAnticipi = totalPaidMichele - totalPaidMiriana; // Positivo: Michele ha anticipato di più
       const michelePct = totalPaid > 0 ? (totalPaidMichele / totalPaid) * 100 : 50;
       const mirianaPct = totalPaid > 0 ? (totalPaidMiriana / totalPaid) * 100 : 50;
+
+      // Calcolo conguaglio sulle quote ANTICIPATE AD OGGI:
+      // In base alle spese a cui sono stati versati acconti, calcoliamo quanto spettava a Michele e quanto a Miriana
+      let paidOwedMichele = 0;
+      let paidOwedMiriana = 0;
+      safeExpenses.forEach(exp => {
+        const tp = typeof exp.totalPaid === 'function' ? exp.totalPaid() : ((exp.paidMichele || 0) + (exp.paidMiriana || 0));
+        if (tp > 0) {
+          if (exp.splitType === 'michele') {
+            paidOwedMichele += tp;
+          } else if (exp.splitType === 'miriana') {
+            paidOwedMiriana += tp;
+          } else if (exp.splitType === 'guests') {
+            const m = Math.round(tp * micheleGuestRatio * 100) / 100;
+            paidOwedMichele += m;
+            paidOwedMiriana += (tp - m);
+          } else {
+            const half = Math.round((tp / 2) * 100) / 100;
+            paidOwedMichele += half;
+            paidOwedMiriana += (tp - half);
+          }
+        }
+      });
+
+      // Se Michele ha pagato 3.110 e la sua quota degli acconti era 2.805, ha un credito di 305 €
+      const currentAdvanceSurplusMichele = totalPaidMichele - paidOwedMichele;
 
       // Numero Ospiti e Formula Doni (formula Excel B15: Ospiti * 100€)
       const estimatedGuests = effectiveTotalGuests;
@@ -300,11 +325,12 @@ window.WeddingApp.Domain = (function () {
           mirianaAmount: totalPaidMiriana,
           micheleOwed: totalOwedMichele,
           mirianaOwed: totalOwedMiriana,
-          settlementDiff,
+          paidOwedMichele,
+          paidOwedMiriana,
+          difference: diffAnticipi,
           micheleSharePct: michelePct,
           mirianaSharePct: mirianaPct,
-          difference: diff,
-          compensationAdvice: WeddingFinances._buildBalanceAdvice(settlementDiff, totalOwedMichele, totalOwedMiriana, totalPaidMichele, totalPaidMiriana),
+          compensationAdvice: WeddingFinances._buildBalanceAdvice(currentAdvanceSurplusMichele, diffAnticipi, totalPaidMichele, totalPaidMiriana),
           guestStats: {
             totalGuests: effectiveTotalGuests,
             rosteredGuests: totalRosteredGuests,
@@ -375,25 +401,28 @@ window.WeddingApp.Domain = (function () {
       };
     }
 
-    static _buildBalanceAdvice(settlementDiff, owedM = 0, owedMir = 0, paidM = 0, paidMir = 0) {
-      const absSettlement = Math.abs(Math.round(settlementDiff));
-      if (settlementDiff > 1) {
+    static _buildBalanceAdvice(surplusM = 0, diffAnticipi = 0, paidM = 0, paidMir = 0) {
+      const roundedSurplus = Math.round(surplusM);
+      const absDiff = Math.abs(Math.round(diffAnticipi));
+
+      if (roundedSurplus > 5) {
         return {
-          status: 'michele_credit',
-          diff: settlementDiff,
-          message: `In base alle responsabilità concordate (spese personali, 50/50 e proporzione invitati), Michele ha anticipato ${absSettlement.toLocaleString('it-IT')} € in più rispetto alla sua quota ideale. A conguaglio o nei prossimi pagamenti, Miriana dovrebbe coprire circa ${absSettlement.toLocaleString('it-IT')} €.`
+          status: 'michele_ahead',
+          diff: roundedSurplus,
+          message: `Michele ha attualmente sostenuto una quota di anticipi superiore di ${absDiff.toLocaleString('it-IT')} € (55% vs 45%). Rispetto alle quote concordate per questi acconti, Michele ha un anticipo a favore di ${roundedSurplus.toLocaleString('it-IT')} €. Per ristabilire la piena parità, Miriana potrà farsi carico dei prossimi acconti previsti per circa ${roundedSurplus.toLocaleString('it-IT')} €.`
         };
-      } else if (settlementDiff < -1) {
+      } else if (roundedSurplus < -5) {
+        const absSurplus = Math.abs(roundedSurplus);
         return {
-          status: 'miriana_credit',
-          diff: settlementDiff,
-          message: `In base alle responsabilità concordate (spese personali, 50/50 e proporzione invitati), Miriana ha anticipato ${absSettlement.toLocaleString('it-IT')} € in più rispetto alla sua quota ideale. A conguaglio o nei prossimi pagamenti, Michele dovrebbe coprire circa ${absSettlement.toLocaleString('it-IT')} €.`
+          status: 'miriana_ahead',
+          diff: roundedSurplus,
+          message: `Miriana ha attualmente sostenuto una quota di anticipi superiore di ${absDiff.toLocaleString('it-IT')} € (55% vs 45%). Rispetto alle quote concordate per questi acconti, Miriana ha un anticipo a favore di ${absSurplus.toLocaleString('it-IT')} €. Per ristabilire la piena parità, Michele potrà farsi carico dei prossimi acconti previsti per circa ${absSurplus.toLocaleString('it-IT')} €.`
         };
       }
       return {
         status: 'balanced',
         diff: 0,
-        message: 'Le spese e gli anticipi tra Michele e Miriana sono in perfetto equilibrio rispetto ai rispettivi accordi.'
+        message: 'Le quote anticipate ad oggi tra Michele e Miriana sono in perfetto equilibrio rispetto agli accordi concordati.'
       };
     }
   }

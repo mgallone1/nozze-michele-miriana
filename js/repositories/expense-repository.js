@@ -117,7 +117,12 @@ window.WeddingApp.Repositories = (function () {
 
       const categories = (raw.categories || []).map(c => new Category(c));
       const expenses = (raw.expenses || []).map(e => new Expense(e));
-      const guests = (raw.guests || []).map(g => new Guest(g));
+      
+      // Se nel localStorage non ci sono ancora ospiti oppure c'erano quelli demo precedenti, sincronizziamo con seedData
+      const seedGuests = (this.seedData?.guests || []);
+      const isDemo = raw.guests && raw.guests.length > 0 && raw.guests.some(g => String(g.id).includes('demo'));
+      const rawGuests = (!raw.guests || raw.guests.length === 0 || isDemo) ? seedGuests : raw.guests;
+      const guests = rawGuests.map(g => new Guest(g));
 
       const rawSavings = raw.savingsPlan || {};
       const seedSavings = this.seedData?.savingsPlan || {};
