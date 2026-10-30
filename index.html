@@ -75,53 +75,19 @@
       </div>
     </header>
 
-    <!-- ======================================================================
-         SIMULATORE TEMPORALE INTERATTIVO & EVOLUZIONE DEL PIANO
-         ====================================================================== -->
-    <section class="timeline-stepper-panel" id="timeline-stepper-panel">
-      <div class="timeline-stepper-header">
-        <div class="timeline-header-info">
-          <div class="timeline-title-row">
-            <span class="timeline-status-badge" id="timeline-status-badge">
-              <span class="today-dot"></span> <span id="timeline-badge-label">Tempo Reale</span>
-            </span>
-            <h3 class="timeline-headline" id="timeline-headline-date">Ottobre 2026</h3>
-          </div>
-          <div class="timeline-sub-narrative">
-            <span>Stato: <strong id="timeline-stat-elapsed">12 mesi trascorsi</strong> (<span id="timeline-stat-pct">57%</span> del percorso)</span>
-            <span class="meta-divider">•</span>
-            <span><strong id="timeline-stat-remaining">9 mesi mancanti</strong> al 2 Luglio 2027</span>
-          </div>
-        </div>
-
-        <div class="timeline-actions-row">
-          <button type="button" class="btn-timeline-step" id="btn-timeline-prev" title="Mese precedente">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
-            <span>Mese Prec.</span>
-          </button>
-          <button type="button" class="btn-timeline-today" id="btn-timeline-reset" title="Ripristina al tempo reale odierno">
-            <span class="today-dot"></span>
-            <span>Oggi Reale</span>
-          </button>
-          <button type="button" class="btn-timeline-step" id="btn-timeline-next" title="Mese successivo">
-            <span>Mese Succ.</span>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Barra Cursore Temporale Interattiva (0..21 mesi) -->
-      <div class="timeline-slider-wrap">
-        <input type="range" id="timeline-slider" min="0" max="21" value="12" step="1" class="timeline-range-slider" aria-label="Avanzamento temporale in mesi">
-        <div class="timeline-ticks">
-          <button type="button" class="timeline-tick tick-start" data-month="0">Ott 2025<br><small>Partenza</small></button>
-          <button type="button" class="timeline-tick tick-mid1" data-month="6">Apr 2026<br><small>6 mesi</small></button>
-          <button type="button" class="timeline-tick tick-now" data-month="12">Ott 2026<br><small>Oggi</small></button>
-          <button type="button" class="timeline-tick tick-mid2" data-month="17">Mar 2027<br><small>-4 mesi</small></button>
-          <button type="button" class="timeline-tick tick-end" data-month="21">Lug 2027<br><small>Nozze</small></button>
-        </div>
-      </div>
-    </section>
+    <!-- SIMULATORE TEMPORALE (NON VISIBILE IN PRIMO PIANO, ID PRESERVATI PER COMPATIBILITÀ) -->
+    <div id="timeline-stepper-panel" class="is-hidden">
+      <span id="timeline-status-badge"></span>
+      <span id="timeline-badge-label"></span>
+      <span id="timeline-headline-date"></span>
+      <span id="timeline-stat-elapsed"></span>
+      <span id="timeline-stat-pct"></span>
+      <span id="timeline-stat-remaining"></span>
+      <button id="btn-timeline-prev"></button>
+      <button id="btn-timeline-reset"></button>
+      <button id="btn-timeline-next"></button>
+      <input type="range" id="timeline-slider">
+    </div>
 
     <!-- ======================================================================
          VISTA 1: QUADRO D'INSIEME
@@ -131,10 +97,10 @@
       <!-- HERO STATISTICO FINANZIARIO -->
       <section class="hero-financial-panel">
         <div class="lead-stat-block">
-          <span class="stat-eyebrow">Investimento Complessivo Stimato</span>
+          <span class="stat-eyebrow">Il Nostro Matrimonio</span>
           <div class="stat-hero-number amount" id="metric-total-budget">—</div>
           <div class="stat-caption">
-            Piano di spesa per <span id="hero-guests-note">105</span> invitati presso Tenuta Tana di Volpe
+            Budget previsto per <span id="hero-guests-note">105</span> invitati a Tenuta Tana di Volpe
           </div>
 
           <!-- Barra di avanzamento a segmenti -->
@@ -146,11 +112,11 @@
             <div class="flow-bar-legend">
               <div class="flow-legend-item">
                 <span class="flow-dot flow-dot-sage"></span>
-                <span>Anticipato ad oggi: <strong id="metric-total-paid" class="amount">—</strong> (<span id="global-progress-text">—</span>)</span>
+                <span>Già versato: <strong id="metric-total-paid" class="amount">—</strong> (<span id="global-progress-text">—</span>)</span>
               </div>
               <div class="flow-legend-item">
                 <span class="flow-dot flow-dot-bronze"></span>
-                <span>In programma: <strong id="metric-remaining" class="amount">—</strong></span>
+                <span>Da saldare: <strong id="metric-remaining" class="amount">—</strong></span>
               </div>
             </div>
           </div>
@@ -159,7 +125,7 @@
         <!-- Colonna Bilanciamento Intimo -->
         <div class="couple-intimate-balance">
           <div class="intimate-balance-header">
-            <span class="intimate-balance-title">Contributi Sostenuti</span>
+            <span class="intimate-balance-title">Anticipi di Coppia</span>
             <div class="intimate-balance-pills">
               <span class="pill-person michele">Michele</span>
               <span class="pill-person miriana">Miriana</span>
@@ -177,7 +143,7 @@
           </div>
 
           <div class="intimate-note">
-            Tenuta Tana di Volpe, caparra catering, fotografo e Gruppo Arechi già parzialmente avviati con acconti dedicati.
+            Tenuta Tana di Volpe, catering, fotografo e Gruppo Arechi avviati con acconti dedicati.
           </div>
         </div>
       </section>
@@ -186,10 +152,9 @@
       <section>
         <div class="section-headline-block">
           <div>
-            <h2 class="section-headline-title">Le Aree del Matrimonio</h2>
-            <div class="section-headline-sub">Ripartizione degli investimenti e avanzamento dei contratti</div>
+            <h2 class="section-headline-title">Dettaglio per Aree</h2>
+            <div class="section-headline-sub">Stato dei preparativi e contratti confermati</div>
           </div>
-          <span class="section-headline-hint">Seleziona una voce per consultare i dettagli</span>
         </div>
 
         <div class="category-atelier-grid" id="category-cards-grid">
@@ -360,35 +325,35 @@
       <!-- QUADRO DI RIPARTIZIONE ACCORDI & RESPONSABILITÀ -->
       <section class="settlement-hero-panel">
         <div class="settlement-card">
-          <span class="stat-eyebrow">Ripartizione Teorica Totale</span>
+          <span class="stat-eyebrow">Ripartizione Accordi</span>
           <div class="settlement-comparison-row">
             <div>
               <span class="pill-person michele">Michele</span>
               <div class="settlement-amount amount" id="balance-owed-michele">—</div>
-              <small class="settlement-sub">Competenza budget nozze</small>
+              <small class="settlement-sub">Quota concordata</small>
             </div>
             <div class="settlement-vs">VS</div>
             <div>
               <span class="pill-person miriana">Miriana</span>
               <div class="settlement-amount amount" id="balance-owed-miriana">—</div>
-              <small class="settlement-sub">Competenza budget nozze</small>
+              <small class="settlement-sub">Quota concordata</small>
             </div>
           </div>
         </div>
 
         <div class="settlement-card">
-          <span class="stat-eyebrow">Anticipi Effettivamente Versati</span>
+          <span class="stat-eyebrow">Quote Già Versate</span>
           <div class="settlement-comparison-row">
             <div>
               <span class="pill-person michele">Michele</span>
               <div class="settlement-amount amount text-positive" id="balance-paid-michele-hero">—</div>
-              <small class="settlement-sub">Anticipati ad oggi (55%)</small>
+              <small class="settlement-sub">Versati (55%)</small>
             </div>
             <div class="settlement-vs">VS</div>
             <div>
               <span class="pill-person miriana">Miriana</span>
               <div class="settlement-amount amount text-positive" id="balance-paid-miriana-hero">—</div>
-              <small class="settlement-sub">Anticipati ad oggi (45%)</small>
+              <small class="settlement-sub">Versati (45%)</small>
             </div>
           </div>
         </div>
