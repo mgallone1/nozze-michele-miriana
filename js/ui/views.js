@@ -1113,6 +1113,10 @@ window.WeddingApp.UI = (function () {
         return;
       }
 
+      const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+        ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+        : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
       grid.innerHTML = guests.map(g => {
         const partyLabel = g.party === 'michele' ? 'Lato Michele' : (g.party === 'miriana' ? 'Lato Miriana' : 'Amici Comuni');
         const partyClass = g.party === 'michele' ? 'michele' : (g.party === 'miriana' ? 'miriana' : 'both');
@@ -1134,13 +1138,17 @@ window.WeddingApp.UI = (function () {
           compositionBadge = `<span class="guest-menu-pill adult">Adulto</span>`;
         }
 
+        const safeName = escape(g.name);
+        const safeNotes = escape(g.notes);
+        const safeId = escape(g.id);
+
         return `
-          <div class="guest-card" data-id="${g.id}">
+          <div class="guest-card" data-id="${safeId}">
             <div class="guest-card-header">
               <div>
                 <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
                 ${compositionBadge}
-                <h4 class="guest-name">${g.name}</h4>
+                <h4 class="guest-name">${safeName}</h4>
               </div>
               <div class="guest-count-badge">${totalPeople} ${totalPeople === 1 ? 'coperto' : 'coperti'}</div>
             </div>
@@ -1151,11 +1159,11 @@ window.WeddingApp.UI = (function () {
                   <span class="gift-caption">Valore Dono:</span>
                   <strong class="gift-amount amount">${CurrencyFormatter.format(giftVal)}</strong>
                 </div>
-                <button type="button" class="btn-gift-status ${isReceived ? 'is-received' : 'is-pending'}" data-action="toggle-gift" data-id="${g.id}">
+                <button type="button" class="btn-gift-status ${isReceived ? 'is-received' : 'is-pending'}" data-action="toggle-gift" data-id="${safeId}">
                   ${isReceived ? '✓ Ricevuto' : 'In Sospeso'}
                 </button>
               </div>
-              ${g.notes ? `<div class="guest-notes-line">${g.notes}</div>` : ''}
+              ${safeNotes ? `<div class="guest-notes-line">${safeNotes}</div>` : ''}
             </div>
 
             <div class="guest-card-actions">
