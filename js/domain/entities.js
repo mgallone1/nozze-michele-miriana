@@ -335,21 +335,31 @@ window.WeddingApp.Domain = (function () {
       const totalBudgetProgressPct = totalBudget > 0 ? Math.min(100, Math.round((totalPaid / totalBudget) * 100)) : 0;
       const targetFundingProgressPct = totalBudget > 0 ? Math.min(100, Math.round(((totalPaid + currentNetLiquidityToday) / totalBudget) * 100)) : 0;
 
-      // Traguardi Personali Singoli (Michele & Miriana)
+      // Traguardi Personali Singoli (Michele & Miriana) con Doppio Binario (Ideale vs Rotta Reale)
+      const remMonths = Math.max(1, timeline.remainingMonths || 9);
+      const totalMonths = Math.max(1, (timeline.elapsedMonths || 12) + remMonths);
+
       // Michele:
       const mTargetBudget = totalOwedMichele;
       const mSavedToday = currentSavingsAccumulatedMichele; // Dotazione iniziale + rate accantonate ad oggi
       const mStillToSave = Math.max(0, mTargetBudget - mExpensesPaid - mCurrentNetLiquidity);
       const mProgressPct = mTargetBudget > 0 ? Math.min(100, Math.round(((mExpensesPaid + mCurrentNetLiquidity) / mTargetBudget) * 100)) : 100;
+      // Binario 1 (Ideale): Quota teorica se avesse diviso l'intero budget su tutti i mesi dall'inizio
+      const mIdealMonthlyRate = Math.round(mTargetBudget / totalMonths);
+      // Binario 2 (Rotta Reale): Quota mensile necessaria da oggi in poi per coprire al 100% il debito residuo
+      const mNeededMonthlyRate = Math.round(mStillToSave / remMonths);
 
       // Miriana (con dote genitori 10k dedicata a copertura delle sue spese):
       const mirTargetBudgetGross = totalOwedMiriana;
       const mirTargetBudgetNet = mirianaNetOwed; // Al netto del dono di Amedeo & Anna
       const mirSavedToday = currentSavingsAccumulatedMiriana;
-      // Per Miriana, la liquidità e i fondi disponibili ad oggi includono i suoi risparmi e il residuo dono genitori disponibile
       const mirTotalAvailableToday = mirCurrentNetLiquidity + famAvailable;
       const mirStillToSave = Math.max(0, mirTargetBudgetNet - mirPersonalExpensesPaid - mirCurrentNetLiquidity);
       const mirProgressPct = mirTargetBudgetNet > 0 ? Math.min(100, Math.round(((mirPersonalExpensesPaid + mirCurrentNetLiquidity) / mirTargetBudgetNet) * 100)) : 100;
+      // Binario 1 (Ideale): Quota teorica netta divisa sui mesi totali
+      const mirIdealMonthlyRate = Math.round(mirTargetBudgetNet / totalMonths);
+      // Binario 2 (Rotta Reale): Quota mensile necessaria da oggi in poi per coprire al 100% il debito residuo
+      const mirNeededMonthlyRate = Math.round(mirStillToSave / remMonths);
 
       return {
         totalBudget,
@@ -460,7 +470,12 @@ window.WeddingApp.Domain = (function () {
               grossProjected: mGrossProjected,
               stillToSave: mStillToSave,
               progressPct: mProgressPct,
-              finalMargin: mFinalNetResidual - (mTargetBudget - mExpensesPaid)
+              finalMargin: mFinalNetResidual - (mTargetBudget - mExpensesPaid),
+              idealMonthlyRate: mIdealMonthlyRate,
+              neededMonthlyRate: mNeededMonthlyRate,
+              plannedMonthlyRate: mMonthly,
+              projectedAtCurrentPace: mCurrentNetLiquidity + (mMonthly * remMonths),
+              gapAtCurrentPace: Math.max(0, mStillToSave - (mMonthly * remMonths))
             },
             miriana: {
               targetBudgetGross: mirTargetBudgetGross,
@@ -473,7 +488,12 @@ window.WeddingApp.Domain = (function () {
               grossProjected: mirGrossProjected,
               stillToSave: mirStillToSave,
               progressPct: mirProgressPct,
-              finalMargin: mirFinalNetResidual - (mirTargetBudgetNet - mirPersonalExpensesPaid)
+              finalMargin: mirFinalNetResidual - (mirTargetBudgetNet - mirPersonalExpensesPaid),
+              idealMonthlyRate: mirIdealMonthlyRate,
+              neededMonthlyRate: mirNeededMonthlyRate,
+              plannedMonthlyRate: mirMonthly,
+              projectedAtCurrentPace: mirCurrentNetLiquidity + (mirMonthly * remMonths),
+              gapAtCurrentPace: Math.max(0, mirStillToSave - (mirMonthly * remMonths))
             }
           }
         }
