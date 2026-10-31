@@ -205,6 +205,10 @@ window.WeddingApp.UI = (function () {
           splitBadge = `<span class="split-type-pill equal">Comune 50/50</span>`;
         }
 
+        const costTypeBadge = exp.isEstimate
+          ? `<span class="cost-nature-pill estimate" title="Costo stimato indicativo">📝 Stima</span>`
+          : `<span class="cost-nature-pill contract" title="Costo reale contrattualizzato">🔒 Contratto</span>`;
+
         html += `
           <tr data-id="${exp.id}">
             <td class="col-item">
@@ -212,6 +216,7 @@ window.WeddingApp.UI = (function () {
               <div class="item-meta-row">
                 ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
                 ${splitBadge}
+                ${costTypeBadge}
               </div>
             </td>
             <td class="col-investment amount">${CurrencyFormatter.format(exp.budget)}</td>
@@ -730,6 +735,7 @@ window.WeddingApp.UI = (function () {
           const isAuto = autoCheckbox ? autoCheckbox.checked : true;
           const formData = {
             estimatedGuests: parseInt(document.getElementById('sp-guests-count')?.value, 10) || 100,
+            staffMealsCount: parseInt(document.getElementById('sp-staff-meals')?.value, 10) || 0,
             michele: {
               monthlySavings: parseFloat(document.getElementById('sp-michele-monthly')?.value) || 0,
               initialSavings: parseFloat(document.getElementById('sp-michele-initial')?.value) || 0,
@@ -804,6 +810,7 @@ window.WeddingApp.UI = (function () {
       };
 
       setVal('sp-guests-count', details?.estimatedGuests ?? 100);
+      setVal('sp-staff-meals', details?.staffMealsCount ?? 0);
       setVal('sp-michele-monthly', m.monthlySavings ?? 740);
       setVal('sp-michele-initial', m.initialSavings ?? 9000);
       setVal('sp-michele-months-done', isManual ? (m.currentMonths ?? defaultElapsed) : defaultElapsed);
@@ -1106,12 +1113,17 @@ window.WeddingApp.UI = (function () {
         const partyClass = g.party === 'michele' ? 'michele' : (g.party === 'miriana' ? 'miriana' : 'both');
         const giftVal = Number(g.gift) || (Number(g.count) * 100);
         const isReceived = Boolean(g.isGiftReceived);
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        const menuBadge = isChild
+          ? `<span class="guest-menu-pill child">Bambino (50%)</span>`
+          : `<span class="guest-menu-pill adult">Adulto</span>`;
 
         return `
           <div class="guest-card" data-id="${g.id}">
             <div class="guest-card-header">
               <div>
                 <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
+                ${menuBadge}
                 <h4 class="guest-name">${g.name}</h4>
               </div>
               <div class="guest-count-badge">${g.count} ${g.count === 1 ? 'persona' : 'persone'}</div>
@@ -1214,6 +1226,8 @@ window.WeddingApp.UI = (function () {
           const count = parseInt(document.getElementById('guest-count').value, 10) || 1;
           const gift = parseFloat(document.getElementById('guest-gift').value) || (count * 100);
           const isGiftReceived = document.getElementById('guest-gift-status').value === 'received';
+          const guestTypeEl = document.getElementById('guest-type');
+          const guestType = guestTypeEl ? guestTypeEl.value : 'adult';
           const notes = document.getElementById('guest-notes').value.trim();
 
           if (typeof onSave === 'function') {
@@ -1222,6 +1236,7 @@ window.WeddingApp.UI = (function () {
               name,
               party,
               count,
+              guestType,
               gift,
               isGiftReceived,
               isGiftCustom: Boolean(giftInput.dataset.manual),
@@ -1242,10 +1257,13 @@ window.WeddingApp.UI = (function () {
 
       GuestModalView._currentId = guest ? guest.id : null;
 
-      if (guest) {
+        if (guest) {
         if (title) title.textContent = 'Modifica Invitato';
         document.getElementById('guest-name').value = guest.name || '';
         document.getElementById('guest-party').value = guest.party || 'both';
+        const isChild = (guest.guestType === 'child' || (guest.notes || '').toLowerCase().includes('bambin'));
+        const typeEl = document.getElementById('guest-type');
+        if (typeEl) typeEl.value = isChild ? 'child' : 'adult';
         document.getElementById('guest-count').value = guest.count || 1;
         document.getElementById('guest-gift').value = guest.gift !== undefined ? guest.gift : (guest.count * 100);
         document.getElementById('guest-gift-status').value = guest.isGiftReceived ? 'received' : 'pending';
@@ -1256,6 +1274,8 @@ window.WeddingApp.UI = (function () {
         if (form) form.reset();
         document.getElementById('guest-count').value = 1;
         document.getElementById('guest-party').value = 'both';
+        const typeEl = document.getElementById('guest-type');
+        if (typeEl) typeEl.value = 'adult';
         document.getElementById('guest-gift').value = 100;
         document.getElementById('guest-gift-status').value = 'pending';
         if (giftInput) delete giftInput.dataset.manual;
