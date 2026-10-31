@@ -21,7 +21,7 @@ window.WeddingApp.Domain = (function () {
       dueDate = '',
       splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
       payer = 'both', // indicativo di chi si occupa del pagamento
-      isEstimate = false, // true = Costo Stimato, false = Costo Reale / a Contratto
+      isEstimate = undefined, // true = Costo Stimato, false = Costo Reale / a Contratto
       staffCount = 0 // Membri staff/fornitori presenti al ricevimento (50% catering)
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
@@ -36,7 +36,15 @@ window.WeddingApp.Domain = (function () {
       this.dueDate = dueDate || '';
       this.splitType = splitType || 'equal';
       this.payer = payer || 'both';
-      this.isEstimate = Boolean(isEstimate);
+
+      // Se non esplicitamente definito, usa l'elenco dei contratti certi; altrimenti stima di default
+      if (isEstimate !== undefined && isEstimate !== null) {
+        this.isEstimate = (isEstimate === true || isEstimate === 'true');
+      } else {
+        const contractIds = new Set(['exp_1', 'exp_2', 'exp_11', 'exp_14', 'exp_15', 'exp_16']);
+        this.isEstimate = !contractIds.has(this.id);
+      }
+
       this.staffCount = Math.max(0, parseInt(staffCount, 10) || 0);
     }
 
