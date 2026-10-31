@@ -3119,6 +3119,12 @@ button.btn-editable-val:hover {
   border: 1px solid rgba(230, 81, 0, 0.25);
 }
 
+.guest-menu-pill.family {
+  background: rgba(138, 115, 84, 0.12);
+  color: var(--accent-bronze);
+  border: 1px solid rgba(138, 115, 84, 0.25);
+}
+
 .guest-menu-pill.adult {
   background: var(--surface-warm);
   color: var(--ink-muted);
