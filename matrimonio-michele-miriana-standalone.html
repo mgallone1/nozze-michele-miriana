@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#FBF9F5">
   <meta name="format-detection" content="telephone=no">
   <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self';">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'><rect width='512' height='512' fill='%23FBF9F5'/><circle cx='256' cy='256' r='220' stroke='%239E7D50' stroke-width='8' fill='%23F7F4EE'/><circle cx='256' cy='256' r='200' stroke='%23ECE5DA' stroke-width='4' fill='none'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Georgia, serif' font-style='italic' font-size='160' fill='%239E7D50'>M&amp;M</text></svg>">
   <title>Michele & Miriana — Il Nostro Matrimonio</title>
@@ -6791,6 +6792,25 @@ window.WeddingApp.Services = (function () {
     // Hash SHA-256 predefinito per il PIN iniziale di sicurezza "0207" (data nozze 2 Luglio)
     static DEFAULT_HASH = '2e3c969e2e9b367ade00279743f88ea0e32f283152223e3d9aaf1c14669d7cbe';
 
+    static escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    static sanitizeUrl(url) {
+      if (!url) return '';
+      const clean = String(url).trim();
+      if (/^(https?:|mailto:|tel:)/i.test(clean)) {
+        return clean;
+      }
+      return '#';
+    }
+
     static async hashPin(pin) {
       const msgBuffer = new TextEncoder().encode(String(pin).trim());
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -8454,6 +8474,10 @@ window.WeddingApp.UI = (function () {
         return;
       }
 
+      const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+        ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+        : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
       grid.innerHTML = guests.map(g => {
         const partyLabel = g.party === 'michele' ? 'Lato Michele' : (g.party === 'miriana' ? 'Lato Miriana' : 'Amici Comuni');
         const partyClass = g.party === 'michele' ? 'michele' : (g.party === 'miriana' ? 'miriana' : 'both');
@@ -8475,13 +8499,17 @@ window.WeddingApp.UI = (function () {
           compositionBadge = `<span class="guest-menu-pill adult">Adulto</span>`;
         }
 
+        const safeName = escape(g.name);
+        const safeNotes = escape(g.notes);
+        const safeId = escape(g.id);
+
         return `
-          <div class="guest-card" data-id="${g.id}">
+          <div class="guest-card" data-id="${safeId}">
             <div class="guest-card-header">
               <div>
                 <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
                 ${compositionBadge}
-                <h4 class="guest-name">${g.name}</h4>
+                <h4 class="guest-name">${safeName}</h4>
               </div>
               <div class="guest-count-badge">${totalPeople} ${totalPeople === 1 ? 'coperto' : 'coperti'}</div>
             </div>
@@ -8492,11 +8520,11 @@ window.WeddingApp.UI = (function () {
                   <span class="gift-caption">Valore Dono:</span>
                   <strong class="gift-amount amount">${CurrencyFormatter.format(giftVal)}</strong>
                 </div>
-                <button type="button" class="btn-gift-status ${isReceived ? 'is-received' : 'is-pending'}" data-action="toggle-gift" data-id="${g.id}">
+                <button type="button" class="btn-gift-status ${isReceived ? 'is-received' : 'is-pending'}" data-action="toggle-gift" data-id="${safeId}">
                   ${isReceived ? '✓ Ricevuto' : 'In Sospeso'}
                 </button>
               </div>
-              ${g.notes ? `<div class="guest-notes-line">${g.notes}</div>` : ''}
+              ${safeNotes ? `<div class="guest-notes-line">${safeNotes}</div>` : ''}
             </div>
 
             <div class="guest-card-actions">
