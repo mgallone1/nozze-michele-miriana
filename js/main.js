@@ -663,12 +663,48 @@
     }
   }
 
+  // Sincronizzazione Cloud Automatica in background
+  async function initCloudSync() {
+    try {
+      const res = await repository.syncFromCloud();
+      if (res.success) {
+        populateCategoryDropdowns();
+        refreshAll();
+        console.log('✓ Atelier sincronizzato con il cloud Supabase');
+      } else {
+        // Se sul cloud non c'è ancora nulla, carichiamo la versione locale attuale
+        const localData = repository.load();
+        repository.persist(localData);
+      }
+    } catch (e) {
+      console.warn('Errore sync cloud iniziale:', e);
+    }
+  }
+
   // Bootstrap dell'Applicazione
   document.addEventListener('DOMContentLoaded', () => {
     registerServiceWorker();
     populateCategoryDropdowns();
     bindEvents();
     refreshAll();
+
+    // Avvia sync cloud automatica all'avvio
+    initCloudSync();
+
+    // Sincronizzazione periodica ogni 15 secondi (o quando l'app torna visibile su iPhone)
+    setInterval(async () => {
+      const res = await repository.syncFromCloud();
+      if (res.success) {
+        populateCategoryDropdowns();
+        refreshAll();
+      }
+    }, 15000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        initCloudSync();
+      }
+    });
 
     // Timer Countdown al minuto
     setInterval(() => {

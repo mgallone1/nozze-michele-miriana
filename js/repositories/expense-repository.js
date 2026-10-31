@@ -8,10 +8,18 @@ window.WeddingApp.Repositories = (function () {
   'use strict';
 
   const STORAGE_KEY = 'matrimonio_michele_miriana_atelier_v3';
+  const SUPABASE_URL = 'https://rpccqbydibkmkpmrlxgv.supabase.co/rest/v1/wedding_vault';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2NxYnlkaWJrbWtwbXJseGd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MDI1OTUsImV4cCI6MjEwODk3ODU5NX0.1Gz2KzPHDCUq4ub_5OY5RuUz3eRQ6G3-p33GXyxojro';
+  const VAULT_ID = 'matrimonio_mm_vault_master';
 
   class LocalStorageExpenseRepository {
     constructor(seedData) {
       this.seedData = seedData;
+      this._onCloudUpdateCallback = null;
+    }
+
+    onCloudUpdate(fn) {
+      this._onCloudUpdateCallback = fn;
     }
 
     load() {
@@ -30,6 +38,31 @@ window.WeddingApp.Repositories = (function () {
       return initial;
     }
 
+    // Carica la versione fresca da Supabase Cloud
+    async syncFromCloud() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*`, {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY
+          }
+        });
+        if (res.ok) {
+          const records = await res.json();
+          if (records && records.length > 0 && records[0].data) {
+            const cloudPlain = records[0].data;
+            const hydrated = this._hydrate(cloudPlain);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudPlain));
+            return { success: true, data: hydrated, updatedAt: records[0].updated_at };
+          }
+        }
+      } catch (err) {
+        console.warn('Sync Cloud non raggiungibile (offline):', err);
+      }
+      return { success: false };
+    }
+
+    // Salva in Locale e poi invia istantaneamente a Supabase Cloud
     persist(dataset) {
       try {
         const plainData = {
@@ -69,10 +102,36 @@ window.WeddingApp.Repositories = (function () {
           }))
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(plainData));
+
+        // Spedizione asincrona a Supabase Cloud (senza bloccare la UI)
+        this._pushToCloud(plainData);
+
         return true;
       } catch (err) {
-        console.error('Repository: errore nel salvataggio.', err);
+        console.error('Repository: errore nel salvataggio locale.', err);
         return false;
+      }
+    }
+
+    async _pushToCloud(plainData) {
+      try {
+        const payload = {
+          id: VAULT_ID,
+          data: plainData,
+          updated_at: new Date().toISOString()
+        };
+        await fetch(SUPABASE_URL, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn('Salvataggio cloud differito (offline):', err);
       }
     }
 
