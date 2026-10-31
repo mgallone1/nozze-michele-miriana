@@ -6915,7 +6915,9 @@ window.WeddingApp.Repositories = (function () {
     // Carica la versione fresca da Supabase Cloud
     async syncFromCloud() {
       try {
-        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*`, {
+        const cacheBuster = Date.now();
+        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*&_t=${cacheBuster}`, {
+          cache: 'no-store',
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY
@@ -9453,7 +9455,11 @@ window.WeddingApp.UI = (function () {
   function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch((err) => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          if (reg) {
+            reg.update();
+          }
+        }).catch((err) => {
           console.warn('ServiceWorker non registrato:', err);
         });
       });
