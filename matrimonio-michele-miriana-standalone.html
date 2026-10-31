@@ -3453,7 +3453,7 @@ button.btn-editable-val:hover {
               <span class="meta-divider">•</span>
               <span>Tenuta Tana di Volpe</span>
               <span class="meta-divider">•</span>
-              <span id="header-guests-count">105 Ospiti</span>
+              <span id="header-guests-count">112 Ospiti</span>
             </div>
           </div>
         </div>
@@ -3523,7 +3523,7 @@ button.btn-editable-val:hover {
           <span class="stat-eyebrow">Il Nostro Matrimonio</span>
           <div class="stat-hero-number amount" id="metric-total-budget">—</div>
           <div class="stat-caption">
-            Budget previsto per <span id="hero-guests-note">105</span> invitati a Tenuta Tana di Volpe
+            Budget previsto per <span id="hero-guests-note">112</span> invitati a Tenuta Tana di Volpe
           </div>
 
           <!-- Barra di avanzamento a segmenti -->
@@ -4414,7 +4414,7 @@ const INITIAL_WEDDING_DATA = {
     date: "2027-07-02",
     time: "17:00",
     venue: "Tenuta Tana di volpe",
-    estimatedGuests: 105,
+    estimatedGuests: 112,
     costPerGuest: 150,
     budgetNote: "Budget stimato per 100 invitati a Tenuta Tana di volpe"
   },
@@ -4656,9 +4656,6 @@ const INITIAL_WEDDING_DATA = {
       notes: "Acconciatura sposa giorno matrimonio + prove",
       status: "pianificato",
       splitType: "miriana"
-    },
-      notes: "Acconciatura sposa + prove",
-      status: "pianificato"
     },
 
     // FOTOGRAFIA E VIDEO
@@ -7426,7 +7423,7 @@ window.WeddingApp.UI = (function () {
       if (details) {
         const guestsEl = document.getElementById('header-guests-count');
         const heroGuestsEl = document.getElementById('hero-guests-note');
-        const count = details.estimatedGuests || 105;
+        const count = details.estimatedGuests || 112;
 
         if (guestsEl) guestsEl.textContent = `${count} Ospiti`;
         if (heroGuestsEl) heroGuestsEl.textContent = count;
@@ -7852,7 +7849,7 @@ window.WeddingApp.UI = (function () {
               <div class="statement-rows">
                 <div class="statement-row">
                   <div class="statement-row-meta">
-                    <span>Stima Doni Ospiti (${fam.giftsEstimated ? Math.round(fam.giftsEstimated / 100) : 105} invitati)</span>
+                    <span>Stima Doni Ospiti (${fam.giftsEstimated ? Math.round(fam.giftsEstimated / 100) : 101} adulti)</span>
                     <small class="formula-chip-hint">Media stimata 100€ a persona</small>
                   </div>
                   <div>
