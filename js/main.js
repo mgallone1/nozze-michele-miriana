@@ -157,9 +157,18 @@
         const guest = guests.find(g => g.id === id);
         if (!guest) return;
         if (window.confirm(`Desideri rimuovere l'invitato "${guest.name}"?`)) {
+          const removedGuest = { ...guest };
           deleteGuestUseCase.execute(id);
           refreshAll();
-          ToastView.show(`Invitato "${guest.name}" rimosso`);
+          ToastView.show(`Invitato "${removedGuest.name}" rimosso`, {
+            undoText: 'Annulla',
+            duration: 6000,
+            onUndo: () => {
+              saveGuestUseCase.execute(removedGuest);
+              refreshAll();
+              ToastView.show(`Invitato "${removedGuest.name}" ripristinato`);
+            }
+          });
         }
       },
       onToggleGift: (id) => {
@@ -311,9 +320,21 @@
     const confirmed = window.confirm(`Desideri eliminare la voce "${exp.item}"?`);
     if (!confirmed) return;
 
+    // Salviamo una copia completa per consentire l'annulla
+    const deletedExp = { ...exp };
+
     deleteExpenseUseCase.execute(id);
-    ToastView.show(`Voce "${exp.item}" eliminata`);
     refreshAll();
+
+    ToastView.show(`Voce "${deletedExp.item}" eliminata`, {
+      undoText: 'Annulla',
+      duration: 6000,
+      onUndo: () => {
+        saveExpenseUseCase.execute(deletedExp);
+        refreshAll();
+        ToastView.show(`Voce "${deletedExp.item}" ripristinata con successo`);
+      }
+    });
   }
 
   // Scorciatoie di Ripartizione nel Modale
@@ -682,14 +703,16 @@
   }
 
   // Bootstrap dell'Applicazione
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     registerServiceWorker();
+
+    // 1. Priorità assoluta al Cloud: proviamo a sincronizzare subito i tuoi salvataggi
+    await initCloudSync();
+
+    // 2. Popolamento e disegno interfaccia (con dati già aggiornati dal cloud)
     populateCategoryDropdowns();
     bindEvents();
     refreshAll();
-
-    // Avvia sync cloud automatica all'avvio
-    initCloudSync();
 
     // Sincronizzazione periodica ogni 15 secondi (o quando l'app torna visibile su iPhone)
     setInterval(async () => {

@@ -255,12 +255,12 @@
         <!-- Renderizzato dinamicamente da SavingsPlanView -->
       </div>
 
-      <!-- Sinottico di Serenità -->
+      <!-- Sinottico di Serenità & Stato Avanzamento Obiettivo -->
       <div class="serenity-card">
         <div class="section-headline-block">
           <div>
-            <h3 class="section-headline-title">Quadro di Serenità Finanziaria</h3>
-            <div class="section-headline-sub">Confronto tra disponibilità complessiva stimata e investimenti previsti</div>
+            <h3 class="section-headline-title">Stato di Copertura & Obiettivo Finanziario</h3>
+            <div class="section-headline-sub">Confronto in tempo reale tra disponibilità accumulate, investimenti previsti e distanza dal traguardo</div>
           </div>
         </div>
 
@@ -268,21 +268,34 @@
           <div class="serenity-item">
             <div class="serenity-label">Fondi Complessivi Previsti</div>
             <div class="serenity-value amount serenity-value-available" id="plan-total-available">—</div>
-            <div class="serenity-subnote">Riserve personali e doni</div>
+            <div class="serenity-subnote">Riserve a fine percorso</div>
           </div>
 
           <div class="serenity-item">
             <div class="serenity-label">Budget Complessivo Voci</div>
             <div class="serenity-value amount" id="plan-budget-required">—</div>
-            <div class="serenity-subnote">Stima totale dei servizi</div>
+            <div class="serenity-subnote">Investimento totale nozze</div>
           </div>
 
           <div class="serenity-item">
             <div class="serenity-label">Margine di Tranquillità</div>
             <div class="serenity-value amount serenity-value-margin" id="plan-safety-margin">—</div>
-            <div class="serenity-subnote">Copertura positiva a garanzia</div>
+            <div class="serenity-subnote">Copertura finale a garanzia</div>
+          </div>
+
+          <div class="serenity-item highlight-target">
+            <div class="serenity-label">Liquidità Disponibile Oggi</div>
+            <div class="serenity-value amount" id="plan-liquid-today">—</div>
+            <div class="serenity-subnote">Accantonati sui conti ad oggi</div>
+          </div>
+
+          <div class="serenity-item highlight-target">
+            <div class="serenity-label">Ancora da Accantonare</div>
+            <div class="serenity-value amount text-terracotta" id="plan-still-to-save">—</div>
+            <div class="serenity-subnote" id="plan-still-to-save-note">Per coprire il 100% delle spese</div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- Quadro Dettaglio Formule Matematiche Trasparenti -->
@@ -336,7 +349,7 @@
             <div>
               <span class="pill-person miriana">Miriana</span>
               <div class="settlement-amount amount" id="balance-owed-miriana">—</div>
-              <small class="settlement-sub">Quota concordata</small>
+              <small class="settlement-sub" id="balance-owed-miriana-sub">Quota al netto doni genitori</small>
             </div>
           </div>
         </div>
@@ -535,7 +548,7 @@
 
             <div class="form-group-noble">
               <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
-              <input type="number" id="expense-budget" class="form-input-noble num" step="10" min="0" placeholder="0">
+              <input type="number" id="expense-budget" class="form-input-noble num" step="any" min="0" placeholder="0">
             </div>
           </div>
 
@@ -557,12 +570,12 @@
             <div class="form-grid-2">
               <div class="form-group-noble mb-xs">
                 <label class="form-label-noble text-michele">Contributo di Michele (€)</label>
-                <input type="number" id="expense-paid-michele" class="form-input-noble num" step="10" min="0" value="0">
+                <input type="number" id="expense-paid-michele" class="form-input-noble num" step="any" min="0" value="0">
               </div>
 
               <div class="form-group-noble mb-xs">
                 <label class="form-label-noble text-miriana">Contributo di Miriana (€)</label>
-                <input type="number" id="expense-paid-miriana" class="form-input-noble num" step="10" min="0" value="0">
+                <input type="number" id="expense-paid-miriana" class="form-input-noble num" step="any" min="0" value="0">
               </div>
             </div>
 

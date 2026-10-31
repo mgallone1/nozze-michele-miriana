@@ -3,7 +3,7 @@
  * Abilita funzionamento offline 100% su iPhone e caching intelligente
  */
 
-const CACHE_NAME = 'nozze-mm-v2027-3';
+const CACHE_NAME = 'nozze-mm-v2027-4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

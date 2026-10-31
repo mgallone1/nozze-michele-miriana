@@ -318,8 +318,22 @@ window.WeddingApp.Domain = (function () {
       const mirPersonalResidual = mirGrossProjected - mirPersonalExpensesPaid;
       const mirFinalNetResidual = mirPersonalResidual;
 
+      // Ripartizione accordi e copertura stanziamento genitori
+      // Lo stanziamento di Amedeo & Anna (famPledged) va a coprire prioritariamente la quota delle spese di Miriana
+      const mirianaNetOwed = Math.max(0, totalOwedMiriana - famPledged);
+
       const totalFundsAvailable = mFinalNetResidual + mirPersonalResidual + famFinalNetResidual;
       const serenityMargin = totalFundsAvailable - totalBudget;
+
+      // Indicatori dinamici di avanzamento verso l'obiettivo:
+      // Quanti soldi sono stati messi da parte/disponibili ad OGGI (dotazioni iniziali + accumuli correnti + anticipi doni)
+      const currentSavingsAccumulatedMichele = mInitial + mAccCurrent;
+      const currentSavingsAccumulatedMiriana = mirInitial + mirAccCurrent;
+      const currentTotalSavingsToday = currentSavingsAccumulatedMichele + currentSavingsAccumulatedMiriana + famUsed;
+      const currentNetLiquidityToday = mCurrentNetLiquidity + mirCurrentNetLiquidity + famAvailable;
+      const stillToSaveToTarget = Math.max(0, totalBudget - totalPaid - currentNetLiquidityToday);
+      const totalBudgetProgressPct = totalBudget > 0 ? Math.min(100, Math.round((totalPaid / totalBudget) * 100)) : 0;
+      const targetFundingProgressPct = totalBudget > 0 ? Math.min(100, Math.round(((totalPaid + currentNetLiquidityToday) / totalBudget) * 100)) : 0;
 
       return {
         totalBudget,
@@ -335,6 +349,9 @@ window.WeddingApp.Domain = (function () {
           mirianaAmount: totalPaidMiriana,
           micheleOwed: totalOwedMichele,
           mirianaOwed: totalOwedMiriana,
+          mirianaGrossOwed: totalOwedMiriana,
+          mirianaNetOwed: mirianaNetOwed,
+          familyContributionMiriana: famPledged,
           paidOwedMichele,
           paidOwedMiriana,
           difference: diffAnticipi,
@@ -382,7 +399,9 @@ window.WeddingApp.Domain = (function () {
             expensesPaid: mirPersonalExpensesPaid,
             currentNetLiquidity: mirCurrentNetLiquidity,
             finalNetResidual: mirFinalNetResidual,
-            familyAvailable: famAvailable
+            familyAvailable: famAvailable,
+            familyPledged: famPledged,
+            netOwedAfterFamily: mirianaNetOwed
           },
           family: {
             title: 'Famiglia & Doni',
@@ -394,7 +413,8 @@ window.WeddingApp.Domain = (function () {
             grossProjected: famTotalGiftsProjected,
             expensesPaid: famUsed,
             currentNetLiquidity: famAvailable,
-            finalNetResidual: famFinalNetResidual
+            finalNetResidual: famFinalNetResidual,
+            dedicatedTo: 'Copertura spese Miriana'
           }
         },
         coverage: {
@@ -406,7 +426,14 @@ window.WeddingApp.Domain = (function () {
           familyAvailable: famAvailable,
           giftsEstimated,
           micheleProjected: mFinalNetResidual,
-          mirianaProjected: mirFinalNetResidual
+          mirianaProjected: mirFinalNetResidual,
+          // Metriche tempo reale per capire quanto siamo lontani dall'obiettivo
+          currentTotalSavingsToday,
+          currentNetLiquidityToday,
+          stillToSaveToTarget,
+          totalBudgetProgressPct,
+          targetFundingProgressPct,
+          remainingMonths: timeline.remainingMonths
         }
       };
     }

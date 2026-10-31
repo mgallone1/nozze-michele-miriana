@@ -352,7 +352,7 @@ window.WeddingApp.UI = (function () {
               <div class="statement-header">
                 <div>
                   <div class="statement-title">${mir.title}</div>
-                  <div class="statement-subtitle">${mir.subtitle}</div>
+                  <div class="statement-subtitle">CONTO PERSONALE & DOTE DEDICATA</div>
                 </div>
                 <button type="button" class="btn-card-edit" data-card="miriana" title="Modifica parametri Miriana">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -388,7 +388,7 @@ window.WeddingApp.UI = (function () {
                   <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.currentAccumulated)}</strong>
                 </div>
 
-                <div class="statement-row border-thick">
+                <div class="statement-row">
                   <div class="statement-row-meta">
                     <span>Accumulo mancante (${mir.remainingMonths} mesi)</span>
                     <small class="formula-chip-hint">${mir.monthlySavings}€ × ${mir.remainingMonths}m</small>
@@ -397,39 +397,58 @@ window.WeddingApp.UI = (function () {
                 </div>
 
                 <div class="statement-row statement-row-bold">
-                  <span>Totale Lordo Previsto Miriana</span>
+                  <span>Totale Risparmi Personali</span>
                   <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.grossProjected)}</strong>
                 </div>
 
                 <div class="statement-row">
-                  <span>Spese anticipate da Miriana</span>
-                  <span class="row-value-negative amount">- ${CurrencyFormatter.format(mir.expensesPaid, { includeSymbol: false })} €</span>
+                  <div class="statement-row-meta">
+                    <span>Dono Genitori (Amedeo & Anna)</span>
+                    <small class="formula-chip-hint">1.500€ anticipati + 8.500€ a saldo</small>
+                  </div>
+                  <strong class="row-value-amount amount text-positive">+ ${CurrencyFormatter.format(mir.familyPledged || 10000)}</strong>
+                </div>
+
+                <div class="statement-row statement-row-bold border-thick">
+                  <div class="statement-row-meta">
+                    <span>Disponibilità Totale Miriana</span>
+                    <small class="formula-chip-hint">Risparmi personali + Dono genitori</small>
+                  </div>
+                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(mir.grossProjected + (mir.familyPledged || 10000))}</strong>
                 </div>
 
                 <div class="statement-row">
-                  <span>Liquidità netta attuale</span>
-                  <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.currentNetLiquidity)}</strong>
+                  <div class="statement-row-meta">
+                    <span>Spese anticipate da Miriana</span>
+                    <small class="formula-chip-hint">1.000€ personali + 1.500€ caparra genitori</small>
+                  </div>
+                  <span class="row-value-negative amount">- ${CurrencyFormatter.format(mir.expensesPaid + (fam.used || 1500), { includeSymbol: false })} €</span>
+                </div>
+
+                <div class="statement-row">
+                  <span>Liquidità disponibile oggi</span>
+                  <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.currentNetLiquidity + fam.available)}</strong>
                 </div>
               </div>
             </div>
 
             <div class="statement-footer-card">
               <div class="statement-footer-title">
-                <span>Residuo Netto Finale</span>
+                <span>Residuo Finale Stimato Miriana</span>
               </div>
-              <strong class="statement-footer-amount amount">${CurrencyFormatter.format(mir.finalNetResidual)}</strong>
+              <strong class="statement-footer-amount amount">${CurrencyFormatter.format(mir.finalNetResidual + fam.available)}</strong>
             </div>
           </div>
 
-          <!-- SCHEDA FAMIGLIA & DONI -->
+          <!-- SCHEDA DONI & BUSTE INVITATI -->
           <div class="statement-card">
             <div>
               <div class="statement-header">
                 <div>
-                  <div class="statement-title">${fam.title}</div>
-                  <div class="statement-subtitle">${fam.subtitle}</div>
+                  <div class="statement-title">Regali & Doni Nozze</div>
+                  <div class="statement-subtitle">STIMA BUSTE INVITATI</div>
                 </div>
-                <button type="button" class="btn-card-edit" data-card="family" title="Modifica contributi famiglia">
+                <button type="button" class="btn-card-edit" data-card="family" title="Modifica stima doni">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   <span>Modifica</span>
                 </button>
@@ -438,32 +457,9 @@ window.WeddingApp.UI = (function () {
 
               <div class="statement-rows">
                 <div class="statement-row">
-                  <span>Stanziamento Amedeo & Anna</span>
-                  <div>
-                    <button type="button" class="value-box-dashed btn-editable-val" data-card="family" title="Clicca per modificare">
-                      ${CurrencyFormatter.format(fam.pledged)}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="statement-row">
-                  <span>Anticipo Banchetto (Catering)</span>
-                  <div>
-                    <button type="button" class="value-box-dashed btn-editable-val text-negative" data-card="family" title="Clicca per modificare">
-                      - ${CurrencyFormatter.format(fam.used, { includeSymbol: false })} €
-                    </button>
-                  </div>
-                </div>
-
-                <div class="statement-row">
-                  <span>Quota Disponibile Amedeo & Anna</span>
-                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(fam.available)}</strong>
-                </div>
-
-                <div class="statement-row border-thick">
                   <div class="statement-row-meta">
-                    <span>Stima Doni Invitati (100 Ospiti)</span>
-                    <small class="formula-chip-hint">100 ospiti × 100€/busta</small>
+                    <span>Stima Doni Ospiti (${fam.giftsEstimated ? Math.round(fam.giftsEstimated / 100) : 105} invitati)</span>
+                    <small class="formula-chip-hint">Media stimata 100€ a persona</small>
                   </div>
                   <div>
                     <button type="button" class="value-box-dashed btn-editable-val" data-card="family" title="Clicca per modificare">
@@ -472,28 +468,34 @@ window.WeddingApp.UI = (function () {
                   </div>
                 </div>
 
-                <div class="statement-row statement-row-bold">
-                  <span>Totale Doni & Contributi</span>
-                  <strong class="row-value-amount amount">${CurrencyFormatter.format(fam.grossProjected)}</strong>
+                <div class="statement-row">
+                  <span>Regali già ricevuti</span>
+                  <span class="row-value-amount amount">0 €</span>
+                </div>
+
+                <div class="statement-row border-thick">
+                  <div class="statement-row-meta">
+                    <span>Destinazione Doni Ospiti</span>
+                    <small class="formula-chip-hint">Margine di serenità e riserva coppia</small>
+                  </div>
+                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(fam.giftsEstimated)}</strong>
                 </div>
 
                 <div class="statement-row">
-                  <span>Caparra già utilizzata</span>
-                  <span class="row-value-negative amount">- ${CurrencyFormatter.format(fam.used, { includeSymbol: false })} €</span>
-                </div>
-
-                <div class="statement-row">
-                  <span>Liquidità doni disponibile oggi</span>
-                  <strong class="row-value-amount amount">${CurrencyFormatter.format(fam.currentNetLiquidity)}</strong>
+                  <div class="statement-row-meta">
+                    <span>Nota su Stanziamento Genitori</span>
+                    <small class="formula-chip-hint">10.000€ Amedeo & Anna</small>
+                  </div>
+                  <span class="text-settled font-semibold">Attribuito a Miriana</span>
                 </div>
               </div>
             </div>
 
             <div class="statement-footer-card">
               <div class="statement-footer-title">
-                <span>Totale Doni Disponibili</span>
+                <span>Totale Doni Stimati</span>
               </div>
-              <strong class="statement-footer-amount amount">${CurrencyFormatter.format(fam.finalNetResidual)}</strong>
+              <strong class="statement-footer-amount amount">${CurrencyFormatter.format(fam.giftsEstimated)}</strong>
             </div>
           </div>
         `;
@@ -509,12 +511,35 @@ window.WeddingApp.UI = (function () {
         const planTotalAvailable = document.getElementById('plan-total-available');
         const planBudgetRequired = document.getElementById('plan-budget-required');
         const planSafetyMargin = document.getElementById('plan-safety-margin');
+        const planLiquidToday = document.getElementById('plan-liquid-today');
+        const planStillToSave = document.getElementById('plan-still-to-save');
+        const planStillToSaveNote = document.getElementById('plan-still-to-save-note');
 
         if (planTotalAvailable) planTotalAvailable.textContent = CurrencyFormatter.format(coverage.totalFundsAvailable);
         if (planBudgetRequired) planBudgetRequired.textContent = CurrencyFormatter.format(coverage.totalBudgetRequired);
         if (planSafetyMargin) {
           planSafetyMargin.textContent = CurrencyFormatter.format(coverage.serenityMargin);
           planSafetyMargin.style.color = coverage.serenityMargin >= 0 ? 'var(--accent-sage)' : 'var(--accent-terracotta)';
+        }
+
+        if (planLiquidToday) {
+          planLiquidToday.textContent = CurrencyFormatter.format(coverage.currentNetLiquidityToday || 0);
+        }
+
+        if (planStillToSave) {
+          const still = coverage.stillToSaveToTarget || 0;
+          if (still <= 0) {
+            planStillToSave.textContent = 'Traguardo Raggiunto!';
+            planStillToSave.style.color = 'var(--accent-sage)';
+            if (planStillToSaveNote) planStillToSaveNote.textContent = 'Fondi attuali sufficienti al 100%';
+          } else {
+            planStillToSave.textContent = CurrencyFormatter.format(still);
+            planStillToSave.style.color = 'var(--accent-terracotta)';
+            if (planStillToSaveNote && coverage.remainingMonths) {
+              const monthlyRate = Math.round(still / Math.max(1, coverage.remainingMonths));
+              planStillToSaveNote.textContent = `Mancano circa ${monthlyRate}€/mese (${coverage.remainingMonths}m)`;
+            }
+          }
         }
       }
     }
@@ -710,11 +735,19 @@ window.WeddingApp.UI = (function () {
 
       const elOwedM = document.getElementById('balance-owed-michele');
       const elOwedMir = document.getElementById('balance-owed-miriana');
+      const elOwedMirSub = document.getElementById('balance-owed-miriana-sub');
       const elPaidHeroM = document.getElementById('balance-paid-michele-hero');
       const elPaidHeroMir = document.getElementById('balance-paid-miriana-hero');
 
       if (elOwedM) elOwedM.textContent = CurrencyFormatter.format(coupleBalance.micheleOwed || 0);
-      if (elOwedMir) elOwedMir.textContent = CurrencyFormatter.format(coupleBalance.mirianaOwed || 0);
+      if (elOwedMir) {
+        // Se c'è la quota al netto del contributo genitori, mostriamo quella
+        const displayOwedMir = (coupleBalance.mirianaNetOwed !== undefined) ? coupleBalance.mirianaNetOwed : (coupleBalance.mirianaOwed || 0);
+        elOwedMir.textContent = CurrencyFormatter.format(displayOwedMir);
+        if (elOwedMirSub && coupleBalance.familyContributionMiriana) {
+          elOwedMirSub.textContent = `Quota residua (-${CurrencyFormatter.format(coupleBalance.familyContributionMiriana)} donati)`;
+        }
+      }
       if (elPaidHeroM) elPaidHeroM.textContent = CurrencyFormatter.format(coupleBalance.micheleAmount || 0);
       if (elPaidHeroMir) elPaidHeroMir.textContent = CurrencyFormatter.format(coupleBalance.mirianaAmount || 0);
 
@@ -854,20 +887,42 @@ window.WeddingApp.UI = (function () {
   }
 
   class ToastView {
-    static show(message) {
+    static show(message, { onUndo = null, undoText = 'Annulla', duration = 5000 } = {}) {
       const container = document.getElementById('toast-container');
       if (!container) return;
 
       const toast = document.createElement('div');
       toast.className = 'toast-note';
-      toast.innerHTML = `<span>${message}</span>`;
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = message;
+      toast.appendChild(textSpan);
+
+      if (typeof onUndo === 'function') {
+        const undoBtn = document.createElement('button');
+        undoBtn.type = 'button';
+        undoBtn.className = 'toast-undo-btn';
+        undoBtn.textContent = undoText;
+        undoBtn.addEventListener('click', () => {
+          try {
+            onUndo();
+          } catch (err) {
+            console.error('Errore durante operazione di annulla:', err);
+          }
+          toast.remove();
+        });
+        toast.appendChild(undoBtn);
+      }
+
       container.appendChild(toast);
 
+      const timeoutDuration = onUndo ? Math.max(duration, 5000) : 3000;
       setTimeout(() => {
+        if (!toast.parentElement) return;
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.3s ease';
         setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      }, timeoutDuration);
     }
   }
 
