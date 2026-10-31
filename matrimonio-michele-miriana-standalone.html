@@ -1989,6 +1989,54 @@ button.btn-editable-val:hover {
   margin-top: 4px;
 }
 
+/* BLOCCO DOPPIO BINARIO SEMPLICE PER I DUE SPOSI */
+.goal-dual-track-box {
+  background: var(--surface-warm);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin: 6px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.track-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84rem;
+}
+
+.track-badge {
+  font-size: 0.70rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.track-ideal .track-badge {
+  background: #E8ECEF;
+  color: var(--ink-secondary);
+}
+
+.track-real .track-badge {
+  background: var(--gold-light);
+  color: var(--ink-primary);
+}
+
+.track-desc {
+  color: var(--ink-secondary);
+}
+
+.text-bronze {
+  color: var(--accent-bronze);
+  font-weight: 700;
+}
+
 .p-row-lbl {
   color: var(--ink-muted);
 }
@@ -3635,17 +3683,36 @@ button.btn-editable-val:hover {
               <span class="p-row-lbl">Quota Spese da Coprire</span>
               <strong class="p-row-val amount" id="goal-michele-target">—</strong>
             </div>
+
             <div class="personal-goal-row">
-              <span class="p-row-lbl">Liquidità Accantonata Oggi</span>
-              <strong class="p-row-val amount text-settled" id="goal-michele-saved">—</strong>
+              <span class="p-row-lbl">Cassa Attuale (ETF + Liquidità)</span>
+              <div>
+                <button type="button" class="value-box-dashed btn-editable-val text-settled" data-card="michele" id="goal-michele-saved" title="Clicca per aggiornare la cassa di Michele">
+                  —
+                </button>
+              </div>
             </div>
+
             <div class="personal-goal-row">
               <span class="p-row-lbl">Distanza dal Traguardo</span>
               <strong class="p-row-val amount text-terracotta" id="goal-michele-still">—</strong>
             </div>
+
+            <!-- BLOCCO DOPPIO BINARIO SEMPLICE -->
+            <div class="goal-dual-track-box">
+              <div class="track-line track-ideal">
+                <span class="track-badge">Piano Teorico</span>
+                <span class="track-desc" id="goal-michele-ideal-desc">Avresti dovuto mettere —€/mese</span>
+              </div>
+              <div class="track-line track-real">
+                <span class="track-badge">Rotta Attuale</span>
+                <span class="track-desc" id="goal-michele-real-desc">Con il ritmo attuale arrivi a —€</span>
+              </div>
+            </div>
+
             <div class="personal-goal-row border-top">
-              <span class="p-row-lbl">Ritmo Rate Mancanti</span>
-              <span class="p-row-val" id="goal-michele-rate">—</span>
+              <span class="p-row-lbl">Per chiudere al 100% senza aiuti</span>
+              <strong class="p-row-val text-bronze" id="goal-michele-needed-rate">—</strong>
             </div>
           </div>
         </div>
@@ -3669,17 +3736,36 @@ button.btn-editable-val:hover {
               <span class="p-row-lbl">Quota Spese (al netto dote genitori)</span>
               <strong class="p-row-val amount" id="goal-miriana-target">—</strong>
             </div>
+
             <div class="personal-goal-row">
-              <span class="p-row-lbl">Liquidità Personale Oggi</span>
-              <strong class="p-row-val amount text-settled" id="goal-miriana-saved">—</strong>
+              <span class="p-row-lbl">Cassa Attuale (XEON + Liquidità)</span>
+              <div>
+                <button type="button" class="value-box-dashed btn-editable-val text-settled" data-card="miriana" id="goal-miriana-saved" title="Clicca per aggiornare la cassa di Miriana">
+                  —
+                </button>
+              </div>
             </div>
+
             <div class="personal-goal-row">
               <span class="p-row-lbl">Distanza dal Traguardo</span>
               <strong class="p-row-val amount text-terracotta" id="goal-miriana-still">—</strong>
             </div>
+
+            <!-- BLOCCO DOPPIO BINARIO SEMPLICE -->
+            <div class="goal-dual-track-box">
+              <div class="track-line track-ideal">
+                <span class="track-badge">Piano Teorico</span>
+                <span class="track-desc" id="goal-miriana-ideal-desc">Avrebbe dovuto mettere —€/mese</span>
+              </div>
+              <div class="track-line track-real">
+                <span class="track-badge">Rotta Attuale</span>
+                <span class="track-desc" id="goal-miriana-real-desc">Con il ritmo attuale arriva a —€</span>
+              </div>
+            </div>
+
             <div class="personal-goal-row border-top">
-              <span class="p-row-lbl">Ritmo Rate Mancanti</span>
-              <span class="p-row-val" id="goal-miriana-rate">—</span>
+              <span class="p-row-lbl">Per chiudere al 100% senza aiuti</span>
+              <strong class="p-row-val text-bronze" id="goal-miriana-needed-rate">—</strong>
             </div>
           </div>
         </div>
@@ -6132,21 +6218,31 @@ window.WeddingApp.Domain = (function () {
       const totalBudgetProgressPct = totalBudget > 0 ? Math.min(100, Math.round((totalPaid / totalBudget) * 100)) : 0;
       const targetFundingProgressPct = totalBudget > 0 ? Math.min(100, Math.round(((totalPaid + currentNetLiquidityToday) / totalBudget) * 100)) : 0;
 
-      // Traguardi Personali Singoli (Michele & Miriana)
+      // Traguardi Personali Singoli (Michele & Miriana) con Doppio Binario (Ideale vs Rotta Reale)
+      const remMonths = Math.max(1, timeline.remainingMonths || 9);
+      const totalMonths = Math.max(1, (timeline.elapsedMonths || 12) + remMonths);
+
       // Michele:
       const mTargetBudget = totalOwedMichele;
       const mSavedToday = currentSavingsAccumulatedMichele; // Dotazione iniziale + rate accantonate ad oggi
       const mStillToSave = Math.max(0, mTargetBudget - mExpensesPaid - mCurrentNetLiquidity);
       const mProgressPct = mTargetBudget > 0 ? Math.min(100, Math.round(((mExpensesPaid + mCurrentNetLiquidity) / mTargetBudget) * 100)) : 100;
+      // Binario 1 (Ideale): Quota teorica se avesse diviso l'intero budget su tutti i mesi dall'inizio
+      const mIdealMonthlyRate = Math.round(mTargetBudget / totalMonths);
+      // Binario 2 (Rotta Reale): Quota mensile necessaria da oggi in poi per coprire al 100% il debito residuo
+      const mNeededMonthlyRate = Math.round(mStillToSave / remMonths);
 
       // Miriana (con dote genitori 10k dedicata a copertura delle sue spese):
       const mirTargetBudgetGross = totalOwedMiriana;
       const mirTargetBudgetNet = mirianaNetOwed; // Al netto del dono di Amedeo & Anna
       const mirSavedToday = currentSavingsAccumulatedMiriana;
-      // Per Miriana, la liquidità e i fondi disponibili ad oggi includono i suoi risparmi e il residuo dono genitori disponibile
       const mirTotalAvailableToday = mirCurrentNetLiquidity + famAvailable;
       const mirStillToSave = Math.max(0, mirTargetBudgetNet - mirPersonalExpensesPaid - mirCurrentNetLiquidity);
       const mirProgressPct = mirTargetBudgetNet > 0 ? Math.min(100, Math.round(((mirPersonalExpensesPaid + mirCurrentNetLiquidity) / mirTargetBudgetNet) * 100)) : 100;
+      // Binario 1 (Ideale): Quota teorica netta divisa sui mesi totali
+      const mirIdealMonthlyRate = Math.round(mirTargetBudgetNet / totalMonths);
+      // Binario 2 (Rotta Reale): Quota mensile necessaria da oggi in poi per coprire al 100% il debito residuo
+      const mirNeededMonthlyRate = Math.round(mirStillToSave / remMonths);
 
       return {
         totalBudget,
@@ -6257,7 +6353,12 @@ window.WeddingApp.Domain = (function () {
               grossProjected: mGrossProjected,
               stillToSave: mStillToSave,
               progressPct: mProgressPct,
-              finalMargin: mFinalNetResidual - (mTargetBudget - mExpensesPaid)
+              finalMargin: mFinalNetResidual - (mTargetBudget - mExpensesPaid),
+              idealMonthlyRate: mIdealMonthlyRate,
+              neededMonthlyRate: mNeededMonthlyRate,
+              plannedMonthlyRate: mMonthly,
+              projectedAtCurrentPace: mCurrentNetLiquidity + (mMonthly * remMonths),
+              gapAtCurrentPace: Math.max(0, mStillToSave - (mMonthly * remMonths))
             },
             miriana: {
               targetBudgetGross: mirTargetBudgetGross,
@@ -6270,7 +6371,12 @@ window.WeddingApp.Domain = (function () {
               grossProjected: mirGrossProjected,
               stillToSave: mirStillToSave,
               progressPct: mirProgressPct,
-              finalMargin: mirFinalNetResidual - (mirTargetBudgetNet - mirPersonalExpensesPaid)
+              finalMargin: mirFinalNetResidual - (mirTargetBudgetNet - mirPersonalExpensesPaid),
+              idealMonthlyRate: mirIdealMonthlyRate,
+              neededMonthlyRate: mirNeededMonthlyRate,
+              plannedMonthlyRate: mirMonthly,
+              projectedAtCurrentPace: mirCurrentNetLiquidity + (mirMonthly * remMonths),
+              gapAtCurrentPace: Math.max(0, mirStillToSave - (mirMonthly * remMonths))
             }
           }
         }
@@ -7581,10 +7687,11 @@ window.WeddingApp.UI = (function () {
           }
         }
 
-        // Render Traguardi Personali dei due sposi
+        // Render Traguardi Personali dei due sposi con Doppio Binario Semplicissimo
         if (coverage.personalGoals) {
           const pgM = coverage.personalGoals.michele;
           const pgMir = coverage.personalGoals.miriana;
+          const remMonths = coverage.remainingMonths || 9;
 
           // Michele
           const gMHeadline = document.getElementById('goal-michele-headline');
@@ -7593,7 +7700,9 @@ window.WeddingApp.UI = (function () {
           const gMTarget = document.getElementById('goal-michele-target');
           const gMSaved = document.getElementById('goal-michele-saved');
           const gMStill = document.getElementById('goal-michele-still');
-          const gMRate = document.getElementById('goal-michele-rate');
+          const gMIdealDesc = document.getElementById('goal-michele-ideal-desc');
+          const gMRealDesc = document.getElementById('goal-michele-real-desc');
+          const gMNeededRate = document.getElementById('goal-michele-needed-rate');
 
           if (pgM) {
             if (gMPct) gMPct.textContent = `${pgM.progressPct}%`;
@@ -7601,22 +7710,36 @@ window.WeddingApp.UI = (function () {
             if (gMTarget) gMTarget.textContent = CurrencyFormatter.format(pgM.targetBudget);
             if (gMSaved) gMSaved.textContent = CurrencyFormatter.format(pgM.currentLiquidity);
 
+            if (gMIdealDesc) {
+              gMIdealDesc.textContent = `Piano originario: ${pgM.idealMonthlyRate} €/mese costanti`;
+            }
+
+            if (gMRealDesc) {
+              const proj = pgM.projectedAtCurrentPace;
+              gMRealDesc.textContent = `A ${pgM.plannedMonthlyRate} €/m arrivi a ${CurrencyFormatter.format(proj)} (${remMonths} mesi)`;
+            }
+
+            if (gMNeededRate) {
+              if (pgM.stillToSave <= 0) {
+                gMNeededRate.textContent = 'Spese già coperte!';
+                gMNeededRate.className = 'p-row-val text-sage';
+              } else {
+                gMNeededRate.textContent = `${pgM.neededMonthlyRate} €/mese per ${remMonths} mesi`;
+                gMNeededRate.className = 'p-row-val text-bronze';
+              }
+            }
+
             if (pgM.stillToSave <= 0) {
               if (gMHeadline) gMHeadline.textContent = 'Traguardo Raggiunto: le tue spese sono coperte!';
               if (gMStill) {
                 gMStill.textContent = 'Coperto 100%';
                 gMStill.className = 'p-row-val text-sage amount';
               }
-              if (gMRate) gMRate.textContent = 'Nessun debito rimanente';
             } else {
               if (gMHeadline) gMHeadline.textContent = `Sei al ${pgM.progressPct}%: mancano ${CurrencyFormatter.format(pgM.stillToSave)}`;
               if (gMStill) {
                 gMStill.textContent = CurrencyFormatter.format(pgM.stillToSave);
                 gMStill.className = 'p-row-val text-terracotta amount';
-              }
-              if (gMRate && coverage.remainingMonths) {
-                const mRate = Math.round(pgM.stillToSave / Math.max(1, coverage.remainingMonths));
-                gMRate.textContent = `Servono ${mRate}€/m per ${coverage.remainingMonths} mesi`;
               }
             }
           }
@@ -7628,7 +7751,9 @@ window.WeddingApp.UI = (function () {
           const gMirTarget = document.getElementById('goal-miriana-target');
           const gMirSaved = document.getElementById('goal-miriana-saved');
           const gMirStill = document.getElementById('goal-miriana-still');
-          const gMirRate = document.getElementById('goal-miriana-rate');
+          const gMirIdealDesc = document.getElementById('goal-miriana-ideal-desc');
+          const gMirRealDesc = document.getElementById('goal-miriana-real-desc');
+          const gMirNeededRate = document.getElementById('goal-miriana-needed-rate');
 
           if (pgMir) {
             if (gMirPct) gMirPct.textContent = `${pgMir.progressPct}%`;
@@ -7636,22 +7761,36 @@ window.WeddingApp.UI = (function () {
             if (gMirTarget) gMirTarget.textContent = CurrencyFormatter.format(pgMir.targetBudgetNet);
             if (gMirSaved) gMirSaved.textContent = CurrencyFormatter.format(pgMir.currentLiquidity);
 
+            if (gMirIdealDesc) {
+              gMirIdealDesc.textContent = `Piano originario: ${pgMir.idealMonthlyRate} €/mese costanti`;
+            }
+
+            if (gMirRealDesc) {
+              const proj = pgMir.projectedAtCurrentPace;
+              gMirRealDesc.textContent = `A ${pgMir.plannedMonthlyRate} €/m arriva a ${CurrencyFormatter.format(proj)} (${remMonths} mesi)`;
+            }
+
+            if (gMirNeededRate) {
+              if (pgMir.stillToSave <= 0) {
+                gMirNeededRate.textContent = 'Spese già coperte!';
+                gMirNeededRate.className = 'p-row-val text-sage';
+              } else {
+                gMirNeededRate.textContent = `${pgMir.neededMonthlyRate} €/mese per ${remMonths} mesi`;
+                gMirNeededRate.className = 'p-row-val text-bronze';
+              }
+            }
+
             if (pgMir.stillToSave <= 0) {
-              if (gMirHeadline) gMirHeadline.textContent = 'Traguardo Raggiunto: le tue spese sono coperte!';
+              if (gMirHeadline) gMirHeadline.textContent = 'Traguardo Raggiunto: le sue spese sono coperte!';
               if (gMirStill) {
                 gMirStill.textContent = 'Coperto 100%';
                 gMirStill.className = 'p-row-val text-sage amount';
               }
-              if (gMirRate) gMirRate.textContent = 'Nessun debito rimanente';
             } else {
-              if (gMirHeadline) gMirHeadline.textContent = `Sei al ${pgMir.progressPct}%: mancano ${CurrencyFormatter.format(pgMir.stillToSave)}`;
+              if (gMirHeadline) gMirHeadline.textContent = `Sei all'${pgMir.progressPct}%: mancano ${CurrencyFormatter.format(pgMir.stillToSave)}`;
               if (gMirStill) {
                 gMirStill.textContent = CurrencyFormatter.format(pgMir.stillToSave);
                 gMirStill.className = 'p-row-val text-terracotta amount';
-              }
-              if (gMirRate && coverage.remainingMonths) {
-                const mirRate = Math.round(pgMir.stillToSave / Math.max(1, coverage.remainingMonths));
-                gMirRate.textContent = `Servono ${mirRate}€/m per ${coverage.remainingMonths} mesi`;
               }
             }
           }
