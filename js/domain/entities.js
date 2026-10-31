@@ -452,6 +452,8 @@ window.WeddingApp.Domain = (function () {
           guestStats: {
             totalGuests: effectiveTotalGuests,
             rosteredGuests: totalRosteredGuests,
+            adultGuestsCount,
+            childGuestsCount,
             micheleGuests: guestsCountMichele,
             mirianaGuests: guestsCountMiriana,
             bothGuests: guestsCountBoth,
