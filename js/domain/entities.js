@@ -20,7 +20,8 @@ window.WeddingApp.Domain = (function () {
       notes = '',
       dueDate = '',
       splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
-      payer = 'both' // indicativo di chi si occupa del pagamento
+      payer = 'both', // indicativo di chi si occupa del pagamento
+      isEstimate = false // true = Costo Stimato, false = Costo Reale / a Contratto
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
@@ -34,6 +35,7 @@ window.WeddingApp.Domain = (function () {
       this.dueDate = dueDate || '';
       this.splitType = splitType || 'equal';
       this.payer = payer || 'both';
+      this.isEstimate = Boolean(isEstimate);
     }
 
     calculateOwed(micheleGuestRatio = 0.5) {
@@ -108,7 +110,8 @@ window.WeddingApp.Domain = (function () {
       gift = 0,
       isGiftReceived = false,
       isGiftCustom = false,
-      notes = ''
+      notes = '',
+      guestType = 'adult' // 'adult' (100% menù), 'child' (50% menù)
     }) {
       this.id = id || ('gst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.name = (name || '').trim();
@@ -118,6 +121,8 @@ window.WeddingApp.Domain = (function () {
       this.isGiftReceived = Boolean(isGiftReceived);
       this.isGiftCustom = Boolean(isGiftCustom);
       this.notes = (notes || '').trim();
+      const detectedChild = (this.notes.toLowerCase().includes('bambin') || guestType === 'child');
+      this.guestType = detectedChild ? 'child' : 'adult';
     }
 
     validate() {
@@ -162,13 +167,41 @@ window.WeddingApp.Domain = (function () {
       const totalRosteredGuests = guestsCountMichele + guestsCountMiriana + guestsCountBoth;
       const effectiveTotalGuests = totalRosteredGuests > 0 ? totalRosteredGuests : Number(safeDetails.estimatedGuests ?? 100);
 
-      // Aggiorna dinamicamente la voce Catering in base al numero esatto di ospiti (150€ + 10% IVA = 165€ a persona)
+      // Conteggio adulti, bambini e staff catering (50% menù bambini e 50% menù fornitori)
+      let adultGuestsCount = 0;
+      let childGuestsCount = 0;
+      safeGuests.forEach(g => {
+        const c = Number(g.count) || 1;
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        if (isChild) {
+          childGuestsCount += c;
+        } else {
+          adultGuestsCount += c;
+        }
+      });
+      if (totalRosteredGuests === 0) {
+        adultGuestsCount = effectiveTotalGuests;
+      }
+      const staffMealsCount = Math.max(0, parseInt(safeDetails.staffMealsCount ?? 0, 10) || 0);
+
+      // Aggiorna dinamicamente la voce Catering:
+      // Adulti: 150€ + 10% IVA = 165€ a persona
+      // Bambini: 50% = 75€ + 10% IVA = 82,50€
+      // Staff / Fornitori: 50% = 75€ + 10% IVA = 82,50€
       const cateringExp = safeExpenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
       if (cateringExp) {
-        cateringExp.item = `Banchetto & Catering (150€ + IVA 10% × ${effectiveTotalGuests} ospiti)`;
-        cateringExp.budget = Math.round(150 * 1.1 * effectiveTotalGuests);
+        const adultTotal = Math.round(150 * 1.1 * adultGuestsCount);
+        const childTotal = Math.round(75 * 1.1 * childGuestsCount);
+        const staffTotal = Math.round(75 * 1.1 * staffMealsCount);
+        cateringExp.budget = adultTotal + childTotal + staffTotal;
+        
+        let labelDesc = `${adultGuestsCount} adulti`;
+        if (childGuestsCount > 0) labelDesc += ` + ${childGuestsCount} bambini (50%)`;
+        if (staffMealsCount > 0) labelDesc += ` + ${staffMealsCount} staff (50%)`;
+        cateringExp.item = `Banchetto & Catering (${labelDesc})`;
+        
         if (!cateringExp.notes.includes('165€')) {
-          cateringExp.notes = `Menù 150€ + IVA 10% (165€ a persona tutto compreso). ${cateringExp.notes}`;
+          cateringExp.notes = `Menù adulti 150€ + IVA (165€). Bambini e Staff al 50% (82,50€). ${cateringExp.notes}`;
         }
       }
 
@@ -495,6 +528,14 @@ window.WeddingApp.Domain = (function () {
               projectedAtCurrentPace: mirCurrentNetLiquidity + (mirMonthly * remMonths),
               gapAtCurrentPace: Math.max(0, mirStillToSave - (mirMonthly * remMonths))
             }
+          },
+          cateringBreakdown: {
+            adultGuestsCount,
+            childGuestsCount,
+            staffMealsCount,
+            costAdult: 165,
+            costChild: 82.5,
+            costStaff: 82.5
           }
         }
       };
