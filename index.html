@@ -628,15 +628,26 @@
             </div>
           </div>
 
-          <!-- Ripartizione Responsabilità Economica (Chi deve sostenerla) -->
-          <div class="form-group-noble">
-            <label class="form-label-noble" for="expense-split-type">Competenza Economica (A carico di)</label>
-            <select id="expense-split-type" class="form-select-noble">
-              <option value="equal">Spesa Comune (Divisa 50% e 50%)</option>
-              <option value="michele">Personale di Michele (100% Michele)</option>
-              <option value="miriana">Personale di Miriana (100% Miriana)</option>
-              <option value="guests">Proporzionale agli Invitati (% Ospiti)</option>
-            </select>
+          <div class="form-grid-2">
+            <!-- Ripartizione Responsabilità Economica (Chi deve sostenerla) -->
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-split-type">Competenza Economica (A carico di)</label>
+              <select id="expense-split-type" class="form-select-noble">
+                <option value="equal">Spesa Comune (Divisa 50% e 50%)</option>
+                <option value="michele">Personale di Michele (100% Michele)</option>
+                <option value="miriana">Personale di Miriana (100% Miriana)</option>
+                <option value="guests">Proporzionale agli Invitati (% Ospiti)</option>
+              </select>
+            </div>
+
+            <!-- Tipologia Costo: Reale / Contratto vs Stimato -->
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-is-estimate">Tipologia Costo</label>
+              <select id="expense-is-estimate" class="form-select-noble">
+                <option value="false">🔒 Costo Reale / a Contratto</option>
+                <option value="true">📝 Costo Stimato / da Definire</option>
+              </select>
+            </div>
           </div>
 
           <!-- Quote Versate -->
@@ -807,12 +818,18 @@
                 <input type="number" id="sp-guests-count" class="form-input-noble" min="1" max="500" step="1" required>
               </div>
               <div class="form-group-noble">
+                <label class="form-label-noble" for="sp-staff-meals">Pasti Staff / Fornitori (50% Catering)</label>
+                <input type="number" id="sp-staff-meals" class="form-input-noble" min="0" max="50" step="1" value="0">
+              </div>
+            </div>
+            <div class="form-grid-row">
+              <div class="form-group-noble">
                 <label class="form-label-noble" for="sp-gifts-estimated">Stima Doni / Buste (€)</label>
                 <input type="number" id="sp-gifts-estimated" class="form-input-noble" min="0" step="100" required>
               </div>
             </div>
             <div class="form-group-noble form-group-last">
-              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato).</div>
+              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato). Lo staff catering è conteggiato al 50% (82,50€ a pasto).</div>
             </div>
           </div>
 
@@ -854,12 +871,20 @@
             </div>
 
             <div class="form-group-noble">
-              <label class="form-label-noble" for="guest-count">Numero Persone (Coperti)</label>
-              <div class="stepper-input-wrap">
-                <button type="button" class="btn-stepper-touch" id="btn-guest-dec">-</button>
-                <input type="number" id="guest-count" class="form-input-noble num" min="1" max="20" step="1" value="1" required>
-                <button type="button" class="btn-stepper-touch" id="btn-guest-inc">+</button>
-              </div>
+              <label class="form-label-noble" for="guest-type">Tipologia Menù / Coperto</label>
+              <select id="guest-type" class="form-select-noble">
+                <option value="adult">Adulto (165€ tutto compreso)</option>
+                <option value="child">Bambino (50% • 82,50€)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group-noble">
+            <label class="form-label-noble" for="guest-count">Numero Persone (Coperti)</label>
+            <div class="stepper-input-wrap">
+              <button type="button" class="btn-stepper-touch" id="btn-guest-dec">-</button>
+              <input type="number" id="guest-count" class="form-input-noble num" min="1" max="20" step="1" value="1" required>
+              <button type="button" class="btn-stepper-touch" id="btn-guest-inc">+</button>
             </div>
           </div>
 
