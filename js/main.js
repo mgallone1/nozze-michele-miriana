@@ -245,11 +245,19 @@
       document.getElementById('expense-notes').value = exp.notes || '';
       document.getElementById('expense-status').value = exp.status || 'pianificato';
       document.getElementById('expense-split-type').value = exp.splitType || 'equal';
+      const estimateSelect = document.getElementById('expense-is-estimate');
+      if (estimateSelect) {
+        estimateSelect.value = exp.isEstimate ? 'true' : 'false';
+      }
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
       document.getElementById('expense-status').value = 'pianificato';
       document.getElementById('expense-split-type').value = 'equal';
+      const estimateSelect = document.getElementById('expense-is-estimate');
+      if (estimateSelect) {
+        estimateSelect.value = 'true';
+      }
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
@@ -287,6 +295,7 @@
     const notes = document.getElementById('expense-notes').value.trim();
     const status = document.getElementById('expense-status').value;
     const splitType = document.getElementById('expense-split-type').value || 'equal';
+    const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
 
     const payload = {
       id: uiState.editingExpenseId,
@@ -298,7 +307,8 @@
       supplier,
       notes,
       status,
-      splitType
+      splitType,
+      isEstimate
     };
 
     const result = saveExpenseUseCase.execute(payload);
