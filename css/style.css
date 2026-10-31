@@ -3075,6 +3075,50 @@ button.btn-editable-val:hover {
   border: 1px solid rgba(74, 107, 89, 0.2);
 }
 
+.cost-nature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+.cost-nature-pill.contract {
+  background: rgba(44, 74, 90, 0.08);
+  color: var(--accent-navy);
+  border: 1px solid rgba(44, 74, 90, 0.25);
+}
+
+.cost-nature-pill.estimate {
+  background: rgba(138, 115, 84, 0.08);
+  color: var(--accent-bronze);
+  border: 1px dashed rgba(138, 115, 84, 0.35);
+}
+
+.guest-menu-pill {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+}
+
+.guest-menu-pill.child {
+  background: #FFF3E0;
+  color: #E65100;
+  border: 1px solid rgba(230, 81, 0, 0.25);
+}
+
+.guest-menu-pill.adult {
+  background: var(--surface-warm);
+  color: var(--ink-muted);
+  border: 1px solid var(--border-hairline);
+}
+
 /* ==========================================================================
    VISTA OSPITI & DONI (LUXURY 2027 MOBILE-FIRST)
    ========================================================================== */
