@@ -43,12 +43,10 @@ window.WeddingApp.UI = (function () {
       if (details) {
         const guestsEl = document.getElementById('header-guests-count');
         const heroGuestsEl = document.getElementById('hero-guests-note');
-        const formulaGiftsEl = document.getElementById('formula-gifts-note');
         const count = details.estimatedGuests || 105;
 
         if (guestsEl) guestsEl.textContent = `${count} Ospiti`;
         if (heroGuestsEl) heroGuestsEl.textContent = count;
-        if (formulaGiftsEl) formulaGiftsEl.textContent = `${count} Ospiti × 100 €/busta`;
       }
     }
   }
@@ -508,14 +506,16 @@ window.WeddingApp.UI = (function () {
       }
 
       if (coverage) {
-        const planTotalAvailable = document.getElementById('plan-total-available');
         const planBudgetRequired = document.getElementById('plan-budget-required');
         const planSafetyMargin = document.getElementById('plan-safety-margin');
         const planLiquidToday = document.getElementById('plan-liquid-today');
         const planStillToSave = document.getElementById('plan-still-to-save');
         const planStillToSaveNote = document.getElementById('plan-still-to-save-note');
 
-        if (planTotalAvailable) planTotalAvailable.textContent = CurrencyFormatter.format(coverage.totalFundsAvailable);
+        const goalStatusHeadline = document.getElementById('goal-status-headline');
+        const goalTargetPct = document.getElementById('goal-target-pct');
+        const goalProgressFill = document.getElementById('goal-progress-fill');
+
         if (planBudgetRequired) planBudgetRequired.textContent = CurrencyFormatter.format(coverage.totalBudgetRequired);
         if (planSafetyMargin) {
           planSafetyMargin.textContent = CurrencyFormatter.format(coverage.serenityMargin);
@@ -526,19 +526,32 @@ window.WeddingApp.UI = (function () {
           planLiquidToday.textContent = CurrencyFormatter.format(coverage.currentNetLiquidityToday || 0);
         }
 
-        if (planStillToSave) {
-          const still = coverage.stillToSaveToTarget || 0;
-          if (still <= 0) {
-            planStillToSave.textContent = 'Traguardo Raggiunto!';
+        const still = coverage.stillToSaveToTarget || 0;
+        const totalReq = coverage.totalBudgetRequired || 1;
+        const savedSoFar = coverage.currentNetLiquidityToday || 0;
+        const pct = Math.min(100, Math.max(0, Math.round((savedSoFar / totalReq) * 100)));
+
+        if (goalTargetPct) goalTargetPct.textContent = `${pct}%`;
+        if (goalProgressFill) goalProgressFill.style.width = `${pct}%`;
+
+        if (still <= 0) {
+          if (goalStatusHeadline) goalStatusHeadline.textContent = 'Traguardo Raggiunto: Tutte le spese sono già coperte!';
+          if (planStillToSave) {
+            planStillToSave.textContent = 'Copertura 100%';
             planStillToSave.style.color = 'var(--accent-sage)';
-            if (planStillToSaveNote) planStillToSaveNote.textContent = 'Fondi attuali sufficienti al 100%';
-          } else {
+          }
+          if (planStillToSaveNote) planStillToSaveNote.textContent = 'Fondi attuali già sufficienti';
+        } else {
+          if (goalStatusHeadline) {
+            goalStatusHeadline.textContent = `Sei al ${pct}% dell'obiettivo: mancano ${CurrencyFormatter.format(still)} al traguardo`;
+          }
+          if (planStillToSave) {
             planStillToSave.textContent = CurrencyFormatter.format(still);
             planStillToSave.style.color = 'var(--accent-terracotta)';
-            if (planStillToSaveNote && coverage.remainingMonths) {
-              const monthlyRate = Math.round(still / Math.max(1, coverage.remainingMonths));
-              planStillToSaveNote.textContent = `Mancano circa ${monthlyRate}€/mese (${coverage.remainingMonths}m)`;
-            }
+          }
+          if (planStillToSaveNote && coverage.remainingMonths) {
+            const monthlyRate = Math.round(still / Math.max(1, coverage.remainingMonths));
+            planStillToSaveNote.textContent = `Circa ${monthlyRate}€/mese nei prossimi ${coverage.remainingMonths} mesi`;
           }
         }
       }

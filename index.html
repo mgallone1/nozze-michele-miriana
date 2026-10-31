@@ -255,79 +255,46 @@
         <!-- Renderizzato dinamicamente da SavingsPlanView -->
       </div>
 
-      <!-- Sinottico di Serenità & Stato Avanzamento Obiettivo -->
-      <div class="serenity-card">
-        <div class="section-headline-block">
+      <!-- CRUSCOTTO TRAGUARDO & STATO OBIETTIVO FINALE -->
+      <div class="goal-target-card">
+        <div class="goal-target-header">
           <div>
-            <h3 class="section-headline-title">Stato di Copertura & Obiettivo Finanziario</h3>
-            <div class="section-headline-sub">Confronto in tempo reale tra disponibilità accumulate, investimenti previsti e distanza dal traguardo</div>
+            <span class="goal-target-badge">Traguardo Finanziario</span>
+            <h3 class="goal-target-title" id="goal-status-headline">Calcolo distanza dall'obiettivo...</h3>
           </div>
+          <div class="goal-target-pct-badge" id="goal-target-pct">0%</div>
         </div>
 
-        <div class="serenity-inner">
-          <div class="serenity-item">
-            <div class="serenity-label">Fondi Complessivi Previsti</div>
-            <div class="serenity-value amount serenity-value-available" id="plan-total-available">—</div>
-            <div class="serenity-subnote">Riserve a fine percorso</div>
-          </div>
-
-          <div class="serenity-item">
-            <div class="serenity-label">Budget Complessivo Voci</div>
-            <div class="serenity-value amount" id="plan-budget-required">—</div>
-            <div class="serenity-subnote">Investimento totale nozze</div>
-          </div>
-
-          <div class="serenity-item">
-            <div class="serenity-label">Margine di Tranquillità</div>
-            <div class="serenity-value amount serenity-value-margin" id="plan-safety-margin">—</div>
-            <div class="serenity-subnote">Copertura finale a garanzia</div>
-          </div>
-
-          <div class="serenity-item highlight-target">
-            <div class="serenity-label">Liquidità Disponibile Oggi</div>
-            <div class="serenity-value amount" id="plan-liquid-today">—</div>
-            <div class="serenity-subnote">Accantonati sui conti ad oggi</div>
-          </div>
-
-          <div class="serenity-item highlight-target">
-            <div class="serenity-label">Ancora da Accantonare</div>
-            <div class="serenity-value amount text-terracotta" id="plan-still-to-save">—</div>
-            <div class="serenity-subnote" id="plan-still-to-save-note">Per coprire il 100% delle spese</div>
-          </div>
+        <div class="goal-progress-track">
+          <div class="goal-progress-bar" id="goal-progress-fill"></div>
         </div>
-      </div>
-      </div>
 
-      <!-- Quadro Dettaglio Formule Matematiche Trasparenti -->
-      <div class="formula-transparency-card">
-        <div class="formula-transparency-header">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <h4 class="formula-transparency-title">Logica Matematica & Formule Finanziarie Integrate</h4>
-        </div>
-        <div class="formula-pills-grid">
-          <div class="formula-pill-item">
-            <span class="formula-pill-name">Accumulo Mensile Attuale</span>
-            <code>Quota Mensile × Mesi Trascorsi</code>
+        <div class="goal-stats-grid">
+          <div class="goal-stat-box">
+            <span class="goal-stat-label">Disponibili & Accantonati Oggi</span>
+            <strong class="goal-stat-val text-settled amount" id="plan-liquid-today">—</strong>
+            <small class="goal-stat-sub">Sui conti e caparra versata</small>
           </div>
-          <div class="formula-pill-item">
-            <span class="formula-pill-name">Accumulo Mensile Rimanente</span>
-            <code>Quota Mensile × Mesi al Matrimonio</code>
+
+          <div class="goal-stat-box">
+            <span class="goal-stat-label">Obiettivo Spese Totali</span>
+            <strong class="goal-stat-val amount" id="plan-budget-required">—</strong>
+            <small class="goal-stat-sub">31 voci pianificate</small>
           </div>
-          <div class="formula-pill-item">
-            <span class="formula-pill-name">Liquidità Netta Personale</span>
-            <code>Dotazione Iniziale + Accumulo Attuale - Spese Anticipate</code>
+
+          <div class="goal-stat-box">
+            <span class="goal-stat-label">Distanza dal Traguardo</span>
+            <strong class="goal-stat-val amount text-terracotta" id="plan-still-to-save">—</strong>
+            <small class="goal-stat-sub" id="plan-still-to-save-note">Per completare il 100%</small>
           </div>
-          <div class="formula-pill-item">
-            <span class="formula-pill-name">Stima Doni Invitati</span>
-            <code id="formula-gifts-note">Invitati × 100 €/busta</code>
-          </div>
-          <div class="formula-pill-item">
-            <span class="formula-pill-name">Margine di Tranquillità</span>
-            <code>Fondi Totali Previsti - Investimento Servizi</code>
+
+          <div class="goal-stat-box">
+            <span class="goal-stat-label">Margine Finale Previsto</span>
+            <strong class="goal-stat-val amount text-sage" id="plan-safety-margin">—</strong>
+            <small class="goal-stat-sub">Riserva di sicurezza</small>
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================================
@@ -338,18 +305,18 @@
       <!-- QUADRO DI RIPARTIZIONE ACCORDI & RESPONSABILITÀ -->
       <section class="settlement-hero-panel">
         <div class="settlement-card">
-          <span class="stat-eyebrow">Ripartizione Accordi</span>
+          <span class="stat-eyebrow">Ripartizione Quote di Spesa</span>
           <div class="settlement-comparison-row">
             <div>
               <span class="pill-person michele">Michele</span>
               <div class="settlement-amount amount" id="balance-owed-michele">—</div>
-              <small class="settlement-sub">Quota concordata</small>
+              <small class="settlement-sub">Quota spese da sostenere</small>
             </div>
             <div class="settlement-vs">VS</div>
             <div>
               <span class="pill-person miriana">Miriana</span>
               <div class="settlement-amount amount" id="balance-owed-miriana">—</div>
-              <small class="settlement-sub" id="balance-owed-miriana-sub">Quota al netto doni genitori</small>
+              <small class="settlement-sub" id="balance-owed-miriana-sub">Quota al netto dono genitori</small>
             </div>
           </div>
         </div>
