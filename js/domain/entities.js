@@ -117,28 +117,50 @@ window.WeddingApp.Domain = (function () {
       name,
       party = 'both', // 'michele', 'miriana', 'both'
       count = 1,
+      adultsCount = null,
+      childrenCount = null,
       gift = 0,
       isGiftReceived = false,
       isGiftCustom = false,
       notes = '',
-      guestType = 'adult' // 'adult' (100% menù), 'child' (50% menù)
+      guestType = 'adult' // 'adult' (100% menù), 'child' (50% menù), 'family' (nucleo familiare con adulti e bambini)
     }) {
       this.id = id || ('gst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.name = (name || '').trim();
       this.party = party || 'both';
-      this.count = Math.max(1, parseInt(count, 10) || 1);
-      this.gift = Math.max(0, Number(gift) || 0);
+      this.notes = (notes || '').trim();
+
+      const isSingleChild = (this.notes.toLowerCase().includes('bambin') || guestType === 'child');
+
+      // Risoluzione adulti e bambini
+      if (adultsCount !== null && adultsCount !== undefined) {
+        this.adultsCount = Math.max(0, parseInt(adultsCount, 10) || 0);
+      } else {
+        this.adultsCount = isSingleChild ? 0 : Math.max(1, parseInt(count, 10) || 1);
+      }
+
+      if (childrenCount !== null && childrenCount !== undefined) {
+        this.childrenCount = Math.max(0, parseInt(childrenCount, 10) || 0);
+      } else {
+        this.childrenCount = isSingleChild ? Math.max(1, parseInt(count, 10) || 1) : 0;
+      }
+
+      this.count = Math.max(1, this.adultsCount + this.childrenCount);
+      this.guestType = (this.childrenCount > 0 && this.adultsCount > 0)
+        ? 'family'
+        : (this.childrenCount > 0 && this.adultsCount === 0 ? 'child' : 'adult');
+
+      // Calcolo default del dono: 100€ a persona adulta (i bambini di default non donano)
+      const defaultGift = this.adultsCount * 100;
+      this.gift = (gift !== undefined && gift !== null && gift !== '') ? Math.max(0, Number(gift) || 0) : defaultGift;
       this.isGiftReceived = Boolean(isGiftReceived);
       this.isGiftCustom = Boolean(isGiftCustom);
-      this.notes = (notes || '').trim();
-      const detectedChild = (this.notes.toLowerCase().includes('bambin') || guestType === 'child');
-      this.guestType = detectedChild ? 'child' : 'adult';
     }
 
     validate() {
       const errors = [];
-      if (!this.name) errors.push('Il nominativo dell\'ospite è obbligatorio.');
-      if (this.count < 1) errors.push('Il numero di persone deve essere almeno 1.');
+      if (!this.name) errors.push('Il nominativo dell\'ospite o famiglia è obbligatorio.');
+      if ((this.adultsCount + this.childrenCount) < 1) errors.push('Il numero complessivo di persone deve essere almeno 1.');
       return {
         isValid: errors.length === 0,
         errors
@@ -181,13 +203,10 @@ window.WeddingApp.Domain = (function () {
       let adultGuestsCount = 0;
       let childGuestsCount = 0;
       safeGuests.forEach(g => {
-        const c = Number(g.count) || 1;
-        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
-        if (isChild) {
-          childGuestsCount += c;
-        } else {
-          adultGuestsCount += c;
-        }
+        const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (g.guestType === 'child' ? 0 : (Number(g.count) || 1));
+        const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (g.guestType === 'child' ? (Number(g.count) || 1) : 0);
+        adultGuestsCount += adults;
+        childGuestsCount += children;
       });
       if (totalRosteredGuests === 0) {
         adultGuestsCount = effectiveTotalGuests;
