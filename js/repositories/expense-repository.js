@@ -16,6 +16,7 @@ window.WeddingApp.Repositories = (function () {
     constructor(seedData) {
       this.seedData = seedData;
       this._onCloudUpdateCallback = null;
+      this._cachedData = null;
     }
 
     onCloudUpdate(fn) {
@@ -23,25 +24,35 @@ window.WeddingApp.Repositories = (function () {
     }
 
     load() {
+      // 1. Se abbiamo già i dati in memoria (dopo il sync da Supabase), restituiamo quelli
+      if (this._cachedData) {
+        return this._cachedData;
+      }
+
+      // 2. Altrimenti leggiamo da localStorage
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const raw = JSON.parse(stored);
-          return this._hydrate(raw);
+          this._cachedData = this._hydrate(raw);
+          return this._cachedData;
         }
       } catch (err) {
-        console.warn('Repository: impossibile leggere da memoria locale, caricamento dati base.', err);
+        console.warn('Repository: memoria locale non disponibile.', err);
       }
 
+      // 3. Fallback estremo solo se è la prima volta assoluta in assoluto
       const initial = this._hydrate(this.seedData);
-      this.persist(initial);
+      this._cachedData = initial;
       return initial;
     }
 
     // Carica la versione fresca da Supabase Cloud
     async syncFromCloud() {
       try {
-        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*`, {
+        const cacheBuster = Date.now();
+        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*&_t=${cacheBuster}`, {
+          cache: 'no-store',
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY
@@ -51,9 +62,9 @@ window.WeddingApp.Repositories = (function () {
           const records = await res.json();
           if (records && records.length > 0 && records[0].data) {
             const cloudPlain = records[0].data;
-            const hydrated = this._hydrate(cloudPlain);
+            this._cachedData = this._hydrate(cloudPlain);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudPlain));
-            return { success: true, data: hydrated, updatedAt: records[0].updated_at };
+            return { success: true, data: this._cachedData, updatedAt: records[0].updated_at };
           }
         }
       } catch (err) {
@@ -65,6 +76,7 @@ window.WeddingApp.Repositories = (function () {
     // Salva in Locale e poi invia istantaneamente a Supabase Cloud
     persist(dataset) {
       try {
+        this._cachedData = dataset;
         const plainData = {
           couple: dataset.couple,
           details: dataset.details,
@@ -88,17 +100,22 @@ window.WeddingApp.Repositories = (function () {
             notes: e.notes,
             dueDate: e.dueDate,
             splitType: e.splitType || 'equal',
-            payer: e.payer || 'both'
+            payer: e.payer || 'both',
+            isEstimate: Boolean(e.isEstimate),
+            staffCount: Math.max(0, parseInt(e.staffCount, 10) || 0)
           })),
           guests: (dataset.guests || []).map(g => ({
             id: g.id,
             name: g.name,
             party: g.party || 'both',
-            count: g.count || 1,
+            count: g.count || (Math.max(1, (g.adultsCount || 0) + (g.childrenCount || 0))),
+            adultsCount: g.adultsCount !== undefined ? g.adultsCount : (g.guestType === 'child' ? 0 : (g.count || 1)),
+            childrenCount: g.childrenCount !== undefined ? g.childrenCount : (g.guestType === 'child' ? (g.count || 1) : 0),
             gift: g.gift || 0,
             isGiftReceived: Boolean(g.isGiftReceived),
             isGiftCustom: Boolean(g.isGiftCustom),
-            notes: g.notes || ''
+            notes: g.notes || '',
+            guestType: g.guestType || ((g.notes || '').toLowerCase().includes('bambin') ? 'child' : 'adult')
           }))
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(plainData));
@@ -108,7 +125,7 @@ window.WeddingApp.Repositories = (function () {
 
         return true;
       } catch (err) {
-        console.error('Repository: errore nel salvataggio locale.', err);
+        console.error('Repository: errore nel salvataggio.', err);
         return false;
       }
     }
@@ -181,7 +198,24 @@ window.WeddingApp.Repositories = (function () {
       const seedGuests = (this.seedData?.guests || []);
       const isDemo = raw.guests && raw.guests.length > 0 && raw.guests.some(g => String(g.id).includes('demo'));
       const rawGuests = (!raw.guests || raw.guests.length === 0 || isDemo) ? seedGuests : raw.guests;
-      const guests = rawGuests.map(g => new Guest(g));
+      
+      // Auto-migrazione: se gli ospiti salvati non hanno ancora valorizzati esplicitamente adultsCount/childrenCount/guestType
+      // li valorizziamo e li arricchiamo deducendoli dalle note/menù
+      const guests = rawGuests.map(g => {
+        if (g.adultsCount === undefined || g.childrenCount === undefined || !g.guestType) {
+          const isChild = (g.notes || '').toLowerCase().includes('bambin') || g.guestType === 'child';
+          const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (isChild ? 0 : (Number(g.count) || 1));
+          const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (isChild ? (Number(g.count) || 1) : 0);
+          return new Guest({
+            ...g,
+            adultsCount: adults,
+            childrenCount: children,
+            guestType: (children > 0 && adults > 0) ? 'family' : (children > 0 && adults === 0 ? 'child' : 'adult'),
+            gift: (isChild && (!g.isGiftCustom || g.gift === 100)) ? 0 : g.gift
+          });
+        }
+        return new Guest(g);
+      });
 
       const rawSavings = raw.savingsPlan || {};
       const seedSavings = this.seedData?.savingsPlan || {};
@@ -194,19 +228,43 @@ window.WeddingApp.Repositories = (function () {
         weddingGifts: { ...(seedSavings.weddingGifts || {}), ...(rawSavings.weddingGifts || {}) }
       };
 
-      // Calcola il numero effettivo degli ospiti se ci sono ospiti registrati
-      const effectiveGuestCount = guests.length > 0 ? guests.length : (raw.details?.estimatedGuests || this.seedData?.details?.estimatedGuests || 105);
+      // Calcola il numero effettivo di persone/coperti a tavola sommando adulti e bambini
+      const totalPeopleCount = guests.reduce((sum, g) => {
+        const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (g.guestType === 'child' ? 0 : (Number(g.count) || 1));
+        const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (g.guestType === 'child' ? (Number(g.count) || 1) : 0);
+        return sum + adults + children;
+      }, 0);
+      const effectiveGuestCount = totalPeopleCount > 0 ? totalPeopleCount : (raw.details?.estimatedGuests || this.seedData?.details?.estimatedGuests || 112);
       const details = {
         ...(this.seedData?.details || {}),
         ...(raw.details || {}),
         estimatedGuests: effectiveGuestCount
       };
 
-      // Aggiornamento dinamico automatico del Catering in base al numero esatto di invitati (150€ + 10% IVA = 165€ a persona)
+      // Aggiornamento dinamico del Catering in base ad adulti, bambini e staff (150€ + 10% IVA per adulti, 50% per bambini e staff)
       const cateringExpense = expenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
       if (cateringExpense) {
-        cateringExpense.item = `Banchetto & Catering (150€ + IVA 10% × ${effectiveGuestCount} ospiti)`;
-        cateringExpense.budget = Math.round(150 * 1.1 * effectiveGuestCount);
+        let adultCount = 0;
+        let childCount = 0;
+        guests.forEach(g => {
+          const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (g.guestType === 'child' ? 0 : (Number(g.count) || 1));
+          const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (g.guestType === 'child' ? (Number(g.count) || 1) : 0);
+          adultCount += adults;
+          childCount += children;
+        });
+        if (guests.length === 0) adultCount = effectiveGuestCount;
+        const vendorStaffSum = expenses.reduce((sum, exp) => sum + (exp.id !== 'exp_2' ? (Number(exp.staffCount) || 0) : 0), 0);
+        const staffCount = vendorStaffSum > 0 ? vendorStaffSum : Math.max(0, parseInt(details.staffMealsCount ?? 0, 10) || 0);
+
+        const adultTotal = Math.round(150 * 1.1 * adultCount);
+        const childTotal = Math.round(75 * 1.1 * childCount);
+        const staffTotal = Math.round(75 * 1.1 * staffCount);
+        cateringExpense.budget = adultTotal + childTotal + staffTotal;
+
+        let labelDesc = `${adultCount} adulti`;
+        if (childCount > 0) labelDesc += ` + ${childCount} bambini (50%)`;
+        if (staffCount > 0) labelDesc += ` + ${staffCount} staff (50%)`;
+        cateringExpense.item = `Banchetto & Catering (${labelDesc})`;
       }
 
       return {
