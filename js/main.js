@@ -249,6 +249,10 @@
       if (estimateSelect) {
         estimateSelect.value = exp.isEstimate ? 'true' : 'false';
       }
+      const staffInput = document.getElementById('expense-staff-count');
+      if (staffInput) {
+        staffInput.value = exp.staffCount ?? 0;
+      }
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
@@ -257,6 +261,10 @@
       const estimateSelect = document.getElementById('expense-is-estimate');
       if (estimateSelect) {
         estimateSelect.value = 'true';
+      }
+      const staffInput = document.getElementById('expense-staff-count');
+      if (staffInput) {
+        staffInput.value = 0;
       }
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
@@ -296,6 +304,7 @@
     const status = document.getElementById('expense-status').value;
     const splitType = document.getElementById('expense-split-type').value || 'equal';
     const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
+    const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
 
     const payload = {
       id: uiState.editingExpenseId,
@@ -308,7 +317,8 @@
       notes,
       status,
       splitType,
-      isEstimate
+      isEstimate,
+      staffCount
     };
 
     const result = saveExpenseUseCase.execute(payload);
