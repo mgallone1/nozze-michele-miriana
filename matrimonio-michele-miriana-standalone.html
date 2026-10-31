@@ -6693,6 +6693,7 @@ window.WeddingApp.Repositories = (function () {
     constructor(seedData) {
       this.seedData = seedData;
       this._onCloudUpdateCallback = null;
+      this._cachedData = null;
     }
 
     onCloudUpdate(fn) {
@@ -6700,18 +6701,26 @@ window.WeddingApp.Repositories = (function () {
     }
 
     load() {
+      // 1. Se abbiamo già i dati in memoria (dopo il sync da Supabase), restituiamo quelli
+      if (this._cachedData) {
+        return this._cachedData;
+      }
+
+      // 2. Altrimenti leggiamo da localStorage
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const raw = JSON.parse(stored);
-          return this._hydrate(raw);
+          this._cachedData = this._hydrate(raw);
+          return this._cachedData;
         }
       } catch (err) {
-        console.warn('Repository: impossibile leggere da memoria locale, caricamento dati base.', err);
+        console.warn('Repository: memoria locale non disponibile.', err);
       }
 
+      // 3. Fallback estremo solo se è la prima volta assoluta in assoluto
       const initial = this._hydrate(this.seedData);
-      this.persist(initial);
+      this._cachedData = initial;
       return initial;
     }
 
@@ -6728,9 +6737,9 @@ window.WeddingApp.Repositories = (function () {
           const records = await res.json();
           if (records && records.length > 0 && records[0].data) {
             const cloudPlain = records[0].data;
-            const hydrated = this._hydrate(cloudPlain);
+            this._cachedData = this._hydrate(cloudPlain);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudPlain));
-            return { success: true, data: hydrated, updatedAt: records[0].updated_at };
+            return { success: true, data: this._cachedData, updatedAt: records[0].updated_at };
           }
         }
       } catch (err) {
@@ -6742,6 +6751,7 @@ window.WeddingApp.Repositories = (function () {
     // Salva in Locale e poi invia istantaneamente a Supabase Cloud
     persist(dataset) {
       try {
+        this._cachedData = dataset;
         const plainData = {
           couple: dataset.couple,
           details: dataset.details,
@@ -6785,7 +6795,7 @@ window.WeddingApp.Repositories = (function () {
 
         return true;
       } catch (err) {
-        console.error('Repository: errore nel salvataggio locale.', err);
+        console.error('Repository: errore nel salvataggio.', err);
         return false;
       }
     }
