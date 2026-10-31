@@ -43,7 +43,7 @@ window.WeddingApp.UI = (function () {
       if (details) {
         const guestsEl = document.getElementById('header-guests-count');
         const heroGuestsEl = document.getElementById('hero-guests-note');
-        const count = details.estimatedGuests || 105;
+        const count = details.estimatedGuests || 112;
 
         if (guestsEl) guestsEl.textContent = `${count} Ospiti`;
         if (heroGuestsEl) heroGuestsEl.textContent = count;
@@ -469,7 +469,7 @@ window.WeddingApp.UI = (function () {
               <div class="statement-rows">
                 <div class="statement-row">
                   <div class="statement-row-meta">
-                    <span>Stima Doni Ospiti (${fam.giftsEstimated ? Math.round(fam.giftsEstimated / 100) : 105} invitati)</span>
+                    <span>Stima Doni Ospiti (${fam.giftsEstimated ? Math.round(fam.giftsEstimated / 100) : 101} adulti)</span>
                     <small class="formula-chip-hint">Media stimata 100€ a persona</small>
                   </div>
                   <div>
