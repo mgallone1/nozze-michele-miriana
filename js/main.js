@@ -697,7 +697,11 @@
   function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch((err) => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          if (reg) {
+            reg.update();
+          }
+        }).catch((err) => {
           console.warn('ServiceWorker non registrato:', err);
         });
       });
