@@ -1116,22 +1116,33 @@ window.WeddingApp.UI = (function () {
       grid.innerHTML = guests.map(g => {
         const partyLabel = g.party === 'michele' ? 'Lato Michele' : (g.party === 'miriana' ? 'Lato Miriana' : 'Amici Comuni');
         const partyClass = g.party === 'michele' ? 'michele' : (g.party === 'miriana' ? 'miriana' : 'both');
-        const giftVal = Number(g.gift) || (Number(g.count) * 100);
+        const giftVal = Number(g.gift) || (Number(g.adultsCount !== undefined ? g.adultsCount : g.count) * 100);
         const isReceived = Boolean(g.isGiftReceived);
-        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
-        const menuBadge = isChild
-          ? `<span class="guest-menu-pill child">Bambino (50%)</span>`
-          : `<span class="guest-menu-pill adult">Adulto</span>`;
+
+        const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (g.guestType === 'child' ? 0 : (Number(g.count) || 1));
+        const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (g.guestType === 'child' ? (Number(g.count) || 1) : 0);
+        const totalPeople = adults + children;
+
+        let compositionBadge = '';
+        if (adults > 0 && children > 0) {
+          compositionBadge = `<span class="guest-menu-pill family" title="${adults} adulti e ${children} bambini">Famiglia (${adults} ad. + ${children} bamb.)</span>`;
+        } else if (children > 0 && adults === 0) {
+          compositionBadge = `<span class="guest-menu-pill child" title="Menù Bambino 50%">Bambino (50%)</span>`;
+        } else if (adults > 1) {
+          compositionBadge = `<span class="guest-menu-pill adult">${adults} Adulti</span>`;
+        } else {
+          compositionBadge = `<span class="guest-menu-pill adult">Adulto</span>`;
+        }
 
         return `
           <div class="guest-card" data-id="${g.id}">
             <div class="guest-card-header">
               <div>
                 <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
-                ${menuBadge}
+                ${compositionBadge}
                 <h4 class="guest-name">${g.name}</h4>
               </div>
-              <div class="guest-count-badge">${g.count} ${g.count === 1 ? 'persona' : 'persone'}</div>
+              <div class="guest-count-badge">${totalPeople} ${totalPeople === 1 ? 'coperto' : 'coperti'}</div>
             </div>
 
             <div class="guest-card-body">
@@ -1179,34 +1190,60 @@ window.WeddingApp.UI = (function () {
       const form = document.getElementById('guest-form');
       const closeBtn = document.getElementById('guest-modal-close-btn');
       const cancelBtn = document.getElementById('guest-modal-cancel-btn');
-      const btnDec = document.getElementById('btn-guest-dec');
-      const btnInc = document.getElementById('btn-guest-inc');
-      const countInput = document.getElementById('guest-count');
+      const btnAdultsDec = document.getElementById('btn-adults-dec');
+      const btnAdultsInc = document.getElementById('btn-adults-inc');
+      const adultsInput = document.getElementById('guest-adults-count');
+      const btnChildrenDec = document.getElementById('btn-children-dec');
+      const btnChildrenInc = document.getElementById('btn-children-inc');
+      const childrenInput = document.getElementById('guest-children-count');
       const giftInput = document.getElementById('guest-gift');
+      const summaryText = document.getElementById('guest-coperti-summary');
 
-      const updateGiftDefault = () => {
-        const c = parseInt(countInput.value, 10) || 1;
-        // Aggiorna valore regalo base solo se non digitato manualmente
-        if (!giftInput.dataset.manual) {
-          giftInput.value = c * 100;
+      const updateSummaryAndGift = () => {
+        const adults = Math.max(0, parseInt(adultsInput.value, 10) || 0);
+        const children = Math.max(0, parseInt(childrenInput.value, 10) || 0);
+        const total = adults + children;
+
+        if (summaryText) {
+          summaryText.textContent = `Totale coperti a tavola: ${total} ${total === 1 ? 'persona' : 'persone'} (${adults} ${adults === 1 ? 'adulto' : 'adulti'}, ${children} ${children === 1 ? 'bambino' : 'bambini'})`;
+        }
+
+        // Il regalo predefinito calcola 100€ SOLO per ciascun adulto (i bambini sono esclusi)
+        if (giftInput && !giftInput.dataset.manual) {
+          giftInput.value = adults * 100;
         }
       };
 
-      if (btnDec && countInput) {
-        btnDec.addEventListener('click', () => {
-          const val = Math.max(1, (parseInt(countInput.value, 10) || 1) - 1);
-          countInput.value = val;
-          updateGiftDefault();
+      if (btnAdultsDec && adultsInput) {
+        btnAdultsDec.addEventListener('click', () => {
+          adultsInput.value = Math.max(0, (parseInt(adultsInput.value, 10) || 0) - 1);
+          updateSummaryAndGift();
         });
       }
 
-      if (btnInc && countInput) {
-        btnInc.addEventListener('click', () => {
-          const val = Math.min(20, (parseInt(countInput.value, 10) || 1) + 1);
-          countInput.value = val;
-          updateGiftDefault();
+      if (btnAdultsInc && adultsInput) {
+        btnAdultsInc.addEventListener('click', () => {
+          adultsInput.value = Math.min(20, (parseInt(adultsInput.value, 10) || 0) + 1);
+          updateSummaryAndGift();
         });
       }
+
+      if (btnChildrenDec && childrenInput) {
+        btnChildrenDec.addEventListener('click', () => {
+          childrenInput.value = Math.max(0, (parseInt(childrenInput.value, 10) || 0) - 1);
+          updateSummaryAndGift();
+        });
+      }
+
+      if (btnChildrenInc && childrenInput) {
+        btnChildrenInc.addEventListener('click', () => {
+          childrenInput.value = Math.min(20, (parseInt(childrenInput.value, 10) || 0) + 1);
+          updateSummaryAndGift();
+        });
+      }
+
+      if (adultsInput) adultsInput.addEventListener('input', updateSummaryAndGift);
+      if (childrenInput) childrenInput.addEventListener('input', updateSummaryAndGift);
 
       if (giftInput) {
         giftInput.addEventListener('input', () => {
@@ -1228,19 +1265,25 @@ window.WeddingApp.UI = (function () {
           const id = GuestModalView._currentId;
           const name = document.getElementById('guest-name').value.trim();
           const party = document.getElementById('guest-party').value;
-          const count = parseInt(document.getElementById('guest-count').value, 10) || 1;
-          const gift = parseFloat(document.getElementById('guest-gift').value) || (count * 100);
+          const adultsCount = Math.max(0, parseInt(adultsInput.value, 10) || 0);
+          const childrenCount = Math.max(0, parseInt(childrenInput.value, 10) || 0);
+          const totalCount = Math.max(1, adultsCount + childrenCount);
+          const gift = parseFloat(giftInput.value) || 0;
           const isGiftReceived = document.getElementById('guest-gift-status').value === 'received';
-          const guestTypeEl = document.getElementById('guest-type');
-          const guestType = guestTypeEl ? guestTypeEl.value : 'adult';
           const notes = document.getElementById('guest-notes').value.trim();
+
+          const guestType = (childrenCount > 0 && adultsCount > 0)
+            ? 'family'
+            : (childrenCount > 0 && adultsCount === 0 ? 'child' : 'adult');
 
           if (typeof onSave === 'function') {
             onSave({
               id,
               name,
               party,
-              count,
+              count: totalCount,
+              adultsCount,
+              childrenCount,
               guestType,
               gift,
               isGiftReceived,
@@ -1258,31 +1301,46 @@ window.WeddingApp.UI = (function () {
       const title = document.getElementById('guest-modal-title');
       const form = document.getElementById('guest-form');
       const giftInput = document.getElementById('guest-gift');
+      const adultsInput = document.getElementById('guest-adults-count');
+      const childrenInput = document.getElementById('guest-children-count');
+      const summaryText = document.getElementById('guest-coperti-summary');
       if (!modal) return;
 
       GuestModalView._currentId = guest ? guest.id : null;
 
-        if (guest) {
-        if (title) title.textContent = 'Modifica Invitato';
+      if (guest) {
+        if (title) title.textContent = 'Modifica Invitato o Famiglia';
         document.getElementById('guest-name').value = guest.name || '';
         document.getElementById('guest-party').value = guest.party || 'both';
+
         const isChild = (guest.guestType === 'child' || (guest.notes || '').toLowerCase().includes('bambin'));
-        const typeEl = document.getElementById('guest-type');
-        if (typeEl) typeEl.value = isChild ? 'child' : 'adult';
-        document.getElementById('guest-count').value = guest.count || 1;
-        document.getElementById('guest-gift').value = guest.gift !== undefined ? guest.gift : (guest.count * 100);
+        const adults = guest.adultsCount !== undefined ? Number(guest.adultsCount) : (isChild ? 0 : (Number(guest.count) || 1));
+        const children = guest.childrenCount !== undefined ? Number(guest.childrenCount) : (isChild ? (Number(guest.count) || 1) : 0);
+
+        if (adultsInput) adultsInput.value = adults;
+        if (childrenInput) childrenInput.value = children;
+
+        const total = adults + children;
+        if (summaryText) {
+          summaryText.textContent = `Totale coperti a tavola: ${total} ${total === 1 ? 'persona' : 'persone'} (${adults} ${adults === 1 ? 'adulto' : 'adulti'}, ${children} ${children === 1 ? 'bambino' : 'bambini'})`;
+        }
+
+        const defaultGift = adults * 100;
+        document.getElementById('guest-gift').value = guest.gift !== undefined ? guest.gift : defaultGift;
         document.getElementById('guest-gift-status').value = guest.isGiftReceived ? 'received' : 'pending';
         document.getElementById('guest-notes').value = guest.notes || '';
         if (giftInput) giftInput.dataset.manual = guest.isGiftCustom ? 'true' : '';
       } else {
-        if (title) title.textContent = 'Nuovo Invitato';
+        if (title) title.textContent = 'Nuovo Invitato o Famiglia';
         if (form) form.reset();
-        document.getElementById('guest-count').value = 1;
+        if (adultsInput) adultsInput.value = 1;
+        if (childrenInput) childrenInput.value = 0;
         document.getElementById('guest-party').value = 'both';
-        const typeEl = document.getElementById('guest-type');
-        if (typeEl) typeEl.value = 'adult';
         document.getElementById('guest-gift').value = 100;
         document.getElementById('guest-gift-status').value = 'pending';
+        if (summaryText) {
+          summaryText.textContent = 'Totale coperti a tavola: 1 persona (1 adulto, 0 bambini)';
+        }
         if (giftInput) delete giftInput.dataset.manual;
       }
 
