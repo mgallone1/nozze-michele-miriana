@@ -93,6 +93,7 @@
       uiState.filterCategory = categoryId;
       const selectEl = document.getElementById('filter-category');
       if (selectEl) selectEl.value = categoryId;
+      refreshAll();
       switchTab('expenses');
     });
 
@@ -730,13 +731,17 @@
   document.addEventListener('DOMContentLoaded', async () => {
     registerServiceWorker();
 
-    // 1. Priorità assoluta al Cloud: proviamo a sincronizzare subito i tuoi salvataggi
-    await initCloudSync();
-
-    // 2. Popolamento e disegno interfaccia (con dati già aggiornati dal cloud)
+    // 1. Rendering immediato dai dati locali per non bloccare l'interfaccia né il countdown
     populateCategoryDropdowns();
     bindEvents();
     refreshAll();
+
+    // 2. Sincronizzazione asincrona con Cloud in background
+    try {
+      await initCloudSync();
+    } catch (e) {
+      console.warn('Sync cloud background fallito:', e);
+    }
 
     // Sincronizzazione periodica ogni 15 secondi (o quando l'app torna visibile su iPhone)
     setInterval(async () => {
