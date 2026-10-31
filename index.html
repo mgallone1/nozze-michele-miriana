@@ -869,33 +869,38 @@
             <input type="text" id="guest-name" class="form-input-noble" required placeholder="Es. Famiglia Rossi, Marco Bianchi...">
           </div>
 
+          <div class="form-group-noble">
+            <label class="form-label-noble" for="guest-party">Parte / Lato</label>
+            <select id="guest-party" class="form-select-noble">
+              <option value="both">Ospite Comune (Entrambi)</option>
+              <option value="michele">Lato Michele</option>
+              <option value="miriana">Lato Miriana</option>
+            </select>
+          </div>
+
+          <!-- Composizione Nucleo: Adulti e Bambini -->
           <div class="form-grid-2">
             <div class="form-group-noble">
-              <label class="form-label-noble" for="guest-party">Parte / Lato</label>
-              <select id="guest-party" class="form-select-noble">
-                <option value="both">Ospite Comune (Entrambi)</option>
-                <option value="michele">Lato Michele</option>
-                <option value="miriana">Lato Miriana</option>
-              </select>
+              <label class="form-label-noble" for="guest-adults-count">Adulti (165€ • Dono 100€)</label>
+              <div class="stepper-input-wrap">
+                <button type="button" class="btn-stepper-touch" id="btn-adults-dec">-</button>
+                <input type="number" id="guest-adults-count" class="form-input-noble num" min="0" max="20" step="1" value="1" required>
+                <button type="button" class="btn-stepper-touch" id="btn-adults-inc">+</button>
+              </div>
             </div>
 
             <div class="form-group-noble">
-              <label class="form-label-noble" for="guest-type">Tipologia Menù / Coperto</label>
-              <select id="guest-type" class="form-select-noble">
-                <option value="adult">Adulto (165€ tutto compreso)</option>
-                <option value="child">Bambino (50% • 82,50€)</option>
-              </select>
+              <label class="form-label-noble" for="guest-children-count">Bambini (50% • 82,50€)</label>
+              <div class="stepper-input-wrap">
+                <button type="button" class="btn-stepper-touch" id="btn-children-dec">-</button>
+                <input type="number" id="guest-children-count" class="form-input-noble num" min="0" max="20" step="1" value="0" required>
+                <button type="button" class="btn-stepper-touch" id="btn-children-inc">+</button>
+              </div>
             </div>
           </div>
 
-          <div class="form-group-noble">
-            <label class="form-label-noble" for="guest-count">Numero Persone (Coperti)</label>
-            <div class="stepper-input-wrap">
-              <button type="button" class="btn-stepper-touch" id="btn-guest-dec">-</button>
-              <input type="number" id="guest-count" class="form-input-noble num" min="1" max="20" step="1" value="1" required>
-              <button type="button" class="btn-stepper-touch" id="btn-guest-inc">+</button>
-            </div>
-          </div>
+          <!-- Totale coperti calcolato -->
+          <div class="input-hint-sub mb-sm" id="guest-coperti-summary">Totale coperti a tavola: 1 persona (1 adulto, 0 bambini)</div>
 
           <div class="modal-advances-box">
             <label class="form-label-noble mb-xs">Regalo / Busta Economica</label>
@@ -913,7 +918,7 @@
                 </select>
               </div>
             </div>
-            <div class="input-hint-sub">Calcolato in automatico a 100€ per persona, modificabile in qualsiasi momento.</div>
+            <div class="input-hint-sub">Calcolato in automatico a 100€ per adulto (i bambini sono esclusi dal dono), modificabile in qualsiasi momento.</div>
           </div>
 
           <div class="form-group-noble mb-0">
