@@ -330,8 +330,11 @@ window.WeddingApp.UI = (function () {
                 </div>
 
                 <div class="statement-row">
-                  <span>Liquidità netta attuale</span>
-                  <strong class="row-value-amount amount">${CurrencyFormatter.format(m.currentNetLiquidity)}</strong>
+                  <div class="statement-row-meta">
+                    <span>Disponibilità attuale sul conto</span>
+                    <small class="formula-chip-hint">Trade Republic: ETF + Liquidità</small>
+                  </div>
+                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(m.currentNetLiquidity)}</strong>
                 </div>
               </div>
             </div>
