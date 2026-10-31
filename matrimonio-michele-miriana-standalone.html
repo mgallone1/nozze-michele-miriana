@@ -6623,11 +6623,26 @@ window.WeddingApp.Services = (function () {
 
   class CountdownService {
     static calculate(targetDateString, targetTimeString = '17:00', referenceDate = null) {
-      const target = new Date(`${targetDateString}T${targetTimeString}:00`);
-      const now = (referenceDate instanceof Date && !isNaN(referenceDate)) ? referenceDate : new Date();
-      const diff = target - now;
+      if (!targetDateString) {
+        targetDateString = '2027-07-02';
+      }
+      const safeTime = targetTimeString || '17:00';
+      // Sostituzione per garantire parsing affidabile su Safari / iOS (evita bug ISO string)
+      const targetParts = targetDateString.split('-');
+      const timeParts = safeTime.split(':');
+      const target = new Date(
+        parseInt(targetParts[0], 10),
+        parseInt(targetParts[1], 10) - 1,
+        parseInt(targetParts[2], 10),
+        parseInt(timeParts[0] || '17', 10),
+        parseInt(timeParts[1] || '0', 10),
+        0
+      );
 
-      if (diff <= 0) {
+      const now = (referenceDate instanceof Date && !isNaN(referenceDate.getTime())) ? referenceDate : new Date();
+      const diff = target.getTime() - now.getTime();
+
+      if (isNaN(diff) || diff <= 0) {
         return { isPassed: true, days: 0, hours: 0, minutes: 0, referenceDate: now };
       }
 
@@ -7076,8 +7091,13 @@ window.WeddingApp.Repositories = (function () {
         weddingGifts: { ...(seedSavings.weddingGifts || {}), ...(rawSavings.weddingGifts || {}) }
       };
 
-      // Calcola il numero effettivo degli ospiti se ci sono ospiti registrati
-      const effectiveGuestCount = guests.length > 0 ? guests.length : (raw.details?.estimatedGuests || this.seedData?.details?.estimatedGuests || 105);
+      // Calcola il numero effettivo di persone/coperti a tavola sommando adulti e bambini
+      const totalPeopleCount = guests.reduce((sum, g) => {
+        const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (g.guestType === 'child' ? 0 : (Number(g.count) || 1));
+        const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (g.guestType === 'child' ? (Number(g.count) || 1) : 0);
+        return sum + adults + children;
+      }, 0);
+      const effectiveGuestCount = totalPeopleCount > 0 ? totalPeopleCount : (raw.details?.estimatedGuests || this.seedData?.details?.estimatedGuests || 112);
       const details = {
         ...(this.seedData?.details || {}),
         ...(raw.details || {}),
