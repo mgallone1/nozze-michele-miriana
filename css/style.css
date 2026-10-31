@@ -1974,6 +1974,54 @@ button.btn-editable-val:hover {
   margin-top: 4px;
 }
 
+/* BLOCCO DOPPIO BINARIO SEMPLICE PER I DUE SPOSI */
+.goal-dual-track-box {
+  background: var(--surface-warm);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin: 6px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.track-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84rem;
+}
+
+.track-badge {
+  font-size: 0.70rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.track-ideal .track-badge {
+  background: #E8ECEF;
+  color: var(--ink-secondary);
+}
+
+.track-real .track-badge {
+  background: var(--gold-light);
+  color: var(--ink-primary);
+}
+
+.track-desc {
+  color: var(--ink-secondary);
+}
+
+.text-bronze {
+  color: var(--accent-bronze);
+  font-weight: 700;
+}
+
 .p-row-lbl {
   color: var(--ink-muted);
 }
