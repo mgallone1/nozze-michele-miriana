@@ -162,11 +162,47 @@ window.WeddingApp.UI = (function () {
       const catMap = {};
       categories.forEach(c => { catMap[c.id] = c; });
 
+      // Ordina le spese per categoria in modo coerente
+      const sortedExpenses = [...expenses].sort((a, b) => {
+        const orderA = categories.findIndex(c => c.id === a.categoryId);
+        const orderB = categories.findIndex(c => c.id === b.categoryId);
+        if (orderA !== orderB) return orderA - orderB;
+        return 0;
+      });
+
       let currentCatId = null;
       let html = '';
 
-      expenses.forEach(exp => {
+      sortedExpenses.forEach(exp => {
         const cat = catMap[exp.categoryId] || { name: 'Altro', icon: 'extra' };
+
+        // Inserimento separatore per area se cambia categoria
+        if (exp.categoryId !== currentCatId) {
+          currentCatId = exp.categoryId;
+          const catExpenses = sortedExpenses.filter(e => e.categoryId === currentCatId);
+          const catBudget = catExpenses.reduce((s, e) => s + (e.budget || 0), 0);
+          const catPaid = catExpenses.reduce((s, e) => s + (typeof e.totalPaid === 'function' ? e.totalPaid() : ((e.paidMichele||0) + (e.paidMiriana||0))), 0);
+          const catRem = Math.max(0, catBudget - catPaid);
+
+          html += `
+            <tr class="ledger-category-row-header">
+              <td colspan="7">
+                <div class="ledger-cat-header-content">
+                  <div class="ledger-cat-title-block">
+                    <span class="ledger-cat-icon">${ICONS[cat.icon] || ICONS.extra}</span>
+                    <strong class="ledger-cat-title">${cat.name}</strong>
+                    <span class="ledger-cat-count">${catExpenses.length} ${catExpenses.length === 1 ? 'voce' : 'voci'}</span>
+                  </div>
+                  <div class="ledger-cat-subtotals">
+                    <span>Budget: <strong>${CurrencyFormatter.format(catBudget)}</strong></span>
+                    <span>Anticipati: <strong class="text-paid">${CurrencyFormatter.format(catPaid)}</strong></span>
+                    <span>Rimanenti: <strong class="${catRem === 0 ? 'text-settled' : 'text-pending'}">${CurrencyFormatter.format(catRem)}</strong></span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
         const status = exp.resolveStatus();
         let statusLabel = 'In pianificazione';
         let statusClass = 'pianificato';
@@ -1085,9 +1121,18 @@ window.WeddingApp.UI = (function () {
         micheleRatio: 0.5
       };
 
+      const adultCount = stats.adultGuestsCount !== undefined ? stats.adultGuestsCount : guests.reduce((sum, g) => {
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        return sum + (g.adultsCount !== undefined ? Number(g.adultsCount) : (isChild ? 0 : (Number(g.count) || 1)));
+      }, 0);
+      const childCount = stats.childGuestsCount !== undefined ? stats.childGuestsCount : guests.reduce((sum, g) => {
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        return sum + (g.childrenCount !== undefined ? Number(g.childrenCount) : (isChild ? (Number(g.count) || 1) : 0));
+      }, 0);
+
       if (totalEl) totalEl.textContent = stats.totalGuests;
       if (breakdownEl) {
-        breakdownEl.textContent = `${stats.micheleGuests} Michele • ${stats.mirianaGuests} Miriana • ${stats.bothGuests} Insieme`;
+        breakdownEl.textContent = `${adultCount} Adulti • ${childCount} Bambini (${stats.micheleGuests} Mich. • ${stats.mirianaGuests} Mir.)`;
       }
 
       const pM = Math.round(stats.micheleRatio * 100);
@@ -1123,8 +1168,9 @@ window.WeddingApp.UI = (function () {
         const giftVal = Number(g.gift) || (Number(g.adultsCount !== undefined ? g.adultsCount : g.count) * 100);
         const isReceived = Boolean(g.isGiftReceived);
 
-        const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (g.guestType === 'child' ? 0 : (Number(g.count) || 1));
-        const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (g.guestType === 'child' ? (Number(g.count) || 1) : 0);
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        const adults = g.adultsCount !== undefined ? Number(g.adultsCount) : (isChild ? 0 : (Number(g.count) || 1));
+        const children = g.childrenCount !== undefined ? Number(g.childrenCount) : (isChild ? (Number(g.count) || 1) : 0);
         const totalPeople = adults + children;
 
         let compositionBadge = '';
