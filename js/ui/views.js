@@ -205,9 +205,13 @@ window.WeddingApp.UI = (function () {
           splitBadge = `<span class="split-type-pill equal">Comune 50/50</span>`;
         }
 
-        const costTypeBadge = exp.isEstimate
+        const costTypeBadge = (exp.isEstimate === true || exp.isEstimate === 'true')
           ? `<span class="cost-nature-pill estimate" title="Costo stimato indicativo">📝 Stima</span>`
           : `<span class="cost-nature-pill contract" title="Costo reale contrattualizzato">🔒 Contratto</span>`;
+
+        const staffBadge = (exp.staffCount && Number(exp.staffCount) > 0)
+          ? `<span class="cost-nature-pill staff" title="${exp.staffCount} membri staff contati al catering al 50%">🍽️ ${exp.staffCount} staff</span>`
+          : '';
 
         html += `
           <tr data-id="${exp.id}">
@@ -217,6 +221,7 @@ window.WeddingApp.UI = (function () {
                 ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
                 ${splitBadge}
                 ${costTypeBadge}
+                ${staffBadge}
               </div>
             </td>
             <td class="col-investment amount">${CurrencyFormatter.format(exp.budget)}</td>
