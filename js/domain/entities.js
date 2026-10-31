@@ -21,7 +21,8 @@ window.WeddingApp.Domain = (function () {
       dueDate = '',
       splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
       payer = 'both', // indicativo di chi si occupa del pagamento
-      isEstimate = false // true = Costo Stimato, false = Costo Reale / a Contratto
+      isEstimate = false, // true = Costo Stimato, false = Costo Reale / a Contratto
+      staffCount = 0 // Membri staff/fornitori presenti al ricevimento (50% catering)
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
@@ -36,6 +37,7 @@ window.WeddingApp.Domain = (function () {
       this.splitType = splitType || 'equal';
       this.payer = payer || 'both';
       this.isEstimate = Boolean(isEstimate);
+      this.staffCount = Math.max(0, parseInt(staffCount, 10) || 0);
     }
 
     calculateOwed(micheleGuestRatio = 0.5) {
@@ -182,7 +184,10 @@ window.WeddingApp.Domain = (function () {
       if (totalRosteredGuests === 0) {
         adultGuestsCount = effectiveTotalGuests;
       }
-      const staffMealsCount = Math.max(0, parseInt(safeDetails.staffMealsCount ?? 0, 10) || 0);
+
+      // Conteggio pasti staff calcolato direttamente sommando il campo staffCount da ciascun fornitore / servizio (fotografo, band, dj, ecc.)
+      const vendorStaffSum = safeExpenses.reduce((sum, exp) => sum + (exp.id !== 'exp_2' ? (Number(exp.staffCount) || 0) : 0), 0);
+      const staffMealsCount = vendorStaffSum > 0 ? vendorStaffSum : Math.max(0, parseInt(safeDetails.staffMealsCount ?? 0, 10) || 0);
 
       // Aggiorna dinamicamente la voce Catering:
       // Adulti: 150€ + 10% IVA = 165€ a persona
