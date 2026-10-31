@@ -3090,6 +3090,50 @@ button.btn-editable-val:hover {
   border: 1px solid rgba(74, 107, 89, 0.2);
 }
 
+.cost-nature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+.cost-nature-pill.contract {
+  background: rgba(44, 74, 90, 0.08);
+  color: var(--accent-navy);
+  border: 1px solid rgba(44, 74, 90, 0.25);
+}
+
+.cost-nature-pill.estimate {
+  background: rgba(138, 115, 84, 0.08);
+  color: var(--accent-bronze);
+  border: 1px dashed rgba(138, 115, 84, 0.35);
+}
+
+.guest-menu-pill {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+}
+
+.guest-menu-pill.child {
+  background: #FFF3E0;
+  color: #E65100;
+  border: 1px solid rgba(230, 81, 0, 0.25);
+}
+
+.guest-menu-pill.adult {
+  background: var(--surface-warm);
+  color: var(--ink-muted);
+  border: 1px solid var(--border-hairline);
+}
+
 /* ==========================================================================
    VISTA OSPITI & DONI (LUXURY 2027 MOBILE-FIRST)
    ========================================================================== */
@@ -3994,15 +4038,26 @@ button.btn-editable-val:hover {
             </div>
           </div>
 
-          <!-- Ripartizione Responsabilità Economica (Chi deve sostenerla) -->
-          <div class="form-group-noble">
-            <label class="form-label-noble" for="expense-split-type">Competenza Economica (A carico di)</label>
-            <select id="expense-split-type" class="form-select-noble">
-              <option value="equal">Spesa Comune (Divisa 50% e 50%)</option>
-              <option value="michele">Personale di Michele (100% Michele)</option>
-              <option value="miriana">Personale di Miriana (100% Miriana)</option>
-              <option value="guests">Proporzionale agli Invitati (% Ospiti)</option>
-            </select>
+          <div class="form-grid-2">
+            <!-- Ripartizione Responsabilità Economica (Chi deve sostenerla) -->
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-split-type">Competenza Economica (A carico di)</label>
+              <select id="expense-split-type" class="form-select-noble">
+                <option value="equal">Spesa Comune (Divisa 50% e 50%)</option>
+                <option value="michele">Personale di Michele (100% Michele)</option>
+                <option value="miriana">Personale di Miriana (100% Miriana)</option>
+                <option value="guests">Proporzionale agli Invitati (% Ospiti)</option>
+              </select>
+            </div>
+
+            <!-- Tipologia Costo: Reale / Contratto vs Stimato -->
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-is-estimate">Tipologia Costo</label>
+              <select id="expense-is-estimate" class="form-select-noble">
+                <option value="false">🔒 Costo Reale / a Contratto</option>
+                <option value="true">📝 Costo Stimato / da Definire</option>
+              </select>
+            </div>
           </div>
 
           <!-- Quote Versate -->
@@ -4173,12 +4228,18 @@ button.btn-editable-val:hover {
                 <input type="number" id="sp-guests-count" class="form-input-noble" min="1" max="500" step="1" required>
               </div>
               <div class="form-group-noble">
+                <label class="form-label-noble" for="sp-staff-meals">Pasti Staff / Fornitori (50% Catering)</label>
+                <input type="number" id="sp-staff-meals" class="form-input-noble" min="0" max="50" step="1" value="0">
+              </div>
+            </div>
+            <div class="form-grid-row">
+              <div class="form-group-noble">
                 <label class="form-label-noble" for="sp-gifts-estimated">Stima Doni / Buste (€)</label>
                 <input type="number" id="sp-gifts-estimated" class="form-input-noble" min="0" step="100" required>
               </div>
             </div>
             <div class="form-group-noble form-group-last">
-              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato).</div>
+              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato). Lo staff catering è conteggiato al 50% (82,50€ a pasto).</div>
             </div>
           </div>
 
@@ -4220,12 +4281,20 @@ button.btn-editable-val:hover {
             </div>
 
             <div class="form-group-noble">
-              <label class="form-label-noble" for="guest-count">Numero Persone (Coperti)</label>
-              <div class="stepper-input-wrap">
-                <button type="button" class="btn-stepper-touch" id="btn-guest-dec">-</button>
-                <input type="number" id="guest-count" class="form-input-noble num" min="1" max="20" step="1" value="1" required>
-                <button type="button" class="btn-stepper-touch" id="btn-guest-inc">+</button>
-              </div>
+              <label class="form-label-noble" for="guest-type">Tipologia Menù / Coperto</label>
+              <select id="guest-type" class="form-select-noble">
+                <option value="adult">Adulto (165€ tutto compreso)</option>
+                <option value="child">Bambino (50% • 82,50€)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group-noble">
+            <label class="form-label-noble" for="guest-count">Numero Persone (Coperti)</label>
+            <div class="stepper-input-wrap">
+              <button type="button" class="btn-stepper-touch" id="btn-guest-dec">-</button>
+              <input type="number" id="guest-count" class="form-input-noble num" min="1" max="20" step="1" value="1" required>
+              <button type="button" class="btn-stepper-touch" id="btn-guest-inc">+</button>
             </div>
           </div>
 
@@ -5913,7 +5982,8 @@ window.WeddingApp.Domain = (function () {
       notes = '',
       dueDate = '',
       splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
-      payer = 'both' // indicativo di chi si occupa del pagamento
+      payer = 'both', // indicativo di chi si occupa del pagamento
+      isEstimate = false // true = Costo Stimato, false = Costo Reale / a Contratto
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
@@ -5927,6 +5997,7 @@ window.WeddingApp.Domain = (function () {
       this.dueDate = dueDate || '';
       this.splitType = splitType || 'equal';
       this.payer = payer || 'both';
+      this.isEstimate = Boolean(isEstimate);
     }
 
     calculateOwed(micheleGuestRatio = 0.5) {
@@ -6001,7 +6072,8 @@ window.WeddingApp.Domain = (function () {
       gift = 0,
       isGiftReceived = false,
       isGiftCustom = false,
-      notes = ''
+      notes = '',
+      guestType = 'adult' // 'adult' (100% menù), 'child' (50% menù)
     }) {
       this.id = id || ('gst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.name = (name || '').trim();
@@ -6011,6 +6083,8 @@ window.WeddingApp.Domain = (function () {
       this.isGiftReceived = Boolean(isGiftReceived);
       this.isGiftCustom = Boolean(isGiftCustom);
       this.notes = (notes || '').trim();
+      const detectedChild = (this.notes.toLowerCase().includes('bambin') || guestType === 'child');
+      this.guestType = detectedChild ? 'child' : 'adult';
     }
 
     validate() {
@@ -6055,13 +6129,41 @@ window.WeddingApp.Domain = (function () {
       const totalRosteredGuests = guestsCountMichele + guestsCountMiriana + guestsCountBoth;
       const effectiveTotalGuests = totalRosteredGuests > 0 ? totalRosteredGuests : Number(safeDetails.estimatedGuests ?? 100);
 
-      // Aggiorna dinamicamente la voce Catering in base al numero esatto di ospiti (150€ + 10% IVA = 165€ a persona)
+      // Conteggio adulti, bambini e staff catering (50% menù bambini e 50% menù fornitori)
+      let adultGuestsCount = 0;
+      let childGuestsCount = 0;
+      safeGuests.forEach(g => {
+        const c = Number(g.count) || 1;
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        if (isChild) {
+          childGuestsCount += c;
+        } else {
+          adultGuestsCount += c;
+        }
+      });
+      if (totalRosteredGuests === 0) {
+        adultGuestsCount = effectiveTotalGuests;
+      }
+      const staffMealsCount = Math.max(0, parseInt(safeDetails.staffMealsCount ?? 0, 10) || 0);
+
+      // Aggiorna dinamicamente la voce Catering:
+      // Adulti: 150€ + 10% IVA = 165€ a persona
+      // Bambini: 50% = 75€ + 10% IVA = 82,50€
+      // Staff / Fornitori: 50% = 75€ + 10% IVA = 82,50€
       const cateringExp = safeExpenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
       if (cateringExp) {
-        cateringExp.item = `Banchetto & Catering (150€ + IVA 10% × ${effectiveTotalGuests} ospiti)`;
-        cateringExp.budget = Math.round(150 * 1.1 * effectiveTotalGuests);
+        const adultTotal = Math.round(150 * 1.1 * adultGuestsCount);
+        const childTotal = Math.round(75 * 1.1 * childGuestsCount);
+        const staffTotal = Math.round(75 * 1.1 * staffMealsCount);
+        cateringExp.budget = adultTotal + childTotal + staffTotal;
+        
+        let labelDesc = `${adultGuestsCount} adulti`;
+        if (childGuestsCount > 0) labelDesc += ` + ${childGuestsCount} bambini (50%)`;
+        if (staffMealsCount > 0) labelDesc += ` + ${staffMealsCount} staff (50%)`;
+        cateringExp.item = `Banchetto & Catering (${labelDesc})`;
+        
         if (!cateringExp.notes.includes('165€')) {
-          cateringExp.notes = `Menù 150€ + IVA 10% (165€ a persona tutto compreso). ${cateringExp.notes}`;
+          cateringExp.notes = `Menù adulti 150€ + IVA (165€). Bambini e Staff al 50% (82,50€). ${cateringExp.notes}`;
         }
       }
 
@@ -6388,6 +6490,14 @@ window.WeddingApp.Domain = (function () {
               projectedAtCurrentPace: mirCurrentNetLiquidity + (mirMonthly * remMonths),
               gapAtCurrentPace: Math.max(0, mirStillToSave - (mirMonthly * remMonths))
             }
+          },
+          cateringBreakdown: {
+            adultGuestsCount,
+            childGuestsCount,
+            staffMealsCount,
+            costAdult: 165,
+            costChild: 82.5,
+            costStaff: 82.5
           }
         }
       };
@@ -6775,7 +6885,8 @@ window.WeddingApp.Repositories = (function () {
             notes: e.notes,
             dueDate: e.dueDate,
             splitType: e.splitType || 'equal',
-            payer: e.payer || 'both'
+            payer: e.payer || 'both',
+            isEstimate: Boolean(e.isEstimate)
           })),
           guests: (dataset.guests || []).map(g => ({
             id: g.id,
@@ -6785,7 +6896,8 @@ window.WeddingApp.Repositories = (function () {
             gift: g.gift || 0,
             isGiftReceived: Boolean(g.isGiftReceived),
             isGiftCustom: Boolean(g.isGiftCustom),
-            notes: g.notes || ''
+            notes: g.notes || '',
+            guestType: g.guestType || ((g.notes || '').toLowerCase().includes('bambin') ? 'child' : 'adult')
           }))
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(plainData));
@@ -6889,11 +7001,29 @@ window.WeddingApp.Repositories = (function () {
         estimatedGuests: effectiveGuestCount
       };
 
-      // Aggiornamento dinamico automatico del Catering in base al numero esatto di invitati (150€ + 10% IVA = 165€ a persona)
+      // Aggiornamento dinamico del Catering in base ad adulti, bambini e staff (150€ + 10% IVA per adulti, 50% per bambini e staff)
       const cateringExpense = expenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
       if (cateringExpense) {
-        cateringExpense.item = `Banchetto & Catering (150€ + IVA 10% × ${effectiveGuestCount} ospiti)`;
-        cateringExpense.budget = Math.round(150 * 1.1 * effectiveGuestCount);
+        let adultCount = 0;
+        let childCount = 0;
+        guests.forEach(g => {
+          const c = Number(g.count) || 1;
+          const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+          if (isChild) childCount += c;
+          else adultCount += c;
+        });
+        if (guests.length === 0) adultCount = effectiveGuestCount;
+        const staffCount = Math.max(0, parseInt(details.staffMealsCount ?? 0, 10) || 0);
+
+        const adultTotal = Math.round(150 * 1.1 * adultCount);
+        const childTotal = Math.round(75 * 1.1 * childCount);
+        const staffTotal = Math.round(75 * 1.1 * staffCount);
+        cateringExpense.budget = adultTotal + childTotal + staffTotal;
+
+        let labelDesc = `${adultCount} adulti`;
+        if (childCount > 0) labelDesc += ` + ${childCount} bambini (50%)`;
+        if (staffCount > 0) labelDesc += ` + ${staffCount} staff (50%)`;
+        cateringExpense.item = `Banchetto & Catering (${labelDesc})`;
       }
 
       return {
@@ -7354,6 +7484,10 @@ window.WeddingApp.UI = (function () {
           splitBadge = `<span class="split-type-pill equal">Comune 50/50</span>`;
         }
 
+        const costTypeBadge = exp.isEstimate
+          ? `<span class="cost-nature-pill estimate" title="Costo stimato indicativo">📝 Stima</span>`
+          : `<span class="cost-nature-pill contract" title="Costo reale contrattualizzato">🔒 Contratto</span>`;
+
         html += `
           <tr data-id="${exp.id}">
             <td class="col-item">
@@ -7361,6 +7495,7 @@ window.WeddingApp.UI = (function () {
               <div class="item-meta-row">
                 ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
                 ${splitBadge}
+                ${costTypeBadge}
               </div>
             </td>
             <td class="col-investment amount">${CurrencyFormatter.format(exp.budget)}</td>
@@ -7879,6 +8014,7 @@ window.WeddingApp.UI = (function () {
           const isAuto = autoCheckbox ? autoCheckbox.checked : true;
           const formData = {
             estimatedGuests: parseInt(document.getElementById('sp-guests-count')?.value, 10) || 100,
+            staffMealsCount: parseInt(document.getElementById('sp-staff-meals')?.value, 10) || 0,
             michele: {
               monthlySavings: parseFloat(document.getElementById('sp-michele-monthly')?.value) || 0,
               initialSavings: parseFloat(document.getElementById('sp-michele-initial')?.value) || 0,
@@ -7953,6 +8089,7 @@ window.WeddingApp.UI = (function () {
       };
 
       setVal('sp-guests-count', details?.estimatedGuests ?? 100);
+      setVal('sp-staff-meals', details?.staffMealsCount ?? 0);
       setVal('sp-michele-monthly', m.monthlySavings ?? 740);
       setVal('sp-michele-initial', m.initialSavings ?? 9000);
       setVal('sp-michele-months-done', isManual ? (m.currentMonths ?? defaultElapsed) : defaultElapsed);
@@ -8255,12 +8392,17 @@ window.WeddingApp.UI = (function () {
         const partyClass = g.party === 'michele' ? 'michele' : (g.party === 'miriana' ? 'miriana' : 'both');
         const giftVal = Number(g.gift) || (Number(g.count) * 100);
         const isReceived = Boolean(g.isGiftReceived);
+        const isChild = (g.guestType === 'child' || (g.notes || '').toLowerCase().includes('bambin'));
+        const menuBadge = isChild
+          ? `<span class="guest-menu-pill child">Bambino (50%)</span>`
+          : `<span class="guest-menu-pill adult">Adulto</span>`;
 
         return `
           <div class="guest-card" data-id="${g.id}">
             <div class="guest-card-header">
               <div>
                 <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
+                ${menuBadge}
                 <h4 class="guest-name">${g.name}</h4>
               </div>
               <div class="guest-count-badge">${g.count} ${g.count === 1 ? 'persona' : 'persone'}</div>
@@ -8363,6 +8505,8 @@ window.WeddingApp.UI = (function () {
           const count = parseInt(document.getElementById('guest-count').value, 10) || 1;
           const gift = parseFloat(document.getElementById('guest-gift').value) || (count * 100);
           const isGiftReceived = document.getElementById('guest-gift-status').value === 'received';
+          const guestTypeEl = document.getElementById('guest-type');
+          const guestType = guestTypeEl ? guestTypeEl.value : 'adult';
           const notes = document.getElementById('guest-notes').value.trim();
 
           if (typeof onSave === 'function') {
@@ -8371,6 +8515,7 @@ window.WeddingApp.UI = (function () {
               name,
               party,
               count,
+              guestType,
               gift,
               isGiftReceived,
               isGiftCustom: Boolean(giftInput.dataset.manual),
@@ -8391,10 +8536,13 @@ window.WeddingApp.UI = (function () {
 
       GuestModalView._currentId = guest ? guest.id : null;
 
-      if (guest) {
+        if (guest) {
         if (title) title.textContent = 'Modifica Invitato';
         document.getElementById('guest-name').value = guest.name || '';
         document.getElementById('guest-party').value = guest.party || 'both';
+        const isChild = (guest.guestType === 'child' || (guest.notes || '').toLowerCase().includes('bambin'));
+        const typeEl = document.getElementById('guest-type');
+        if (typeEl) typeEl.value = isChild ? 'child' : 'adult';
         document.getElementById('guest-count').value = guest.count || 1;
         document.getElementById('guest-gift').value = guest.gift !== undefined ? guest.gift : (guest.count * 100);
         document.getElementById('guest-gift-status').value = guest.isGiftReceived ? 'received' : 'pending';
@@ -8405,6 +8553,8 @@ window.WeddingApp.UI = (function () {
         if (form) form.reset();
         document.getElementById('guest-count').value = 1;
         document.getElementById('guest-party').value = 'both';
+        const typeEl = document.getElementById('guest-type');
+        if (typeEl) typeEl.value = 'adult';
         document.getElementById('guest-gift').value = 100;
         document.getElementById('guest-gift-status').value = 'pending';
         if (giftInput) delete giftInput.dataset.manual;
@@ -8698,11 +8848,19 @@ window.WeddingApp.UI = (function () {
       document.getElementById('expense-notes').value = exp.notes || '';
       document.getElementById('expense-status').value = exp.status || 'pianificato';
       document.getElementById('expense-split-type').value = exp.splitType || 'equal';
+      const estimateSelect = document.getElementById('expense-is-estimate');
+      if (estimateSelect) {
+        estimateSelect.value = exp.isEstimate ? 'true' : 'false';
+      }
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
       document.getElementById('expense-status').value = 'pianificato';
       document.getElementById('expense-split-type').value = 'equal';
+      const estimateSelect = document.getElementById('expense-is-estimate');
+      if (estimateSelect) {
+        estimateSelect.value = 'true';
+      }
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
@@ -8740,6 +8898,7 @@ window.WeddingApp.UI = (function () {
     const notes = document.getElementById('expense-notes').value.trim();
     const status = document.getElementById('expense-status').value;
     const splitType = document.getElementById('expense-split-type').value || 'equal';
+    const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
 
     const payload = {
       id: uiState.editingExpenseId,
@@ -8751,7 +8910,8 @@ window.WeddingApp.UI = (function () {
       supplier,
       notes,
       status,
-      splitType
+      splitType,
+      isEstimate
     };
 
     const result = saveExpenseUseCase.execute(payload);
