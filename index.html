@@ -255,11 +255,11 @@
         <!-- Renderizzato dinamicamente da SavingsPlanView -->
       </div>
 
-      <!-- CRUSCOTTO TRAGUARDO & STATO OBIETTIVO FINALE -->
+      <!-- CRUSCOTTO TRAGUARDO FINANZIARIO GENERALE & PERSONALE -->
       <div class="goal-target-card">
         <div class="goal-target-header">
           <div>
-            <span class="goal-target-badge">Traguardo Finanziario</span>
+            <span class="goal-target-badge">Traguardo Finanziario Totale</span>
             <h3 class="goal-target-title" id="goal-status-headline">Calcolo distanza dall'obiettivo...</h3>
           </div>
           <div class="goal-target-pct-badge" id="goal-target-pct">0%</div>
@@ -292,6 +292,77 @@
             <span class="goal-stat-label">Margine Finale Previsto</span>
             <strong class="goal-stat-val amount text-sage" id="plan-safety-margin">—</strong>
             <small class="goal-stat-sub">Riserva di sicurezza</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRUSCOTTO TRAGUARDI PERSONALI DEI DUE SPOSI -->
+      <div class="personal-goals-grid">
+        <!-- TRAGUARDO MICHELE -->
+        <div class="personal-goal-card michele-card">
+          <div class="personal-goal-header">
+            <div>
+              <span class="pill-person michele">Traguardo Michele</span>
+              <h4 class="personal-goal-headline" id="goal-michele-headline">Avanzamento personale...</h4>
+            </div>
+            <div class="personal-goal-pct" id="goal-michele-pct">0%</div>
+          </div>
+
+          <div class="goal-progress-track">
+            <div class="goal-progress-bar personal-progress-michele" id="goal-michele-fill"></div>
+          </div>
+
+          <div class="personal-goal-rows">
+            <div class="personal-goal-row">
+              <span class="p-row-lbl">Quota Spese da Coprire</span>
+              <strong class="p-row-val amount" id="goal-michele-target">—</strong>
+            </div>
+            <div class="personal-goal-row">
+              <span class="p-row-lbl">Liquidità Accantonata Oggi</span>
+              <strong class="p-row-val amount text-settled" id="goal-michele-saved">—</strong>
+            </div>
+            <div class="personal-goal-row">
+              <span class="p-row-lbl">Distanza dal Traguardo</span>
+              <strong class="p-row-val amount text-terracotta" id="goal-michele-still">—</strong>
+            </div>
+            <div class="personal-goal-row border-top">
+              <span class="p-row-lbl">Ritmo Rate Mancanti</span>
+              <span class="p-row-val" id="goal-michele-rate">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRAGUARDO MIRIANA -->
+        <div class="personal-goal-card miriana-card">
+          <div class="personal-goal-header">
+            <div>
+              <span class="pill-person miriana">Traguardo Miriana</span>
+              <h4 class="personal-goal-headline" id="goal-miriana-headline">Avanzamento personale...</h4>
+            </div>
+            <div class="personal-goal-pct" id="goal-miriana-pct">0%</div>
+          </div>
+
+          <div class="goal-progress-track">
+            <div class="goal-progress-bar personal-progress-miriana" id="goal-miriana-fill"></div>
+          </div>
+
+          <div class="personal-goal-rows">
+            <div class="personal-goal-row">
+              <span class="p-row-lbl">Quota Spese (al netto dote genitori)</span>
+              <strong class="p-row-val amount" id="goal-miriana-target">—</strong>
+            </div>
+            <div class="personal-goal-row">
+              <span class="p-row-lbl">Liquidità Personale Oggi</span>
+              <strong class="p-row-val amount text-settled" id="goal-miriana-saved">—</strong>
+            </div>
+            <div class="personal-goal-row">
+              <span class="p-row-lbl">Distanza dal Traguardo</span>
+              <strong class="p-row-val amount text-terracotta" id="goal-miriana-still">—</strong>
+            </div>
+            <div class="personal-goal-row border-top">
+              <span class="p-row-lbl">Ritmo Rate Mancanti</span>
+              <span class="p-row-val" id="goal-miriana-rate">—</span>
+            </div>
           </div>
         </div>
       </div>
