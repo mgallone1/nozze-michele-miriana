@@ -554,6 +554,82 @@ window.WeddingApp.UI = (function () {
             planStillToSaveNote.textContent = `Circa ${monthlyRate}€/mese nei prossimi ${coverage.remainingMonths} mesi`;
           }
         }
+
+        // Render Traguardi Personali dei due sposi
+        if (coverage.personalGoals) {
+          const pgM = coverage.personalGoals.michele;
+          const pgMir = coverage.personalGoals.miriana;
+
+          // Michele
+          const gMHeadline = document.getElementById('goal-michele-headline');
+          const gMPct = document.getElementById('goal-michele-pct');
+          const gMFill = document.getElementById('goal-michele-fill');
+          const gMTarget = document.getElementById('goal-michele-target');
+          const gMSaved = document.getElementById('goal-michele-saved');
+          const gMStill = document.getElementById('goal-michele-still');
+          const gMRate = document.getElementById('goal-michele-rate');
+
+          if (pgM) {
+            if (gMPct) gMPct.textContent = `${pgM.progressPct}%`;
+            if (gMFill) gMFill.style.width = `${pgM.progressPct}%`;
+            if (gMTarget) gMTarget.textContent = CurrencyFormatter.format(pgM.targetBudget);
+            if (gMSaved) gMSaved.textContent = CurrencyFormatter.format(pgM.currentLiquidity);
+
+            if (pgM.stillToSave <= 0) {
+              if (gMHeadline) gMHeadline.textContent = 'Traguardo Raggiunto: le tue spese sono coperte!';
+              if (gMStill) {
+                gMStill.textContent = 'Coperto 100%';
+                gMStill.className = 'p-row-val text-sage amount';
+              }
+              if (gMRate) gMRate.textContent = 'Nessun debito rimanente';
+            } else {
+              if (gMHeadline) gMHeadline.textContent = `Sei al ${pgM.progressPct}%: mancano ${CurrencyFormatter.format(pgM.stillToSave)}`;
+              if (gMStill) {
+                gMStill.textContent = CurrencyFormatter.format(pgM.stillToSave);
+                gMStill.className = 'p-row-val text-terracotta amount';
+              }
+              if (gMRate && coverage.remainingMonths) {
+                const mRate = Math.round(pgM.stillToSave / Math.max(1, coverage.remainingMonths));
+                gMRate.textContent = `Servono ${mRate}€/m per ${coverage.remainingMonths} mesi`;
+              }
+            }
+          }
+
+          // Miriana
+          const gMirHeadline = document.getElementById('goal-miriana-headline');
+          const gMirPct = document.getElementById('goal-miriana-pct');
+          const gMirFill = document.getElementById('goal-miriana-fill');
+          const gMirTarget = document.getElementById('goal-miriana-target');
+          const gMirSaved = document.getElementById('goal-miriana-saved');
+          const gMirStill = document.getElementById('goal-miriana-still');
+          const gMirRate = document.getElementById('goal-miriana-rate');
+
+          if (pgMir) {
+            if (gMirPct) gMirPct.textContent = `${pgMir.progressPct}%`;
+            if (gMirFill) gMirFill.style.width = `${pgMir.progressPct}%`;
+            if (gMirTarget) gMirTarget.textContent = CurrencyFormatter.format(pgMir.targetBudgetNet);
+            if (gMirSaved) gMirSaved.textContent = CurrencyFormatter.format(pgMir.currentLiquidity);
+
+            if (pgMir.stillToSave <= 0) {
+              if (gMirHeadline) gMirHeadline.textContent = 'Traguardo Raggiunto: le tue spese sono coperte!';
+              if (gMirStill) {
+                gMirStill.textContent = 'Coperto 100%';
+                gMirStill.className = 'p-row-val text-sage amount';
+              }
+              if (gMirRate) gMirRate.textContent = 'Nessun debito rimanente';
+            } else {
+              if (gMirHeadline) gMirHeadline.textContent = `Sei al ${pgMir.progressPct}%: mancano ${CurrencyFormatter.format(pgMir.stillToSave)}`;
+              if (gMirStill) {
+                gMirStill.textContent = CurrencyFormatter.format(pgMir.stillToSave);
+                gMirStill.className = 'p-row-val text-terracotta amount';
+              }
+              if (gMirRate && coverage.remainingMonths) {
+                const mirRate = Math.round(pgMir.stillToSave / Math.max(1, coverage.remainingMonths));
+                gMirRate.textContent = `Servono ${mirRate}€/m per ${coverage.remainingMonths} mesi`;
+              }
+            }
+          }
+        }
       }
     }
   }
