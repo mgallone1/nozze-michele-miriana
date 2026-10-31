@@ -335,6 +335,22 @@ window.WeddingApp.Domain = (function () {
       const totalBudgetProgressPct = totalBudget > 0 ? Math.min(100, Math.round((totalPaid / totalBudget) * 100)) : 0;
       const targetFundingProgressPct = totalBudget > 0 ? Math.min(100, Math.round(((totalPaid + currentNetLiquidityToday) / totalBudget) * 100)) : 0;
 
+      // Traguardi Personali Singoli (Michele & Miriana)
+      // Michele:
+      const mTargetBudget = totalOwedMichele;
+      const mSavedToday = currentSavingsAccumulatedMichele; // Dotazione iniziale + rate accantonate ad oggi
+      const mStillToSave = Math.max(0, mTargetBudget - mExpensesPaid - mCurrentNetLiquidity);
+      const mProgressPct = mTargetBudget > 0 ? Math.min(100, Math.round(((mExpensesPaid + mCurrentNetLiquidity) / mTargetBudget) * 100)) : 100;
+
+      // Miriana (con dote genitori 10k dedicata a copertura delle sue spese):
+      const mirTargetBudgetGross = totalOwedMiriana;
+      const mirTargetBudgetNet = mirianaNetOwed; // Al netto del dono di Amedeo & Anna
+      const mirSavedToday = currentSavingsAccumulatedMiriana;
+      // Per Miriana, la liquidità e i fondi disponibili ad oggi includono i suoi risparmi e il residuo dono genitori disponibile
+      const mirTotalAvailableToday = mirCurrentNetLiquidity + famAvailable;
+      const mirStillToSave = Math.max(0, mirTargetBudgetNet - mirPersonalExpensesPaid - mirCurrentNetLiquidity);
+      const mirProgressPct = mirTargetBudgetNet > 0 ? Math.min(100, Math.round(((mirPersonalExpensesPaid + mirCurrentNetLiquidity) / mirTargetBudgetNet) * 100)) : 100;
+
       return {
         totalBudget,
         totalPaidMichele,
@@ -433,7 +449,33 @@ window.WeddingApp.Domain = (function () {
           stillToSaveToTarget,
           totalBudgetProgressPct,
           targetFundingProgressPct,
-          remainingMonths: timeline.remainingMonths
+          remainingMonths: timeline.remainingMonths,
+          // Traguardi Personali
+          personalGoals: {
+            michele: {
+              targetBudget: mTargetBudget,
+              savedToday: mSavedToday,
+              paidToday: mExpensesPaid,
+              currentLiquidity: mCurrentNetLiquidity,
+              grossProjected: mGrossProjected,
+              stillToSave: mStillToSave,
+              progressPct: mProgressPct,
+              finalMargin: mFinalNetResidual - (mTargetBudget - mExpensesPaid)
+            },
+            miriana: {
+              targetBudgetGross: mirTargetBudgetGross,
+              targetBudgetNet: mirTargetBudgetNet,
+              savedToday: mirSavedToday,
+              paidToday: mirPersonalExpensesPaid,
+              currentLiquidity: mirCurrentNetLiquidity,
+              familyAvailable: famAvailable,
+              totalAvailableToday: mirTotalAvailableToday,
+              grossProjected: mirGrossProjected,
+              stillToSave: mirStillToSave,
+              progressPct: mirProgressPct,
+              finalMargin: mirFinalNetResidual - (mirTargetBudgetNet - mirPersonalExpensesPaid)
+            }
+          }
         }
       };
     }
