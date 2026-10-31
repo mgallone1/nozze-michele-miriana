@@ -1892,6 +1892,108 @@ button.btn-editable-val:hover {
   }
 }
 
+/* CRUSCOTTO TRAGUARDI PERSONALI DEI DUE SPOSI */
+.personal-goals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.personal-goal-card {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.personal-goal-card.michele-card {
+  border-top: 3px solid var(--accent-slate);
+}
+
+.personal-goal-card.miriana-card {
+  border-top: 3px solid var(--accent-rose);
+}
+
+.personal-goal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.personal-goal-headline {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--ink-primary);
+  margin: 6px 0 0 0;
+}
+
+.personal-goal-pct {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  background: var(--surface-warm);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.personal-progress-michele {
+  background: linear-gradient(90deg, #A8C0D6, var(--accent-slate));
+}
+
+.personal-progress-miriana {
+  background: linear-gradient(90deg, #F0C4CC, var(--accent-rose));
+}
+
+.personal-goal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.personal-goal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+
+.personal-goal-row.border-top {
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.p-row-lbl {
+  color: var(--ink-muted);
+}
+
+.p-row-val {
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+@media (max-width: 768px) {
+  .personal-goals-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .personal-goal-card {
+    padding: 20px 16px;
+  }
+}
+
 /* ==========================================================================
    CLASSI DI PRESENTAZIONE SEMANTICA (ZERO STILI INLINE)
    ========================================================================== */
