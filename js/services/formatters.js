@@ -23,11 +23,26 @@ window.WeddingApp.Services = (function () {
 
   class CountdownService {
     static calculate(targetDateString, targetTimeString = '17:00', referenceDate = null) {
-      const target = new Date(`${targetDateString}T${targetTimeString}:00`);
-      const now = (referenceDate instanceof Date && !isNaN(referenceDate)) ? referenceDate : new Date();
-      const diff = target - now;
+      if (!targetDateString) {
+        targetDateString = '2027-07-02';
+      }
+      const safeTime = targetTimeString || '17:00';
+      // Sostituzione per garantire parsing affidabile su Safari / iOS (evita bug ISO string)
+      const targetParts = targetDateString.split('-');
+      const timeParts = safeTime.split(':');
+      const target = new Date(
+        parseInt(targetParts[0], 10),
+        parseInt(targetParts[1], 10) - 1,
+        parseInt(targetParts[2], 10),
+        parseInt(timeParts[0] || '17', 10),
+        parseInt(timeParts[1] || '0', 10),
+        0
+      );
 
-      if (diff <= 0) {
+      const now = (referenceDate instanceof Date && !isNaN(referenceDate.getTime())) ? referenceDate : new Date();
+      const diff = target.getTime() - now.getTime();
+
+      if (isNaN(diff) || diff <= 0) {
         return { isPassed: true, days: 0, hours: 0, minutes: 0, referenceDate: now };
       }
 
@@ -191,6 +206,25 @@ window.WeddingApp.Services = (function () {
     static SESSION_AUTH_KEY = 'matrimonio_mm_auth_active';
     // Hash SHA-256 predefinito per il PIN iniziale di sicurezza "0207" (data nozze 2 Luglio)
     static DEFAULT_HASH = '2e3c969e2e9b367ade00279743f88ea0e32f283152223e3d9aaf1c14669d7cbe';
+
+    static escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    static sanitizeUrl(url) {
+      if (!url) return '';
+      const clean = String(url).trim();
+      if (/^(https?:|mailto:|tel:)/i.test(clean)) {
+        return clean;
+      }
+      return '#';
+    }
 
     static async hashPin(pin) {
       const msgBuffer = new TextEncoder().encode(String(pin).trim());
