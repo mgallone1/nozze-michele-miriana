@@ -1,22 +1,9 @@
 /**
  * SERVICE WORKER — ATELIER NOZZE M&M
- * Abilita funzionamento offline 100% su iPhone e caching intelligente
+ * Abilita funzionamento offline 100% su iPhone e auto-aggiornamento immediato
  */
 
-const CACHE_NAME = 'nozze-mm-v2027-v11';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  './css/style.css',
-  './js/data.js',
-  './js/domain/entities.js',
-  './js/services/formatters.js',
-  './js/repositories/expense-repository.js',
-  './js/usecases/usecases.js',
-  './js/ui/views.js',
-  './js/main.js'
-];
+const CACHE_NAME = 'nozze-mm-v2027-v12';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -33,16 +20,21 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network-first: prova sempre a prendere la versione fresca dal server (GitHub)
-  // Se sei offline, ripiega sulla cache
+  // Ignora richieste non-GET o verso le API cloud di Supabase
+  if (event.request.method !== 'GET' || event.request.url.includes('supabase.co')) {
+    return;
+  }
+
+  // Network-First con Cache-Busting: tenta sempre di ottenere il file fresco da internet
   event.respondWith(
-    fetch(event.request).then((networkResponse) => {
+    fetch(event.request, { cache: 'no-cache' }).then((networkResponse) => {
       if (networkResponse && networkResponse.status === 200) {
         const responseClone = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
       }
       return networkResponse;
     }).catch(() => {
+      // Se offline su iPhone, ripiega istantaneamente sulla versione in cache
       return caches.match(event.request);
     })
   );
