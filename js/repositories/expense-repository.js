@@ -194,10 +194,11 @@ window.WeddingApp.Repositories = (function () {
       const categories = (raw.categories || []).map(c => new Category(c));
       const expenses = (raw.expenses || []).map(e => new Expense(e));
       
-      // Se nel localStorage non ci sono ancora ospiti oppure c'erano quelli demo precedenti, sincronizziamo con seedData
+      // Se nel localStorage non ci sono ancora ospiti oppure c'erano quelli demo precedenti o la vecchia lista singola da 105 persone, sincronizziamo con le 38 famiglie del file Excel
       const seedGuests = (this.seedData?.guests || []);
       const isDemo = raw.guests && raw.guests.length > 0 && raw.guests.some(g => String(g.id).includes('demo'));
-      const rawGuests = (!raw.guests || raw.guests.length === 0 || isDemo) ? seedGuests : raw.guests;
+      const isOldIndividualList = raw.guests && raw.guests.length > 0 && raw.guests.some(g => g.id === 'gst_1' || g.id === 'gst_105');
+      const rawGuests = (!raw.guests || raw.guests.length === 0 || isDemo || isOldIndividualList) ? seedGuests : raw.guests;
       
       // Auto-migrazione: se gli ospiti salvati non hanno ancora valorizzati esplicitamente adultsCount/childrenCount/guestType
       // li valorizziamo e li arricchiamo deducendoli dalle note/menù
