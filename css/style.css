@@ -842,6 +842,72 @@ body::before {
   background: var(--surface-tint);
 }
 
+.ledger-table tr.ledger-category-row-header td {
+  background: var(--surface-warm);
+  padding: 12px 20px;
+  border-top: 2px solid var(--border-hairline);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.ledger-table tr.ledger-category-row-header:hover td {
+  background: var(--surface-warm);
+}
+
+.ledger-cat-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ledger-cat-title-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ledger-cat-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent-bronze);
+}
+
+.ledger-cat-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--ink-primary);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ledger-cat-count {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.ledger-cat-subtotals {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--ink-secondary);
+}
+
+.ledger-cat-subtotals strong {
+  color: var(--ink-primary);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+}
+
+.ledger-cat-subtotals .text-paid {
+  color: var(--accent-sage);
+}
+
 /* Classi Semantiche per Colonne (Zero Stili Inline) */
 .col-item {
   min-width: 220px;
