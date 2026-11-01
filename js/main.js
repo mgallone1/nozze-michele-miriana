@@ -694,16 +694,39 @@
     }
   }
 
-  // Registrazione Service Worker per iPhone & Offline PWA
+  // Registrazione Service Worker per iPhone & Offline PWA con auto-aggiornamento
   function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then((reg) => {
           if (reg) {
+            // Controlla aggiornamenti all'avvio
             reg.update();
+
+            // Rileva quando c'è un nuovo service worker pronto
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('Nuova versione rilevata, ricaricamento automatico...');
+                    window.location.reload();
+                  }
+                });
+              }
+            });
           }
         }).catch((err) => {
           console.warn('ServiceWorker non registrato:', err);
+        });
+
+        // Quando torni sull'app da background/multitasking su iPhone
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            navigator.serviceWorker.getRegistration().then((reg) => {
+              if (reg) reg.update();
+            });
+          }
         });
       });
     }
