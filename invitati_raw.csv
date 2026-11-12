@@ -1,0 +1,106 @@
+NOME,COGNOME,GRUPPO,INVITATO,CONFERMATO,MENÙ,TAVOLO,SESSO
+Michele,,Coppie,OK,CONFERMATO,Adulti,Presidenziale,Uomo
+Miriana,,Coppie,OK,CONFERMATO,Adulti,Presidenziale,Donna
+Vito,Gallone,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Alessia,Gallone,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Amedeo,Mercurio,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Amira,Dioletta,Famiglia Michele,,IN ATTESA,Bambini,,
+Anna,Landi,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Chiara,Maiellaro,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Generoso,Mercurio,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Gerardina,Boccalupo ,Amici in comune,,IN ATTESA,Adulti,,Donna
+Giovanni,Landi,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Imma,Dell’Università,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Lorenzo,Gallone,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Maria,Salerno,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Manuel,De Sio,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Maria,Maiellaro,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Nadia,Gallone,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Nicola,Scuotto,Amici in comune,,IN ATTESA,Adulti,,Uomo
+Nonna Lidia,,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Nonno Nicola,,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Zia Lina,Landi,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Zia Isabella,,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Zio Antonio,,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Zio Enzo,Maiellaro,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Zio Valter,Gallone,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Simone,Toro,Amici in comune,,IN ATTESA,Adulti,,Uomo
+Antonio,Maiellaro,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Rocco compagno Chiara,,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Alfonso compagno Maria,,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Mattia,Mercurio,Famiglia Miriana,,IN ATTESA,Bambini,,
+Dario,Landi,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Dalia,Landi,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Nonna Annamaria,Landi,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Zia Concetta ,Farina,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Zio Angelo,Mercurio,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Annamaria,Mercurio,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Pietro,Marito Annamaria ,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Vincenzo,Figlio Annamaria ,Famiglia Miriana,,IN ATTESA,Bambini,,
+Noemi,Figlia Annamaria ,Famiglia Miriana,,IN ATTESA,Bambini,,Donna
+Suami ,Figlia Annamaria ,Famiglia Miriana,,IN ATTESA,Bambini,,Donna
+Martina ,Mercurio ,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Mario compagno Martina ,,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Maria ,Sica ,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Lucio ,Dell’università ,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Giovanni,Dell’università ,Famiglia Miriana,,IN ATTESA,Adulti,,Uomo
+Ilaria ,Dell’università ,Famiglia Miriana,,IN ATTESA,Adulti,,Donna
+Veronica compagna zio,,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Francesco,Dioletta,Famiglia Michele,,IN ATTESA,Bambini,,Uomo
+Antonello compagno Nadia,,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Nicola,De Sio,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Manuel ,De Sio +1,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Anna,Visconti,Famiglia Michele,,IN ATTESA,Adulti,,Donna
+Gianfranco,Landi,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Roberto,Landi,Famiglia Michele,,IN ATTESA,Adulti,,Uomo
+Jessica,Barra,Amici in comune,,IN ATTESA,Adulti,,Donna
+Roberto,Sabatino,Amici in comune,,IN ATTESA,Adulti,,Uomo
+Rocco,Comandé,Amici in comune,,IN ATTESA,Adulti,,Uomo
+Silvia,Carleo,Amici in comune,,IN ATTESA,Adulti,,Donna
+Laura,Maiellaro,Amici Miriana,,IN ATTESA,Adulti,,Donna
+Laura,Maiellaro +1,Amici Miriana,,IN ATTESA,Adulti,,Uomo
+Alfredo,Pagano,Amici Michele,,IN ATTESA,Adulti,,Uomo
+Luca,Pagano,Amici Michele,,IN ATTESA,Adulti,,Uomo
+Gemma Luca,Leonardi ,Amici Michele,,IN ATTESA,Adulti,,Donna
+Mirko,Unisa,Amici Michele,,IN ATTESA,Adulti,,Uomo
+Fidanzata Mirko,,Amici Michele,,IN ATTESA,Adulti,,Donna
+Gerardo,Toro,Amici in comune,,IN ATTESA,Adulti,,Uomo
+Rino,Toro,Amici in comune,,IN ATTESA,Adulti,,Uomo
+Johara,,Amici Miriana,,IN ATTESA,Adulti,,Donna
+Salvatore Johara ,,Amici Miriana,,IN ATTESA,Adulti,,Uomo
+Alfonsina,Della rocca,Amici in comune,,IN ATTESA,Adulti,,Donna
+Lucia Rino,,Amici in comune,,IN ATTESA,Adulti,,Donna
+Christian ,Landi,Famiglia Michele,,IN ATTESA,Bambini,,Uomo
+Armando,Pescosolido,Lavoro Michele,,IN ATTESA,Adulti,,Uomo
+Matteo,Felici,Lavoro Michele,,IN ATTESA,Adulti,,Uomo
+Marilia moglie Matteo,,Lavoro Michele,,IN ATTESA,Adulti,,Donna
+Fidanzata Dario,Piantarosa,Lavoro Michele,,IN ATTESA,Adulti,,Donna
+Dario,Piantarosa,Lavoro Michele,,IN ATTESA,Adulti,,Uomo
+Claudia moglie Armando,,Lavoro Michele,,IN ATTESA,Adulti,,Donna
+Gabriele,Pescosolido figlio Armando ,Lavoro Michele,,IN ATTESA,Bambini,,
+Riccardo,Pescosolido figlio Armando,Lavoro Michele,,IN ATTESA,Bambini,,Uomo
+Giovanni,Marino,Lavoro Michele,,IN ATTESA,Adulti,,Uomo
+Francesco,Di Trio,Lavoro Michele,,IN ATTESA,Adulti,,Uomo
+Diletta ,De deo,Lavoro Miriana,,IN ATTESA,Adulti,,Donna
+Diletta,1,Lavoro Miriana,,IN ATTESA,Adulti,,Uomo
+Matteo,Spertino ,Lavoro Miriana,,IN ATTESA,Adulti,,Uomo
+Francesco,Minini ,Lavoro Miriana,,IN ATTESA,Adulti,,Uomo
+Vincenzo ,Vadalà,Lavoro Miriana,,IN ATTESA,Adulti,,Uomo
+Vincenzo,1,Lavoro Miriana,,IN ATTESA,Adulti,,Donna
+Valeria,Farinola,Lavoro Miriana,,IN ATTESA,Adulti,,Donna
+Valeria,1,Lavoro Miriana,,IN ATTESA,Adulti,,Uomo
+Domenico,Zaccaria,Lavoro Michele,,IN ATTESA,Adulti,,Uomo
+Francesco di trio,1,Lavoro Michele,,IN ATTESA,Adulti,,Donna
+Nicola,Scuotto +1,Amici in comune,,IN ATTESA,Adulti,,Donna
+Riky,Schlauch,Amici Michele,,IN ATTESA,Adulti,,Uomo
+Riky,1,Amici Michele,,IN ATTESA,Adulti,,Donna
+Antonio,Trivelli,Amici Michele,,IN ATTESA,Adulti,,Uomo
+Antonio,Trivelli + 1,Amici Michele,,IN ATTESA,Adulti,,Donna
+Gigino,D’Andria,Amici Michele,,IN ATTESA,Adulti,,Uomo
+Gilda,D’Andria,Amici Michele,,IN ATTESA,Adulti,,Donna
+Damiano,,Amici Michele,,IN ATTESA,,,Uomo
+Cristian,Crossfit,Amici Michele,,IN ATTESA,,,
+Gabri,Crossfit,Amici Michele,,IN ATTESA,,,
+Luca,Crossfit,Amici Michele,,IN ATTESA,,,
+Paolo,Crossfit Ricambi,Amici Michele,,IN ATTESA,,,
+Giordano,,Amici Michele,,IN ATTESA,Adulti,,Uomo
