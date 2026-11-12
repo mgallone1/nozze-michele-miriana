@@ -52,7 +52,15 @@
     // Filtri Ospiti
     searchGuestsQuery: '',
     filterGuestsParty: 'all',
-    filterGuestsGift: 'all'
+    filterGuestsGift: 'all',
+    // Posizioni di scorrimento indipendenti per ciascuna tab
+    scrollPositions: {
+      overview: 0,
+      expenses: 0,
+      savings: 0,
+      balance: 0,
+      guests: 0
+    }
   };
 
   // Istanze Architetturali
@@ -189,8 +197,15 @@
     HeaderView.updateCountdown(result, details);
   }
 
-  // Gestione Tab
+  // Gestione Tab con Scroll Memory indipendente per ciascuna vista
   function switchTab(targetTab) {
+    const currentTab = uiState.activeTab;
+
+    // 1. Memorizza la posizione di scorrimento della scheda corrente
+    if (currentTab && uiState.scrollPositions) {
+      uiState.scrollPositions[currentTab] = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    }
+
     uiState.activeTab = targetTab;
     const tabs = document.querySelectorAll('.nav-link-btn');
     const sections = {
@@ -219,6 +234,20 @@
           sections[key].style.display = 'none';
         }
       }
+    });
+
+    // 2. Ripristina la posizione esatta della nuova scheda (o cima se mai visitata)
+    const savedY = (uiState.scrollPositions && uiState.scrollPositions[targetTab] !== undefined)
+      ? uiState.scrollPositions[targetTab]
+      : 0;
+
+    // RequestAnimationFrame garantisce il ripristino dopo il reflow del DOM
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: savedY,
+        left: 0,
+        behavior: 'instant'
+      });
     });
   }
 
