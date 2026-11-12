@@ -761,22 +761,52 @@
     }
   }
 
-  // Sincronizzazione Cloud Automatica in background
-  async function initCloudSync() {
+  // Aggiornamento visivo dello stato di sincronizzazione Cloud
+  function setSyncStatus(status, text) {
+    const dot = document.getElementById('sync-status-dot');
+    const label = document.getElementById('sync-status-text');
+    if (dot) {
+      dot.className = 'sync-dot ' + status; // 'synced', 'syncing', 'error'
+    }
+    if (label) {
+      label.textContent = text;
+    }
+  }
+
+  // Sincronizzazione Cloud Automatica in background con Polling Dinamico
+  let isSyncing = false;
+  async function triggerCloudSync(showToastOnSuccess = false) {
+    if (isSyncing) return;
+    isSyncing = true;
+    setSyncStatus('syncing', 'Sincronizzazione...');
+
     try {
       const res = await repository.syncFromCloud();
       if (res.success) {
-        populateCategoryDropdowns();
-        refreshAll();
-        console.log('✓ Atelier sincronizzato con il cloud Supabase');
+        if (res.updated) {
+          populateCategoryDropdowns();
+          refreshAll();
+          if (showToastOnSuccess) {
+            ToastView.show('Dati aggiornati in tempo reale con il Cloud');
+          }
+        } else if (showToastOnSuccess) {
+          ToastView.show('Dati già allineati al Cloud');
+        }
+        setSyncStatus('synced', 'Sincronizzato');
       } else {
-        // Se sul cloud non c'è ancora nulla, carichiamo la versione locale attuale
-        const localData = repository.load();
-        repository.persist(localData);
+        setSyncStatus('synced', 'Sincronizzato (offline)');
       }
     } catch (e) {
-      console.warn('Errore sync cloud iniziale:', e);
+      console.warn('Errore sincronizzazione cloud:', e);
+      setSyncStatus('error', 'Non sincronizzato');
+    } finally {
+      isSyncing = false;
     }
+  }
+
+  // Sincronizzazione Cloud Automatica iniziale
+  async function initCloudSync() {
+    await triggerCloudSync(false);
   }
 
   // Bootstrap dell'Applicazione
@@ -788,29 +818,37 @@
     bindEvents();
     refreshAll();
 
-    // 2. Sincronizzazione asincrona con Cloud in background
-    try {
-      await initCloudSync();
-    } catch (e) {
-      console.warn('Sync cloud background fallito:', e);
+    // 2. Tasto manuale di sincronizzazione nell'header
+    const btnManualSync = document.getElementById('btn-manual-cloud-sync');
+    if (btnManualSync) {
+      btnManualSync.addEventListener('click', () => {
+        triggerCloudSync(true);
+      });
     }
 
-    // Sincronizzazione periodica ogni 15 secondi (o quando l'app torna visibile su iPhone)
-    setInterval(async () => {
-      const res = await repository.syncFromCloud();
-      if (res.success) {
-        populateCategoryDropdowns();
-        refreshAll();
+    // 3. Sincronizzazione asincrona con Cloud in background
+    await initCloudSync();
+
+    // 4. Polling ultra-reattivo a 4 secondi (tempo reale condiviso tra iPhone e Desktop)
+    setInterval(() => {
+      if (!document.hidden) {
+        triggerCloudSync(false);
       }
-    }, 15000);
+    }, 4000);
+
+    // 5. Risveglio immediato su iPhone (Safari / PWA Standalone)
+    // Intercetta ritorno da lock-screen, cambio app o passaggio a scheda attiva
+    const onWakeup = () => {
+      triggerCloudSync(false);
+    };
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        initCloudSync();
-      }
+      if (!document.hidden) onWakeup();
     });
+    window.addEventListener('pageshow', onWakeup);
+    window.addEventListener('focus', onWakeup);
 
-    // Timer Countdown al minuto
+    // 6. Timer Countdown al minuto
     setInterval(() => {
       const summary = getSummaryUseCase.execute({ referenceDate: uiState.simulatedDate });
       updateCountdownTick(summary.details, summary.finances?.timeline?.currentDate);

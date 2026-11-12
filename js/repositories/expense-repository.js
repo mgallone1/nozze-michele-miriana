@@ -17,6 +17,8 @@ window.WeddingApp.Repositories = (function () {
       this.seedData = seedData;
       this._onCloudUpdateCallback = null;
       this._cachedData = null;
+      this._lastCloudUpdatedAt = null;
+      this._lastLocalRawString = null;
     }
 
     onCloudUpdate(fn) {
@@ -34,6 +36,7 @@ window.WeddingApp.Repositories = (function () {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const raw = JSON.parse(stored);
+          this._lastLocalRawString = stored;
           this._cachedData = this._hydrate(raw);
           return this._cachedData;
         }
@@ -62,15 +65,27 @@ window.WeddingApp.Repositories = (function () {
           const records = await res.json();
           if (records && records.length > 0 && records[0].data) {
             const cloudPlain = records[0].data;
-            this._cachedData = this._hydrate(cloudPlain);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudPlain));
-            return { success: true, data: this._cachedData, updatedAt: records[0].updated_at };
+            const cloudRawString = JSON.stringify(cloudPlain);
+            const cloudUpdatedAt = records[0].updated_at;
+
+            // Rileva se ci sono novità rispetto a quanto attualmente in memoria locale
+            const hasChanged = (cloudUpdatedAt !== this._lastCloudUpdatedAt) || (cloudRawString !== this._lastLocalRawString);
+
+            if (hasChanged) {
+              this._lastCloudUpdatedAt = cloudUpdatedAt;
+              this._lastLocalRawString = cloudRawString;
+              this._cachedData = this._hydrate(cloudPlain);
+              localStorage.setItem(STORAGE_KEY, cloudRawString);
+              return { success: true, updated: true, data: this._cachedData, updatedAt: cloudUpdatedAt };
+            }
+
+            return { success: true, updated: false, data: this._cachedData };
           }
         }
       } catch (err) {
         console.warn('Sync Cloud non raggiungibile (offline):', err);
       }
-      return { success: false };
+      return { success: false, updated: false };
     }
 
     // Salva in Locale e poi invia istantaneamente a Supabase Cloud

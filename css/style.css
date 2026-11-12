@@ -279,6 +279,66 @@ body::before {
   border-radius: var(--radius-md);
 }
 
+/* Pulsante di Sincronizzazione Cloud in tempo reale */
+.btn-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-sync-badge:hover {
+  background: var(--surface-tint);
+  border-color: var(--accent-bronze);
+  color: var(--ink-primary);
+}
+
+.btn-sync-badge:active {
+  transform: scale(0.96);
+}
+
+.sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--accent-sage);
+  box-shadow: 0 0 0 2px rgba(69, 97, 81, 0.2);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sync-dot.synced {
+  background: var(--accent-sage);
+  box-shadow: 0 0 0 2px rgba(69, 97, 81, 0.25);
+}
+
+.sync-dot.syncing {
+  background: var(--accent-bronze);
+  box-shadow: 0 0 0 3px rgba(158, 125, 80, 0.35);
+  animation: pulse-sync 1s infinite alternate ease-in-out;
+}
+
+.sync-dot.error {
+  background: var(--accent-terracotta);
+  box-shadow: 0 0 0 2px rgba(140, 78, 64, 0.25);
+}
+
+@keyframes pulse-sync {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.2); opacity: 1; }
+}
+
 .countdown-intro {
   font-family: var(--font-serif);
   font-style: italic;
