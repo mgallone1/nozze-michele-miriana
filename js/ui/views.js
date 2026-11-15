@@ -800,13 +800,12 @@ window.WeddingApp.UI = (function () {
       }
     }
 
-    static open(savingsPlan = {}, targetCard = 'all', timeline = null, details = null) {
+    static open(savingsPlan = {}, targetCard = 'all', timeline = null, details = null, finances = null) {
       const modal = document.getElementById('savings-modal');
       if (!modal) return;
 
       const m = savingsPlan.michele || {};
       const mir = savingsPlan.miriana || {};
-      const fam = savingsPlan.familyContribution || {};
       const gifts = savingsPlan.weddingGifts || {};
 
       const isManual = Boolean(m.isManualMonths || mir.isManualMonths);
@@ -855,14 +854,14 @@ window.WeddingApp.UI = (function () {
       setVal('sp-miriana-months-done', isManual ? (mir.currentMonths ?? defaultElapsed) : defaultElapsed);
       setVal('sp-miriana-months-todo', isManual ? (mir.remainingMonths ?? defaultRemaining) : defaultRemaining);
 
-      setVal('sp-family-pledged', fam.totalPledged ?? 10000);
-      setVal('sp-family-advanced', fam.alreadyAdvanced ?? 0);
+      setVal('sp-family-pledged', 0);
+      setVal('sp-family-advanced', finances?.coverage?.familyUsed ?? 0);
       const advDisplay = document.getElementById('sp-family-advanced-display');
       if (advDisplay) {
-        const familyTotal = (fam.used !== undefined) ? fam.used : (fam.alreadyAdvanced || 0);
+        const familyTotal = finances?.coverage?.familyUsed ?? 0;
         advDisplay.textContent = `${CurrencyFormatter.format(familyTotal)} (da spese registrate)`;
       }
-      setVal('sp-gifts-estimated', gifts.estimated ?? 10000);
+      setVal('sp-gifts-estimated', gifts.estimated ?? (finances?.coupleBalance?.guestStats?.giftsTotalProjected ?? 10000));
 
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') SavingsPlanModalView.close();

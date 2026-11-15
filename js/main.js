@@ -467,7 +467,7 @@
   function openSavingsPlanModal(targetCard = 'all') {
     const data = repository.load();
     const summary = getSummaryUseCase.execute({ referenceDate: uiState.simulatedDate });
-    SavingsPlanModalView.open(data.savingsPlan, targetCard, summary.finances?.timeline, summary.details);
+    SavingsPlanModalView.open(data.savingsPlan, targetCard, summary.finances?.timeline, summary.details, summary.finances);
   }
 
   // Inizializzazione Eventi
