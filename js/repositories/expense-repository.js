@@ -55,7 +55,7 @@ window.WeddingApp.Repositories = (function () {
       try {
         const cacheBuster = Date.now();
         const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*&_t=${cacheBuster}`, {
-          cache: 'no-store',
+          method: 'GET',
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY
@@ -81,6 +81,8 @@ window.WeddingApp.Repositories = (function () {
 
             return { success: true, updated: false, data: this._cachedData };
           }
+        } else {
+          console.warn('Sync Cloud HTTP error:', res.status, res.statusText);
         }
       } catch (err) {
         console.warn('Sync Cloud non raggiungibile (offline):', err);

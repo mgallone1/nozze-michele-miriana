@@ -791,32 +791,40 @@
     }
   }
 
-  // Sincronizzazione Cloud Automatica in background con Polling Dinamico
+  // Sincronizzazione Cloud in background senza flicker
   let isSyncing = false;
-  async function triggerCloudSync(showToastOnSuccess = false) {
+  async function triggerCloudSync(isManualClick = false) {
     if (isSyncing) return;
     isSyncing = true;
-    setSyncStatus('syncing', 'Sincronizzazione...');
+    
+    // Aggiorna lo stato testuale solo se l'utente ha toccato manualmente il bottone
+    if (isManualClick) {
+      setSyncStatus('syncing', 'Sincronizzazione...');
+    }
 
     try {
       const res = await repository.syncFromCloud();
-      if (res.success) {
+      if (res && res.success) {
         if (res.updated) {
           populateCategoryDropdowns();
           refreshAll();
-          if (showToastOnSuccess) {
+          if (isManualClick) {
             ToastView.show('Dati aggiornati in tempo reale con il Cloud');
           }
-        } else if (showToastOnSuccess) {
+        } else if (isManualClick) {
           ToastView.show('Dati già allineati al Cloud');
         }
         setSyncStatus('synced', 'Sincronizzato');
       } else {
-        setSyncStatus('synced', 'Sincronizzato (offline)');
+        // Rete momentaneamente non disponibile o modalità offline
+        if (isManualClick) {
+          ToastView.show('Cloud momentaneamente non raggiungibile. Usando dati salvati.');
+        }
+        setSyncStatus('error', 'Offline');
       }
     } catch (e) {
       console.warn('Errore sincronizzazione cloud:', e);
-      setSyncStatus('error', 'Non sincronizzato');
+      setSyncStatus('error', 'Offline');
     } finally {
       isSyncing = false;
     }
@@ -847,12 +855,12 @@
     // 3. Sincronizzazione asincrona con Cloud in background
     await initCloudSync();
 
-    // 4. Polling ultra-reattivo a 4 secondi (tempo reale condiviso tra iPhone e Desktop)
+    // 4. Polling intelligente ogni 20 secondi in background quando la scheda è attiva
     setInterval(() => {
-      if (!document.hidden) {
+      if (!document.hidden && navigator.onLine) {
         triggerCloudSync(false);
       }
-    }, 4000);
+    }, 20000);
 
     // 5. Risveglio immediato su iPhone (Safari / PWA Standalone)
     // Intercetta ritorno da lock-screen, cambio app o passaggio a scheda attiva
