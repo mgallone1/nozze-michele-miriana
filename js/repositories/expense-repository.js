@@ -71,23 +71,23 @@ window.WeddingApp.Repositories = (function () {
             // Rileva se ci sono novità rispetto a quanto attualmente in memoria locale
             const hasChanged = (cloudUpdatedAt !== this._lastCloudUpdatedAt) || (cloudRawString !== this._lastLocalRawString);
 
-            if (hasChanged) {
-              this._lastCloudUpdatedAt = cloudUpdatedAt;
-              this._lastLocalRawString = cloudRawString;
-              this._cachedData = this._hydrate(cloudPlain);
-              localStorage.setItem(STORAGE_KEY, cloudRawString);
-              return { success: true, updated: true, data: this._cachedData, updatedAt: cloudUpdatedAt };
-            }
+            this._lastCloudUpdatedAt = cloudUpdatedAt;
+            this._lastLocalRawString = cloudRawString;
+            this._cachedData = this._hydrate(cloudPlain);
+            localStorage.setItem(STORAGE_KEY, cloudRawString);
 
-            return { success: true, updated: false, data: this._cachedData };
+            return { success: true, updated: hasChanged, data: this._cachedData, updatedAt: cloudUpdatedAt };
           }
         } else {
           console.warn('Sync Cloud HTTP error:', res.status, res.statusText);
+          const errBody = await res.text().catch(() => '');
+          return { success: false, error: `HTTP ${res.status}: ${errBody}` };
         }
       } catch (err) {
         console.warn('Sync Cloud non raggiungibile (offline):', err);
+        return { success: false, error: err.message || String(err) };
       }
-      return { success: false, updated: false };
+      return { success: false, error: 'Risposta vuota dal server' };
     }
 
     // Salva in Locale e poi invia istantaneamente a Supabase Cloud

@@ -818,7 +818,8 @@
       } else {
         // Rete momentaneamente non disponibile o modalità offline
         if (isManualClick) {
-          ToastView.show('Cloud momentaneamente non raggiungibile. Usando dati salvati.');
+          const detail = res && res.error ? ` (${res.error})` : '';
+          ToastView.show(`Cloud momentaneamente non raggiungibile${detail}. Usando dati salvati.`);
         }
         setSyncStatus('error', 'Offline');
       }
