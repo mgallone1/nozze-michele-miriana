@@ -9089,6 +9089,8 @@ window.WeddingApp.UI = (function () {
     const chkVat = document.getElementById('expense-add-vat');
     const pnlVat = document.getElementById('expense-vat-panel');
     const bInput = document.getElementById('expense-budget');
+    const catSelect = document.getElementById('expense-category');
+    const itemInput = document.getElementById('expense-item');
     const netDisp = document.getElementById('vat-net-display');
     const vatDisp = document.getElementById('vat-amount-display');
     const grossDisp = document.getElementById('vat-gross-display');
@@ -9096,6 +9098,31 @@ window.WeddingApp.UI = (function () {
     if (!chkVat || !pnlVat || !bInput) return;
 
     let baseNetValue = 0;
+
+    function setVatRate(rateVal) {
+      const radio = document.querySelector(`input[name="vat-rate"][value="${rateVal}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    function autoSelectRateByCategory() {
+      const cat = catSelect ? catSelect.value : '';
+      const text = (itemInput ? itemInput.value : '').toLowerCase();
+      if (cat === 'location_catering' || text.includes('catering') || text.includes('banchetto') || text.includes('pranzo') || text.includes('cena')) {
+        setVatRate(10);
+      } else {
+        setVatRate(22);
+      }
+    }
+
+    if (catSelect) {
+      catSelect.addEventListener('change', () => {
+        if (!chkVat.checked) autoSelectRateByCategory();
+        else {
+          autoSelectRateByCategory();
+          updateVatFeedback();
+        }
+      });
+    }
 
     function getSelectedVatRate() {
       const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
@@ -9121,6 +9148,7 @@ window.WeddingApp.UI = (function () {
 
     chkVat.addEventListener('change', () => {
       if (chkVat.checked) {
+        autoSelectRateByCategory();
         // Quando spunti il checkbox, il numero attualmente nel campo diventa l'imponibile netto
         baseNetValue = parseFloat(bInput.value) || 0;
         updateVatFeedback();
