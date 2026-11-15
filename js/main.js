@@ -287,9 +287,17 @@
       if (staffInput) {
         staffInput.value = exp.staffCount ?? 0;
       }
+      const chkVat = document.getElementById('expense-add-vat');
+      if (chkVat) chkVat.checked = false;
+      const pnlVat = document.getElementById('expense-vat-panel');
+      if (pnlVat) pnlVat.style.display = 'none';
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
+      const chkVat = document.getElementById('expense-add-vat');
+      if (chkVat) chkVat.checked = false;
+      const pnlVat = document.getElementById('expense-vat-panel');
+      if (pnlVat) pnlVat.style.display = 'none';
       const famMInput = document.getElementById('expense-paid-family-michele');
       if (famMInput) famMInput.value = 0;
       const famMirInput = document.getElementById('expense-paid-family-miriana');
@@ -395,6 +403,76 @@
         saveExpenseUseCase.execute(deletedExp);
         refreshAll();
         ToastView.show(`Voce "${deletedExp.item}" ripristinata con successo`);
+      }
+    });
+  }
+
+  // Setup Calcolatore IVA Dinamica per Budget Spesa
+  function setupVatCalculator() {
+    const chkVat = document.getElementById('expense-add-vat');
+    const pnlVat = document.getElementById('expense-vat-panel');
+    const bInput = document.getElementById('expense-budget');
+    const netDisp = document.getElementById('vat-net-display');
+    const vatDisp = document.getElementById('vat-amount-display');
+    const grossDisp = document.getElementById('vat-gross-display');
+
+    if (!chkVat || !pnlVat || !bInput) return;
+
+    let baseNetValue = 0;
+
+    function getSelectedVatRate() {
+      const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
+      return checkedRadio ? (parseFloat(checkedRadio.value) || 22) : 22;
+    }
+
+    function updateVatFeedback() {
+      if (!chkVat.checked) {
+        pnlVat.style.display = 'none';
+        return;
+      }
+      pnlVat.style.display = 'flex';
+      const rate = getSelectedVatRate();
+      const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
+      const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
+
+      if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
+      if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
+      if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
+
+      bInput.value = totalGross;
+    }
+
+    chkVat.addEventListener('change', () => {
+      if (chkVat.checked) {
+        // Quando spunti il checkbox, il numero attualmente nel campo diventa l'imponibile netto
+        baseNetValue = parseFloat(bInput.value) || 0;
+        updateVatFeedback();
+      } else {
+        // Se togli la spunta, ripristina il valore imponibile netto
+        if (baseNetValue > 0) {
+          bInput.value = baseNetValue;
+        }
+        pnlVat.style.display = 'none';
+      }
+    });
+
+    document.querySelectorAll('input[name="vat-rate"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (chkVat.checked) updateVatFeedback();
+      });
+    });
+
+    bInput.addEventListener('input', () => {
+      if (chkVat.checked) {
+        // Se l'utente digita mentre il checkbox è attivo, aggiorniamo la base imponibile proporzionalmente
+        // o consideriamo il valore digitato come nuovo imponibile netto
+        baseNetValue = parseFloat(bInput.value) || 0;
+        const rate = getSelectedVatRate();
+        const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
+        const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
+        if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
+        if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
+        if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
       }
     });
   }
@@ -595,6 +673,7 @@
     if (form) form.addEventListener('submit', handleSaveForm);
 
     setupSplitShortcuts();
+    setupVatCalculator();
 
     // Export & Backup
     const btnExportCsv = document.getElementById('btn-export-csv');

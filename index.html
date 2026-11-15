@@ -644,8 +644,40 @@
             </div>
 
             <div class="form-group-noble">
-              <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
+              <div class="budget-label-row">
+                <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
+                <label class="vat-toggle-pill" for="expense-add-vat" title="Seleziona se il prezzo inserito è imponibile e occorre aggiungere l'IVA (es. 22% o 10%)">
+                  <input type="checkbox" id="expense-add-vat">
+                  <span>+ Aggiungi IVA</span>
+                </label>
+              </div>
               <input type="number" id="expense-budget" class="form-input-noble num" step="any" min="0" placeholder="0">
+              
+              <!-- Selettore Aliquota IVA (mostrato quando il checkbox è attivo) -->
+              <div class="vat-calculator-bar" id="expense-vat-panel" style="display: none;">
+                <div class="vat-rate-selection">
+                  <span class="vat-sub-label">Aliquota:</span>
+                  <label class="vat-radio-chip">
+                    <input type="radio" name="vat-rate" value="22" checked>
+                    <span>22% (Standard)</span>
+                  </label>
+                  <label class="vat-radio-chip">
+                    <input type="radio" name="vat-rate" value="10">
+                    <span>10% (Ristorazione)</span>
+                  </label>
+                  <label class="vat-radio-chip">
+                    <input type="radio" name="vat-rate" value="4">
+                    <span>4% (Agevolata)</span>
+                  </label>
+                </div>
+                <div class="vat-calc-feedback">
+                  <span>Imponibile: <strong id="vat-net-display">0 €</strong></span>
+                  <span>•</span>
+                  <span>IVA: <strong id="vat-amount-display">+ 0 €</strong></span>
+                  <span>•</span>
+                  <span>Totale Finale: <strong class="text-settled" id="vat-gross-display">0 €</strong></span>
+                </div>
+              </div>
             </div>
           </div>
 

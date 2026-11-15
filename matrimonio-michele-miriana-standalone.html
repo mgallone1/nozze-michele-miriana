@@ -3600,6 +3600,111 @@ button.btn-editable-val:hover {
   }
 }
 
+/* Calcolatore IVA Dinamico nel Modale Spese */
+.budget-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.budget-label-row .form-label-noble {
+  margin-bottom: 0;
+}
+
+.vat-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-bronze);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.vat-toggle-pill:hover {
+  background: var(--surface-tint);
+  border-color: var(--accent-bronze);
+}
+
+.vat-toggle-pill input[type="checkbox"] {
+  accent-color: var(--accent-bronze);
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.vat-calculator-bar {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vat-rate-selection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vat-sub-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+
+.vat-radio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.vat-radio-chip input[type="radio"] {
+  accent-color: var(--accent-bronze);
+  cursor: pointer;
+}
+
+.vat-calc-feedback {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--ink-secondary);
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.vat-calc-feedback strong {
+  color: var(--ink-primary);
+}
+
+.vat-calc-feedback .text-settled {
+  color: var(--accent-sage);
+  font-weight: 700;
+}
+
 </style>
 </head>
 <body>
@@ -4231,8 +4336,40 @@ button.btn-editable-val:hover {
             </div>
 
             <div class="form-group-noble">
-              <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
+              <div class="budget-label-row">
+                <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
+                <label class="vat-toggle-pill" for="expense-add-vat" title="Seleziona se il prezzo inserito è imponibile e occorre aggiungere l'IVA (es. 22% o 10%)">
+                  <input type="checkbox" id="expense-add-vat">
+                  <span>+ Aggiungi IVA</span>
+                </label>
+              </div>
               <input type="number" id="expense-budget" class="form-input-noble num" step="any" min="0" placeholder="0">
+              
+              <!-- Selettore Aliquota IVA (mostrato quando il checkbox è attivo) -->
+              <div class="vat-calculator-bar" id="expense-vat-panel" style="display: none;">
+                <div class="vat-rate-selection">
+                  <span class="vat-sub-label">Aliquota:</span>
+                  <label class="vat-radio-chip">
+                    <input type="radio" name="vat-rate" value="22" checked>
+                    <span>22% (Standard)</span>
+                  </label>
+                  <label class="vat-radio-chip">
+                    <input type="radio" name="vat-rate" value="10">
+                    <span>10% (Ristorazione)</span>
+                  </label>
+                  <label class="vat-radio-chip">
+                    <input type="radio" name="vat-rate" value="4">
+                    <span>4% (Agevolata)</span>
+                  </label>
+                </div>
+                <div class="vat-calc-feedback">
+                  <span>Imponibile: <strong id="vat-net-display">0 €</strong></span>
+                  <span>•</span>
+                  <span>IVA: <strong id="vat-amount-display">+ 0 €</strong></span>
+                  <span>•</span>
+                  <span>Totale Finale: <strong class="text-settled" id="vat-gross-display">0 €</strong></span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -8827,9 +8964,17 @@ window.WeddingApp.UI = (function () {
       if (staffInput) {
         staffInput.value = exp.staffCount ?? 0;
       }
+      const chkVat = document.getElementById('expense-add-vat');
+      if (chkVat) chkVat.checked = false;
+      const pnlVat = document.getElementById('expense-vat-panel');
+      if (pnlVat) pnlVat.style.display = 'none';
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
+      const chkVat = document.getElementById('expense-add-vat');
+      if (chkVat) chkVat.checked = false;
+      const pnlVat = document.getElementById('expense-vat-panel');
+      if (pnlVat) pnlVat.style.display = 'none';
       const famMInput = document.getElementById('expense-paid-family-michele');
       if (famMInput) famMInput.value = 0;
       const famMirInput = document.getElementById('expense-paid-family-miriana');
@@ -8935,6 +9080,76 @@ window.WeddingApp.UI = (function () {
         saveExpenseUseCase.execute(deletedExp);
         refreshAll();
         ToastView.show(`Voce "${deletedExp.item}" ripristinata con successo`);
+      }
+    });
+  }
+
+  // Setup Calcolatore IVA Dinamica per Budget Spesa
+  function setupVatCalculator() {
+    const chkVat = document.getElementById('expense-add-vat');
+    const pnlVat = document.getElementById('expense-vat-panel');
+    const bInput = document.getElementById('expense-budget');
+    const netDisp = document.getElementById('vat-net-display');
+    const vatDisp = document.getElementById('vat-amount-display');
+    const grossDisp = document.getElementById('vat-gross-display');
+
+    if (!chkVat || !pnlVat || !bInput) return;
+
+    let baseNetValue = 0;
+
+    function getSelectedVatRate() {
+      const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
+      return checkedRadio ? (parseFloat(checkedRadio.value) || 22) : 22;
+    }
+
+    function updateVatFeedback() {
+      if (!chkVat.checked) {
+        pnlVat.style.display = 'none';
+        return;
+      }
+      pnlVat.style.display = 'flex';
+      const rate = getSelectedVatRate();
+      const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
+      const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
+
+      if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
+      if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
+      if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
+
+      bInput.value = totalGross;
+    }
+
+    chkVat.addEventListener('change', () => {
+      if (chkVat.checked) {
+        // Quando spunti il checkbox, il numero attualmente nel campo diventa l'imponibile netto
+        baseNetValue = parseFloat(bInput.value) || 0;
+        updateVatFeedback();
+      } else {
+        // Se togli la spunta, ripristina il valore imponibile netto
+        if (baseNetValue > 0) {
+          bInput.value = baseNetValue;
+        }
+        pnlVat.style.display = 'none';
+      }
+    });
+
+    document.querySelectorAll('input[name="vat-rate"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (chkVat.checked) updateVatFeedback();
+      });
+    });
+
+    bInput.addEventListener('input', () => {
+      if (chkVat.checked) {
+        // Se l'utente digita mentre il checkbox è attivo, aggiorniamo la base imponibile proporzionalmente
+        // o consideriamo il valore digitato come nuovo imponibile netto
+        baseNetValue = parseFloat(bInput.value) || 0;
+        const rate = getSelectedVatRate();
+        const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
+        const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
+        if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
+        if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
+        if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
       }
     });
   }
@@ -9135,6 +9350,7 @@ window.WeddingApp.UI = (function () {
     if (form) form.addEventListener('submit', handleSaveForm);
 
     setupSplitShortcuts();
+    setupVatCalculator();
 
     // Export & Backup
     const btnExportCsv = document.getElementById('btn-export-csv');

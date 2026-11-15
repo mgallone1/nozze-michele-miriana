@@ -3583,3 +3583,108 @@ button.btn-editable-val:hover {
     flex-direction: column;
   }
 }
+
+/* Calcolatore IVA Dinamico nel Modale Spese */
+.budget-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.budget-label-row .form-label-noble {
+  margin-bottom: 0;
+}
+
+.vat-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-bronze);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.vat-toggle-pill:hover {
+  background: var(--surface-tint);
+  border-color: var(--accent-bronze);
+}
+
+.vat-toggle-pill input[type="checkbox"] {
+  accent-color: var(--accent-bronze);
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.vat-calculator-bar {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vat-rate-selection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vat-sub-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+
+.vat-radio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.vat-radio-chip input[type="radio"] {
+  accent-color: var(--accent-bronze);
+  cursor: pointer;
+}
+
+.vat-calc-feedback {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--ink-secondary);
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.vat-calc-feedback strong {
+  color: var(--ink-primary);
+}
+
+.vat-calc-feedback .text-settled {
+  color: var(--accent-sage);
+  font-weight: 700;
+}
