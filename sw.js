@@ -3,7 +3,7 @@
  * Abilita funzionamento offline 100% su iPhone e auto-aggiornamento immediato
  */
 
-const CACHE_NAME = 'nozze-mm-v2027-v28';
+const CACHE_NAME = 'nozze-mm-v2027-v29';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

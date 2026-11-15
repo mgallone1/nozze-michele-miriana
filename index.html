@@ -643,48 +643,60 @@
               </select>
             </div>
 
+            <!-- Tipologia Costo: Reale / Contratto vs Stimato -->
             <div class="form-group-noble">
-              <div class="budget-label-row">
-                <label class="form-label-noble" id="lbl-expense-amount" for="expense-net-amount">Prezzo Netto (IVA Esclusa) (€)</label>
-                <label class="vat-toggle-pill" for="expense-has-vat" title="Spunta per applicare l'IVA sul prezzo netto">
-                  <input type="checkbox" id="expense-has-vat" checked>
-                  <span>Applica IVA</span>
-                </label>
+              <label class="form-label-noble" for="expense-is-estimate">Tipologia Costo</label>
+              <select id="expense-is-estimate" class="form-select-noble">
+                <option value="false">🔒 Costo Reale / a Contratto</option>
+                <option value="true">📝 Costo Stimato / da Definire</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SEZIONE IMPORTI & IVA A LARGHEZZA INTERA -->
+          <div class="expense-pricing-box">
+            <div class="pricing-box-header">
+              <div class="pricing-box-titles">
+                <label class="pricing-box-label" id="lbl-expense-amount" for="expense-net-amount">Prezzo Netto (IVA Esclusa)</label>
+                <span class="pricing-box-hint" id="net-amount-subnote">Prezzo imponibile prima dell'applicazione dell'IVA</span>
+              </div>
+              <label class="vat-switch-pill" for="expense-has-vat">
+                <input type="checkbox" id="expense-has-vat" checked>
+                <span class="vat-switch-text">IVA Applicata</span>
+              </label>
+            </div>
+
+            <div class="pricing-box-body">
+              <div class="pricing-input-wrap">
+                <input type="number" id="expense-net-amount" class="form-input-noble num pricing-main-input" step="any" min="0" placeholder="0">
+                <span class="pricing-currency-symbol">€</span>
               </div>
 
-              <!-- Input importo base (se catering è il prezzo a persona es. 150€, altrimenti totale netto imponibile) -->
-              <input type="number" id="expense-net-amount" class="form-input-noble num" step="any" min="0" placeholder="Es. 150">
-              <div class="input-hint-sub" id="net-amount-subnote" style="margin-top: 4px; margin-bottom: 6px;">
-                Inserisci il prezzo netto senza IVA (se è il catering inserisci il costo a persona, es. 150€).
-              </div>
-              
-              <!-- Selettore Aliquota e Resoconto Trasparente IVA -->
-              <div class="vat-calculator-bar" id="expense-vat-panel">
-                <div class="vat-rate-selection">
-                  <span class="vat-sub-label">Aliquota:</span>
-                  <label class="vat-radio-chip">
-                    <input type="radio" name="vat-rate" value="10" checked>
-                    <span>10% (Catering / Ristorazione)</span>
+              <!-- Dettaglio Formula & Aliquota -->
+              <div class="pricing-calc-strip" id="expense-vat-panel">
+                <div class="pricing-rate-chips">
+                  <label class="rate-chip">
+                    <input type="radio" name="vat-rate" value="10">
+                    <span>10% (Ristorazione)</span>
                   </label>
-                  <label class="vat-radio-chip">
-                    <input type="radio" name="vat-rate" value="22">
-                    <span>22% (Fornitori standard)</span>
+                  <label class="rate-chip">
+                    <input type="radio" name="vat-rate" value="22" checked>
+                    <span>22% (Standard)</span>
                   </label>
-                  <label class="vat-radio-chip">
+                  <label class="rate-chip">
                     <input type="radio" name="vat-rate" value="4">
                     <span>4% (Agevolata)</span>
                   </label>
                 </div>
-                <!-- Resoconto esatto richiesto: 150 + 15 = 165 € -->
-                <div class="vat-formula-equation" id="vat-formula-text">
-                  150 € + 15 € (IVA 10%) = 165 €
+                <div class="pricing-formula-text" id="vat-formula-text">
+                  5.000 € + 1.100 € (IVA 22%) = 6.100 €
                 </div>
               </div>
 
-              <!-- Campo di riepilogo lordo complessivo calcolato -->
-              <div class="budget-total-summary-card">
-                <span class="budget-summary-label" id="budget-summary-label">Budget Complessivo della Spesa:</span>
-                <strong class="budget-summary-val amount text-settled" id="budget-summary-val">0 €</strong>
+              <!-- Riepilogo Totale Finito -->
+              <div class="pricing-total-card">
+                <span class="pricing-total-label" id="budget-summary-label">Budget Complessivo da Coprire:</span>
+                <strong class="pricing-total-number amount" id="budget-summary-val">5.000 €</strong>
                 <input type="hidden" id="expense-budget" value="0">
               </div>
             </div>
@@ -702,13 +714,9 @@
               </select>
             </div>
 
-            <!-- Tipologia Costo: Reale / Contratto vs Stimato -->
             <div class="form-group-noble">
-              <label class="form-label-noble" for="expense-is-estimate">Tipologia Costo</label>
-              <select id="expense-is-estimate" class="form-select-noble">
-                <option value="false">🔒 Costo Reale / a Contratto</option>
-                <option value="true">📝 Costo Stimato / da Definire</option>
-              </select>
+              <label class="form-label-noble" for="expense-staff-count">Personale Staff Presente (pasti 50%)</label>
+              <input type="number" id="expense-staff-count" class="form-input-noble num" min="0" max="50" step="1" value="0">
             </div>
           </div>
 

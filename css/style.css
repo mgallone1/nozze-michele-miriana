@@ -3584,75 +3584,120 @@ button.btn-editable-val:hover {
   }
 }
 
-/* Calcolatore IVA Dinamico nel Modale Spese */
-.budget-label-row {
+/* Riquadro Pricing & IVA ad Alta Sartoria */
+.expense-pricing-box {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pricing-box-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 12px;
 }
 
-.budget-label-row .form-label-noble {
-  margin-bottom: 0;
+.pricing-box-label {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+  margin-bottom: 2px;
+  display: block;
 }
 
-.vat-toggle-pill {
+.pricing-box-hint {
+  font-size: 0.72rem;
+  color: var(--ink-secondary);
+  display: block;
+}
+
+.vat-switch-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 9px;
-  background: var(--surface-subtle);
+  padding: 4px 10px;
+  background: var(--surface-pure);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--accent-bronze);
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.vat-toggle-pill:hover {
+.vat-switch-pill:hover {
   background: var(--surface-tint);
   border-color: var(--accent-bronze);
 }
 
-.vat-toggle-pill input[type="checkbox"] {
+.vat-switch-pill input[type="checkbox"] {
   accent-color: var(--accent-bronze);
   cursor: pointer;
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   margin: 0;
 }
 
-.vat-calculator-bar {
-  margin-top: 8px;
-  padding: 10px 12px;
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+.pricing-box-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
-.vat-rate-selection {
+.pricing-input-wrap {
+  position: relative;
   display: flex;
   align-items: center;
+}
+
+.pricing-main-input {
+  width: 100%;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  padding-right: 32px !important;
+  background: var(--surface-pure) !important;
+}
+
+.pricing-currency-symbol {
+  position: absolute;
+  right: 14px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  pointer-events: none;
+}
+
+.pricing-calc-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.pricing-rate-chips {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.vat-sub-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ink-secondary);
-}
-
-.vat-radio-chip {
+.rate-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -3663,42 +3708,36 @@ button.btn-editable-val:hover {
   user-select: none;
 }
 
-.vat-radio-chip input[type="radio"] {
+.rate-chip input[type="radio"] {
   accent-color: var(--accent-bronze);
   cursor: pointer;
 }
 
-.vat-formula-equation {
-  font-size: 0.82rem;
+.pricing-formula-text {
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, monospace;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--accent-bronze);
-  background: var(--surface-pure);
-  padding: 6px 10px;
-  border-radius: var(--radius-xs);
-  border: 1px dashed var(--border-subtle);
-  display: inline-block;
-  margin-top: 4px;
-  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, monospace;
 }
 
-.budget-total-summary-card {
-  margin-top: 8px;
-  padding: 8px 12px;
+.pricing-total-card {
+  padding: 10px 14px;
   background: var(--surface-pure);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--accent-sage);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.budget-summary-label {
-  font-size: 0.78rem;
-  color: var(--ink-secondary);
+.pricing-total-label {
+  font-size: 0.8rem;
   font-weight: 600;
+  color: var(--ink-secondary);
 }
 
-.budget-summary-val {
-  font-size: 0.95rem;
+.pricing-total-number {
+  font-size: 1.15rem;
   font-weight: 700;
+  color: var(--accent-sage);
 }
