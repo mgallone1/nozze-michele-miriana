@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const projectRoot = 'c:\\Users\\Miriana\\Documents\\Antigravity projects';
+const projectRoot = __dirname;
 
 // 1. Legge index.html
 let html = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');

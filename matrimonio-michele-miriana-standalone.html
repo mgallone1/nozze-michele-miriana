@@ -295,6 +295,66 @@ body::before {
   border-radius: var(--radius-md);
 }
 
+/* Pulsante di Sincronizzazione Cloud in tempo reale */
+.btn-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-sync-badge:hover {
+  background: var(--surface-tint);
+  border-color: var(--accent-bronze);
+  color: var(--ink-primary);
+}
+
+.btn-sync-badge:active {
+  transform: scale(0.96);
+}
+
+.sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--accent-sage);
+  box-shadow: 0 0 0 2px rgba(69, 97, 81, 0.2);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sync-dot.synced {
+  background: var(--accent-sage);
+  box-shadow: 0 0 0 2px rgba(69, 97, 81, 0.25);
+}
+
+.sync-dot.syncing {
+  background: var(--accent-bronze);
+  box-shadow: 0 0 0 3px rgba(158, 125, 80, 0.35);
+  animation: pulse-sync 1s infinite alternate ease-in-out;
+}
+
+.sync-dot.error {
+  background: var(--accent-terracotta);
+  box-shadow: 0 0 0 2px rgba(140, 78, 64, 0.25);
+}
+
+@keyframes pulse-sync {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.2); opacity: 1; }
+}
+
 .countdown-intro {
   font-family: var(--font-serif);
   font-style: italic;
@@ -574,6 +634,45 @@ body::before {
   background: var(--person-miriana-bg);
   color: var(--person-miriana);
   border: 1px solid var(--person-miriana-border);
+}
+
+.pill-person.family-michele {
+  background: #F2F5F8;
+  color: #2F4858;
+  border: 1px solid #C4D3DE;
+}
+
+.pill-person.family-miriana {
+  background: #FAF0F4;
+  color: #7A3B57;
+  border: 1px solid #E6CAD7;
+}
+
+.pill-person.family-badge {
+  background: var(--accent-bronze-light);
+  color: var(--accent-bronze);
+  border: 1px solid var(--accent-bronze-border);
+}
+
+/* Sezione Doni Famiglie nel Modale Spese */
+.family-gift-advances-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.family-gift-title {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-bronze);
+  margin-bottom: 8px;
+}
+
+.family-balance-panel {
+  border-left: 3px solid var(--accent-bronze);
 }
 
 .payer-badges-stack {
@@ -3524,7 +3623,7 @@ button.btn-editable-val:hover {
           </div>
         </div>
 
-        <!-- BLOCCO COUNTDOWN -->
+        <!-- BLOCCO COUNTDOWN & STATO SINCRONIZZAZIONE -->
         <div class="header-time-block">
           <div class="countdown-strip">
             <span class="countdown-intro">Al Grande Giorno</span>
@@ -3534,6 +3633,10 @@ button.btn-editable-val:hover {
               <span id="countdown-mins">—</span><small>min</small>
             </div>
           </div>
+          <button type="button" class="btn-sync-badge" id="btn-manual-cloud-sync" title="Tocca per aggiornare subito dal Cloud">
+            <span class="sync-dot" id="sync-status-dot"></span>
+            <span id="sync-status-text">Sincronizzato</span>
+          </button>
         </div>
       </div>
 
@@ -3675,6 +3778,7 @@ button.btn-editable-val:hover {
               <option value="all">Tutti i Contributi</option>
               <option value="michele">Curato da Michele</option>
               <option value="miriana">Curato da Miriana</option>
+              <option value="family">Dono/Famiglie</option>
               <option value="both">Insieme (50/50)</option>
               <option value="unpaid">Da definire</option>
             </select>
@@ -3967,6 +4071,21 @@ button.btn-editable-val:hover {
         </div>
       </div>
 
+      <!-- SEZIONE DONI & CONTRIBUTI DELLE FAMIGLIE -->
+      <div class="balance-duo-panel family-balance-panel" id="balance-family-gifts-container" style="display: none; margin-top: 24px;">
+        <div class="reserve-panel-header">
+          <div>
+            <h3 class="reserve-panel-title">🎁 Doni e Anticipi Versati dalle Famiglie</h3>
+            <div class="balance-panel-sub">Quote esterne pagate direttamente ai fornitori (senza intaccare i risparmi personali)</div>
+          </div>
+          <span class="pill-person family-badge" id="badge-count-family">0 doni</span>
+        </div>
+        <div class="balance-hero-amount text-settled amount" id="balance-family-paid-total">0 €</div>
+        <div class="balance-items-list" id="list-family-items">
+          <!-- Generato dinamicamente -->
+        </div>
+      </div>
+
       <div class="suggestion-box">
         <div class="suggestion-title">
           Armonia dei Pagamenti
@@ -4139,18 +4258,18 @@ button.btn-editable-val:hover {
             </div>
           </div>
 
-          <!-- Quote Versate -->
+          <!-- Quote Versate dagli Sposi e dalle Famiglie -->
           <div class="modal-advances-box">
-            <label class="form-label-noble mb-xs">Accordi & Anticipi già Sostenuti</label>
+            <label class="form-label-noble mb-xs">Accordi & Anticipi degli Sposi (Conti Personali)</label>
             
             <div class="form-grid-2">
               <div class="form-group-noble mb-xs">
-                <label class="form-label-noble text-michele">Contributo di Michele (€)</label>
+                <label class="form-label-noble text-michele">Quota di Michele (€)</label>
                 <input type="number" id="expense-paid-michele" class="form-input-noble num" step="any" min="0" value="0">
               </div>
 
               <div class="form-group-noble mb-xs">
-                <label class="form-label-noble text-miriana">Contributo di Miriana (€)</label>
+                <label class="form-label-noble text-miriana">Quota di Miriana (€)</label>
                 <input type="number" id="expense-paid-miriana" class="form-input-noble num" step="any" min="0" value="0">
               </div>
             </div>
@@ -4160,6 +4279,25 @@ button.btn-editable-val:hover {
               <button type="button" class="split-tag-btn" id="split-all-michele">Curato da Michele</button>
               <button type="button" class="split-tag-btn" id="split-all-miriana">Curato da Miriana</button>
               <button type="button" class="split-tag-btn" id="split-reset">Azzera</button>
+            </div>
+
+            <!-- Sezione Doni & Acconti Famiglie Esterne (Non intacca i conti personali degli sposi) -->
+            <div class="family-gift-advances-section">
+              <div class="family-gift-title">
+                <span>🎁 Dono / Pagato dalle Famiglie (Non tocca i risparmi personali)</span>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group-noble mb-xs">
+                  <label class="form-label-noble" for="expense-paid-family-michele">Famiglia Michele / Sposo (€)</label>
+                  <input type="number" id="expense-paid-family-michele" class="form-input-noble num" step="any" min="0" value="0" placeholder="0">
+                </div>
+
+                <div class="form-group-noble mb-xs">
+                  <label class="form-label-noble" for="expense-paid-family-miriana">Famiglia Miriana / Sposa (€)</label>
+                  <input type="number" id="expense-paid-family-miriana" class="form-input-noble num" step="any" min="0" value="0" placeholder="0">
+                </div>
+              </div>
+              <div class="input-hint-sub">Es. Acconto vestito o regalo abito: il fornitore risulterà regolarmente pagato, senza alterare il piano di accumulo mensile degli sposi.</div>
             </div>
           </div>
 
@@ -4306,8 +4444,9 @@ button.btn-editable-val:hover {
                 <input type="number" id="sp-family-pledged" class="form-input-noble" min="0" step="100" required>
               </div>
               <div class="form-group-noble">
-                <label class="form-label-noble" for="sp-family-advanced">Caparra Anticipata Catering (€)</label>
-                <input type="number" id="sp-family-advanced" class="form-input-noble" min="0" step="50" required>
+                <label class="form-label-noble">Anticipi Spese Pagati dalle Famiglie</label>
+                <div class="form-input-noble static-val text-settled font-semibold" id="sp-family-advanced-display">1.500 € (calcolato da spese)</div>
+                <input type="hidden" id="sp-family-advanced" value="0">
               </div>
             </div>
             <div class="form-grid-row">
@@ -4612,9 +4751,11 @@ const INITIAL_WEDDING_DATA = {
       "supplier": "Catering convenzionato",
       "budget": 16500,
       "paidMichele": 1500,
-      "paidMiriana": 1500,
+      "paidMiriana": 0,
+      "paidFamilyMichele": 0,
+      "paidFamilyMiriana": 1500,
       "dueDate": "2027-07-02",
-      "notes": "Aperitivo, pranzo/cena, bevande (1.500€ Michele + 1.500€ Miriana da contributo Amedeo/Anna)",
+      "notes": "Aperitivo, pranzo/cena, bevande (1.500€ Michele + 1.500€ Famiglia Miriana / Amedeo e Anna)",
       "status": "acconto",
       "splitType": "guests"
     },
@@ -5491,6 +5632,8 @@ window.WeddingApp.Domain = (function () {
       budget = 0,
       paidMichele = 0,
       paidMiriana = 0,
+      paidFamilyMichele = 0,
+      paidFamilyMiriana = 0,
       status = 'pianificato',
       notes = '',
       dueDate = '',
@@ -5506,6 +5649,8 @@ window.WeddingApp.Domain = (function () {
       this.budget = Math.max(0, Number(budget) || 0);
       this.paidMichele = Math.max(0, Number(paidMichele) || 0);
       this.paidMiriana = Math.max(0, Number(paidMiriana) || 0);
+      this.paidFamilyMichele = Math.max(0, Number(paidFamilyMichele) || 0);
+      this.paidFamilyMiriana = Math.max(0, Number(paidFamilyMiriana) || 0);
       this.status = status || 'pianificato';
       this.notes = (notes || '').trim();
       this.dueDate = dueDate || '';
@@ -5524,7 +5669,10 @@ window.WeddingApp.Domain = (function () {
     }
 
     calculateOwed(micheleGuestRatio = 0.5) {
-      const b = this.budget;
+      // Il costo da ripartire tra gli sposi è il budget al netto di quanto offerto/pagato dalle famiglie
+      const familyGiftTotal = (this.paidFamilyMichele || 0) + (this.paidFamilyMiriana || 0);
+      const b = Math.max(0, this.budget - familyGiftTotal);
+
       if (this.splitType === 'michele') {
         return { micheleOwed: b, mirianaOwed: 0 };
       }
@@ -5541,7 +5689,7 @@ window.WeddingApp.Domain = (function () {
     }
 
     totalPaid() {
-      return this.paidMichele + this.paidMiriana;
+      return this.paidMichele + this.paidMiriana + (this.paidFamilyMichele || 0) + (this.paidFamilyMiriana || 0);
     }
 
     remaining() {
@@ -5569,6 +5717,8 @@ window.WeddingApp.Domain = (function () {
       if (isNaN(this.budget) || this.budget < 0) errors.push('Il budget previsto deve essere un valore positivo.');
       if (isNaN(this.paidMichele) || this.paidMichele < 0) errors.push('La quota di Michele deve essere un valore positivo.');
       if (isNaN(this.paidMiriana) || this.paidMiriana < 0) errors.push('La quota di Miriana deve essere un valore positivo.');
+      if (isNaN(this.paidFamilyMichele) || this.paidFamilyMichele < 0) errors.push('La quota famiglia Michele deve essere un valore positivo.');
+      if (isNaN(this.paidFamilyMiriana) || this.paidFamilyMiriana < 0) errors.push('La quota famiglia Miriana deve essere un valore positivo.');
       return {
         isValid: errors.length === 0,
         errors
@@ -5719,6 +5869,8 @@ window.WeddingApp.Domain = (function () {
       let totalBudget = 0;
       let totalPaidMichele = 0;
       let totalPaidMiriana = 0;
+      let totalPaidFamilyMichele = 0;
+      let totalPaidFamilyMiriana = 0;
       let totalOwedMichele = 0;
       let totalOwedMiriana = 0;
 
@@ -5729,6 +5881,8 @@ window.WeddingApp.Domain = (function () {
           budget: 0,
           paidMichele: 0,
           paidMiriana: 0,
+          paidFamilyMichele: 0,
+          paidFamilyMiriana: 0,
           totalPaid: 0,
           remaining: 0,
           count: 0
@@ -5739,20 +5893,26 @@ window.WeddingApp.Domain = (function () {
         const b = exp.budget || 0;
         const pm = exp.paidMichele || 0;
         const pmi = exp.paidMiriana || 0;
-        const tp = typeof exp.totalPaid === 'function' ? exp.totalPaid() : (pm + pmi);
+        const pfm = exp.paidFamilyMichele || 0;
+        const pfmir = exp.paidFamilyMiriana || 0;
+        const tp = typeof exp.totalPaid === 'function' ? exp.totalPaid() : (pm + pmi + pfm + pfmir);
 
         totalBudget += b;
         totalPaidMichele += pm;
         totalPaidMiriana += pmi;
+        totalPaidFamilyMichele += pfm;
+        totalPaidFamilyMiriana += pfmir;
 
         if (typeof exp.calculateOwed === 'function') {
           const owed = exp.calculateOwed(micheleGuestRatio);
           totalOwedMichele += owed.micheleOwed;
           totalOwedMiriana += owed.mirianaOwed;
         } else {
-          const half = Math.round((b / 2) * 100) / 100;
+          const familyGift = pfm + pfmir;
+          const netB = Math.max(0, b - familyGift);
+          const half = Math.round((netB / 2) * 100) / 100;
           totalOwedMichele += half;
-          totalOwedMiriana += (b - half);
+          totalOwedMiriana += (netB - half);
         }
 
         if (categoryAggregates[exp.categoryId]) {
@@ -5760,13 +5920,16 @@ window.WeddingApp.Domain = (function () {
           c.budget += b;
           c.paidMichele += pm;
           c.paidMiriana += pmi;
+          c.paidFamilyMichele += pfm;
+          c.paidFamilyMiriana += pfmir;
           c.totalPaid += tp;
           c.remaining += Math.max(0, b - tp);
           c.count += 1;
         }
       });
 
-      const totalPaid = totalPaidMichele + totalPaidMiriana;
+      const totalFamilyPaid = totalPaidFamilyMichele + totalPaidFamilyMiriana;
+      const totalPaid = totalPaidMichele + totalPaidMiriana + totalFamilyPaid;
       const totalRemaining = Math.max(0, totalBudget - totalPaid);
       const progressPercentage = totalBudget > 0 ? (totalPaid / totalBudget) * 100 : 0;
 
@@ -5813,7 +5976,7 @@ window.WeddingApp.Domain = (function () {
 
       // Dono Famiglia Amedeo & Anna e Regali
       const famPledged = Number(plan.familyContribution?.totalPledged ?? 10000);
-      const famUsed = Number(plan.familyContribution?.alreadyAdvanced ?? 1500);
+      const famUsed = totalPaidFamilyMiriana;
       const famAvailable = Math.max(0, famPledged - famUsed);
       const famTotalGiftsProjected = famPledged + giftsEstimated;
       const famFinalNetResidual = famAvailable + giftsEstimated;
@@ -5853,7 +6016,7 @@ window.WeddingApp.Domain = (function () {
       const mirAccCurrent = mirMonthly * mirCurrentMonths;
       const mirAccRemaining = mirMonthly * mirRemainingMonths;
       const mirGrossProjected = mirInitial + mirAccCurrent + mirAccRemaining;
-      const mirPersonalExpensesPaid = Math.max(0, totalPaidMiriana - famUsed);
+      const mirPersonalExpensesPaid = totalPaidMiriana;
       const mirCurrentNetLiquidity = mirInitial + mirAccCurrent - mirPersonalExpensesPaid;
       const mirPersonalResidual = mirGrossProjected - mirPersonalExpensesPaid;
       const mirFinalNetResidual = mirPersonalResidual;
@@ -5905,6 +6068,9 @@ window.WeddingApp.Domain = (function () {
         totalBudget,
         totalPaidMichele,
         totalPaidMiriana,
+        totalPaidFamilyMichele,
+        totalPaidFamilyMiriana,
+        totalFamilyPaid,
         totalPaid,
         totalRemaining,
         progressPercentage,
@@ -5913,6 +6079,9 @@ window.WeddingApp.Domain = (function () {
         coupleBalance: {
           micheleAmount: totalPaidMichele,
           mirianaAmount: totalPaidMiriana,
+          paidFamilyMichele: totalPaidFamilyMichele,
+          paidFamilyMiriana: totalPaidFamilyMiriana,
+          totalFamilyPaid,
           micheleOwed: totalOwedMichele,
           mirianaOwed: totalOwedMiriana,
           mirianaGrossOwed: totalOwedMiriana,
@@ -6385,6 +6554,8 @@ window.WeddingApp.Repositories = (function () {
       this.seedData = seedData;
       this._onCloudUpdateCallback = null;
       this._cachedData = null;
+      this._lastCloudUpdatedAt = null;
+      this._lastLocalRawString = null;
     }
 
     onCloudUpdate(fn) {
@@ -6402,6 +6573,7 @@ window.WeddingApp.Repositories = (function () {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const raw = JSON.parse(stored);
+          this._lastLocalRawString = stored;
           this._cachedData = this._hydrate(raw);
           return this._cachedData;
         }
@@ -6420,7 +6592,7 @@ window.WeddingApp.Repositories = (function () {
       try {
         const cacheBuster = Date.now();
         const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*&_t=${cacheBuster}`, {
-          cache: 'no-store',
+          method: 'GET',
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY
@@ -6430,15 +6602,29 @@ window.WeddingApp.Repositories = (function () {
           const records = await res.json();
           if (records && records.length > 0 && records[0].data) {
             const cloudPlain = records[0].data;
-            this._cachedData = this._hydrate(cloudPlain);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudPlain));
-            return { success: true, data: this._cachedData, updatedAt: records[0].updated_at };
+            const cloudRawString = JSON.stringify(cloudPlain);
+            const cloudUpdatedAt = records[0].updated_at;
+
+            // Rileva se ci sono novità rispetto a quanto attualmente in memoria locale
+            const hasChanged = (cloudUpdatedAt !== this._lastCloudUpdatedAt) || (cloudRawString !== this._lastLocalRawString);
+
+            if (hasChanged) {
+              this._lastCloudUpdatedAt = cloudUpdatedAt;
+              this._lastLocalRawString = cloudRawString;
+              this._cachedData = this._hydrate(cloudPlain);
+              localStorage.setItem(STORAGE_KEY, cloudRawString);
+              return { success: true, updated: true, data: this._cachedData, updatedAt: cloudUpdatedAt };
+            }
+
+            return { success: true, updated: false, data: this._cachedData };
           }
+        } else {
+          console.warn('Sync Cloud HTTP error:', res.status, res.statusText);
         }
       } catch (err) {
         console.warn('Sync Cloud non raggiungibile (offline):', err);
       }
-      return { success: false };
+      return { success: false, updated: false };
     }
 
     // Salva in Locale e poi invia istantaneamente a Supabase Cloud
@@ -6464,6 +6650,8 @@ window.WeddingApp.Repositories = (function () {
             budget: e.budget,
             paidMichele: e.paidMichele,
             paidMiriana: e.paidMiriana,
+            paidFamilyMichele: e.paidFamilyMichele || 0,
+            paidFamilyMiriana: e.paidFamilyMiriana || 0,
             status: e.status,
             notes: e.notes,
             dueDate: e.dueDate,
@@ -6710,8 +6898,9 @@ window.WeddingApp.UseCases = (function () {
 
         if (payer === 'michele' && exp.paidMichele <= 0) return false;
         if (payer === 'miriana' && exp.paidMiriana <= 0) return false;
+        if (payer === 'family' && (exp.paidFamilyMichele <= 0 && exp.paidFamilyMiriana <= 0)) return false;
         if (payer === 'both' && (exp.paidMichele <= 0 || exp.paidMiriana <= 0)) return false;
-        if (payer === 'unpaid' && (exp.paidMichele > 0 || exp.paidMiriana > 0)) return false;
+        if (payer === 'unpaid' && (exp.paidMichele > 0 || exp.paidMiriana > 0 || exp.paidFamilyMichele > 0 || exp.paidFamilyMiriana > 0)) return false;
 
         if (status !== 'all') {
           const currentStatus = exp.resolveStatus();
@@ -7110,6 +7299,12 @@ window.WeddingApp.UI = (function () {
         }
         if (exp.paidMiriana > 0) {
           payerBadges += `<span class="pill-person miriana">Miriana: ${CurrencyFormatter.format(exp.paidMiriana)}</span>`;
+        }
+        if (exp.paidFamilyMichele > 0) {
+          payerBadges += `<span class="pill-person family-michele" title="Dono/Acconto offerto dalla Famiglia di Michele">Fam. Michele: ${CurrencyFormatter.format(exp.paidFamilyMichele)}</span>`;
+        }
+        if (exp.paidFamilyMiriana > 0) {
+          payerBadges += `<span class="pill-person family-miriana" title="Dono/Acconto offerto dalla Famiglia di Miriana">Fam. Miriana: ${CurrencyFormatter.format(exp.paidFamilyMiriana)}</span>`;
         }
         if (!payerBadges) {
           payerBadges = `<span class="badge-unpaid">In attesa</span>`;
@@ -7752,7 +7947,12 @@ window.WeddingApp.UI = (function () {
       setVal('sp-miriana-months-todo', isManual ? (mir.remainingMonths ?? defaultRemaining) : defaultRemaining);
 
       setVal('sp-family-pledged', fam.totalPledged ?? 10000);
-      setVal('sp-family-advanced', fam.alreadyAdvanced ?? 1500);
+      setVal('sp-family-advanced', fam.alreadyAdvanced ?? 0);
+      const advDisplay = document.getElementById('sp-family-advanced-display');
+      if (advDisplay) {
+        const familyTotal = (fam.used !== undefined) ? fam.used : (fam.alreadyAdvanced || 0);
+        advDisplay.textContent = `${CurrencyFormatter.format(familyTotal)} (da spese registrate)`;
+      }
       setVal('sp-gifts-estimated', gifts.estimated ?? 10000);
 
       window.addEventListener('keydown', (e) => {
@@ -7862,6 +8062,45 @@ window.WeddingApp.UI = (function () {
               <div class="balance-chip-amount miriana amount">${CurrencyFormatter.format(exp.paidMiriana)}</div>
             </div>
           `).join('');
+        }
+      }
+
+      // Riquadro doni e acconti versati dalle Famiglie
+      const familyPanel = document.getElementById('balance-family-gifts-container');
+      const listFamily = document.getElementById('list-family-items');
+      const badgeCountFamily = document.getElementById('badge-count-family');
+      const totalFamilyEl = document.getElementById('balance-family-paid-total');
+
+      const familyExpenses = expenses.filter(e => (e.paidFamilyMichele > 0 || e.paidFamilyMiriana > 0));
+
+      if (familyPanel) {
+        if (familyExpenses.length > 0) {
+          familyPanel.style.display = 'block';
+          const totalFamilyAmount = familyExpenses.reduce((s, e) => s + (e.paidFamilyMichele || 0) + (e.paidFamilyMiriana || 0), 0);
+          if (totalFamilyEl) totalFamilyEl.textContent = CurrencyFormatter.format(totalFamilyAmount);
+          if (badgeCountFamily) badgeCountFamily.textContent = `${familyExpenses.length} ${familyExpenses.length === 1 ? 'dono' : 'doni'}`;
+
+          if (listFamily) {
+            listFamily.innerHTML = familyExpenses.map(exp => {
+              let tagFamily = '';
+              let amounts = [];
+              if (exp.paidFamilyMiriana > 0) amounts.push(`Fam. Miriana: ${CurrencyFormatter.format(exp.paidFamilyMiriana)}`);
+              if (exp.paidFamilyMichele > 0) amounts.push(`Fam. Michele: ${CurrencyFormatter.format(exp.paidFamilyMichele)}`);
+              tagFamily = amounts.join(' • ');
+
+              return `
+                <div class="balance-expense-chip">
+                  <div class="balance-chip-info">
+                    <div class="balance-chip-title">${exp.item}</div>
+                    <div class="balance-chip-supplier">${tagFamily}${exp.supplier ? ` • ${exp.supplier}` : ''}</div>
+                  </div>
+                  <div class="balance-chip-amount text-settled amount">${CurrencyFormatter.format((exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0))}</div>
+                </div>
+              `;
+            }).join('');
+          }
+        } else {
+          familyPanel.style.display = 'none';
         }
       }
     }
@@ -8382,7 +8621,15 @@ window.WeddingApp.UI = (function () {
     // Filtri Ospiti
     searchGuestsQuery: '',
     filterGuestsParty: 'all',
-    filterGuestsGift: 'all'
+    filterGuestsGift: 'all',
+    // Posizioni di scorrimento indipendenti per ciascuna tab
+    scrollPositions: {
+      overview: 0,
+      expenses: 0,
+      savings: 0,
+      balance: 0,
+      guests: 0
+    }
   };
 
   // Istanze Architetturali
@@ -8519,8 +8766,15 @@ window.WeddingApp.UI = (function () {
     HeaderView.updateCountdown(result, details);
   }
 
-  // Gestione Tab
+  // Gestione Tab con Scroll Memory indipendente per ciascuna vista
   function switchTab(targetTab) {
+    const currentTab = uiState.activeTab;
+
+    // 1. Memorizza la posizione di scorrimento della scheda corrente
+    if (currentTab && uiState.scrollPositions) {
+      uiState.scrollPositions[currentTab] = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    }
+
     uiState.activeTab = targetTab;
     const tabs = document.querySelectorAll('.nav-link-btn');
     const sections = {
@@ -8550,6 +8804,20 @@ window.WeddingApp.UI = (function () {
         }
       }
     });
+
+    // 2. Ripristina la posizione esatta della nuova scheda (o cima se mai visitata)
+    const savedY = (uiState.scrollPositions && uiState.scrollPositions[targetTab] !== undefined)
+      ? uiState.scrollPositions[targetTab]
+      : 0;
+
+    // RequestAnimationFrame garantisce il ripristino dopo il reflow del DOM
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: savedY,
+        left: 0,
+        behavior: 'instant'
+      });
+    });
   }
 
   // Modale Inserimento & Modifica
@@ -8572,6 +8840,10 @@ window.WeddingApp.UI = (function () {
       document.getElementById('expense-budget').value = exp.budget ?? 0;
       document.getElementById('expense-paid-michele').value = exp.paidMichele ?? 0;
       document.getElementById('expense-paid-miriana').value = exp.paidMiriana ?? 0;
+      const famMInput = document.getElementById('expense-paid-family-michele');
+      if (famMInput) famMInput.value = exp.paidFamilyMichele ?? 0;
+      const famMirInput = document.getElementById('expense-paid-family-miriana');
+      if (famMirInput) famMirInput.value = exp.paidFamilyMiriana ?? 0;
       document.getElementById('expense-supplier').value = exp.supplier || '';
       document.getElementById('expense-notes').value = exp.notes || '';
       document.getElementById('expense-status').value = exp.status || 'pianificato';
@@ -8587,6 +8859,10 @@ window.WeddingApp.UI = (function () {
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
+      const famMInput = document.getElementById('expense-paid-family-michele');
+      if (famMInput) famMInput.value = 0;
+      const famMirInput = document.getElementById('expense-paid-family-miriana');
+      if (famMirInput) famMirInput.value = 0;
       document.getElementById('expense-status').value = 'pianificato';
       document.getElementById('expense-split-type').value = 'equal';
       const estimateSelect = document.getElementById('expense-is-estimate');
@@ -8630,6 +8906,8 @@ window.WeddingApp.UI = (function () {
     const budget = parseFloat(document.getElementById('expense-budget').value) || 0;
     const paidMichele = parseFloat(document.getElementById('expense-paid-michele').value) || 0;
     const paidMiriana = parseFloat(document.getElementById('expense-paid-miriana').value) || 0;
+    const paidFamilyMichele = parseFloat(document.getElementById('expense-paid-family-michele')?.value) || 0;
+    const paidFamilyMiriana = parseFloat(document.getElementById('expense-paid-family-miriana')?.value) || 0;
     const supplier = document.getElementById('expense-supplier').value.trim();
     const notes = document.getElementById('expense-notes').value.trim();
     const status = document.getElementById('expense-status').value;
@@ -8644,6 +8922,8 @@ window.WeddingApp.UI = (function () {
       budget,
       paidMichele,
       paidMiriana,
+      paidFamilyMichele,
+      paidFamilyMiriana,
       supplier,
       notes,
       status,
@@ -8728,6 +9008,10 @@ window.WeddingApp.UI = (function () {
       btnReset.addEventListener('click', () => {
         mInput.value = 0;
         mirInput.value = 0;
+        const famM = document.getElementById('expense-paid-family-michele');
+        if (famM) famM.value = 0;
+        const famMir = document.getElementById('expense-paid-family-miriana');
+        if (famMir) famMir.value = 0;
       });
     }
   }
@@ -8878,6 +9162,8 @@ window.WeddingApp.UI = (function () {
 
     const form = document.getElementById('expense-form');
     if (form) form.addEventListener('submit', handleSaveForm);
+
+    setupSplitShortcuts();
 
     // Export & Backup
     const btnExportCsv = document.getElementById('btn-export-csv');
@@ -9062,22 +9348,60 @@ window.WeddingApp.UI = (function () {
     }
   }
 
-  // Sincronizzazione Cloud Automatica in background
-  async function initCloudSync() {
+  // Aggiornamento visivo dello stato di sincronizzazione Cloud
+  function setSyncStatus(status, text) {
+    const dot = document.getElementById('sync-status-dot');
+    const label = document.getElementById('sync-status-text');
+    if (dot) {
+      dot.className = 'sync-dot ' + status; // 'synced', 'syncing', 'error'
+    }
+    if (label) {
+      label.textContent = text;
+    }
+  }
+
+  // Sincronizzazione Cloud in background senza flicker
+  let isSyncing = false;
+  async function triggerCloudSync(isManualClick = false) {
+    if (isSyncing) return;
+    isSyncing = true;
+    
+    // Aggiorna lo stato testuale solo se l'utente ha toccato manualmente il bottone
+    if (isManualClick) {
+      setSyncStatus('syncing', 'Sincronizzazione...');
+    }
+
     try {
       const res = await repository.syncFromCloud();
-      if (res.success) {
-        populateCategoryDropdowns();
-        refreshAll();
-        console.log('✓ Atelier sincronizzato con il cloud Supabase');
+      if (res && res.success) {
+        if (res.updated) {
+          populateCategoryDropdowns();
+          refreshAll();
+          if (isManualClick) {
+            ToastView.show('Dati aggiornati in tempo reale con il Cloud');
+          }
+        } else if (isManualClick) {
+          ToastView.show('Dati già allineati al Cloud');
+        }
+        setSyncStatus('synced', 'Sincronizzato');
       } else {
-        // Se sul cloud non c'è ancora nulla, carichiamo la versione locale attuale
-        const localData = repository.load();
-        repository.persist(localData);
+        // Rete momentaneamente non disponibile o modalità offline
+        if (isManualClick) {
+          ToastView.show('Cloud momentaneamente non raggiungibile. Usando dati salvati.');
+        }
+        setSyncStatus('error', 'Offline');
       }
     } catch (e) {
-      console.warn('Errore sync cloud iniziale:', e);
+      console.warn('Errore sincronizzazione cloud:', e);
+      setSyncStatus('error', 'Offline');
+    } finally {
+      isSyncing = false;
     }
+  }
+
+  // Sincronizzazione Cloud Automatica iniziale
+  async function initCloudSync() {
+    await triggerCloudSync(false);
   }
 
   // Bootstrap dell'Applicazione
@@ -9089,29 +9413,37 @@ window.WeddingApp.UI = (function () {
     bindEvents();
     refreshAll();
 
-    // 2. Sincronizzazione asincrona con Cloud in background
-    try {
-      await initCloudSync();
-    } catch (e) {
-      console.warn('Sync cloud background fallito:', e);
+    // 2. Tasto manuale di sincronizzazione nell'header
+    const btnManualSync = document.getElementById('btn-manual-cloud-sync');
+    if (btnManualSync) {
+      btnManualSync.addEventListener('click', () => {
+        triggerCloudSync(true);
+      });
     }
 
-    // Sincronizzazione periodica ogni 15 secondi (o quando l'app torna visibile su iPhone)
-    setInterval(async () => {
-      const res = await repository.syncFromCloud();
-      if (res.success) {
-        populateCategoryDropdowns();
-        refreshAll();
+    // 3. Sincronizzazione asincrona con Cloud in background
+    await initCloudSync();
+
+    // 4. Polling intelligente ogni 20 secondi in background quando la scheda è attiva
+    setInterval(() => {
+      if (!document.hidden && navigator.onLine) {
+        triggerCloudSync(false);
       }
-    }, 15000);
+    }, 20000);
+
+    // 5. Risveglio immediato su iPhone (Safari / PWA Standalone)
+    // Intercetta ritorno da lock-screen, cambio app o passaggio a scheda attiva
+    const onWakeup = () => {
+      triggerCloudSync(false);
+    };
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        initCloudSync();
-      }
+      if (!document.hidden) onWakeup();
     });
+    window.addEventListener('pageshow', onWakeup);
+    window.addEventListener('focus', onWakeup);
 
-    // Timer Countdown al minuto
+    // 6. Timer Countdown al minuto
     setInterval(() => {
       const summary = getSummaryUseCase.execute({ referenceDate: uiState.simulatedDate });
       updateCountdownTick(summary.details, summary.finances?.timeline?.currentDate);
