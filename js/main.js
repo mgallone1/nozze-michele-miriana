@@ -268,7 +268,25 @@
       title.textContent = 'Modifica Voce';
       document.getElementById('expense-item').value = exp.item || '';
       document.getElementById('expense-category').value = exp.categoryId || (data.categories[0]?.id || '');
-      document.getElementById('expense-budget').value = exp.budget ?? 0;
+      
+      const isCatering = (exp.id === 'exp_2' || (exp.categoryId === 'location_catering' && (exp.item || '').toLowerCase().includes('catering')));
+      const netInput = document.getElementById('expense-net-amount');
+      const bInput = document.getElementById('expense-budget');
+      const chkVat = document.getElementById('expense-has-vat');
+      const pnlVat = document.getElementById('expense-vat-panel');
+
+      // Se è catering, l'imponibile è il prezzo a persona (default 150), altrimenti il costo imponibile registrato
+      let baseNet = isCatering ? (exp.unitPriceNet || 150) : (exp.netAmount !== null ? exp.netAmount : exp.budget);
+      if (netInput) netInput.value = baseNet;
+      if (bInput) bInput.value = exp.budget ?? 0;
+
+      if (chkVat) {
+        chkVat.checked = (exp.hasVat !== false); // True di default o se salvato true
+      }
+      const rateToSet = exp.vatRate || (isCatering ? 10 : 22);
+      const radioRate = document.querySelector(`input[name="vat-rate"][value="${rateToSet}"]`);
+      if (radioRate) radioRate.checked = true;
+
       document.getElementById('expense-paid-michele').value = exp.paidMichele ?? 0;
       document.getElementById('expense-paid-miriana').value = exp.paidMiriana ?? 0;
       const famMInput = document.getElementById('expense-paid-family-michele');
@@ -287,17 +305,19 @@
       if (staffInput) {
         staffInput.value = exp.staffCount ?? 0;
       }
-      const chkVat = document.getElementById('expense-add-vat');
-      if (chkVat) chkVat.checked = false;
-      const pnlVat = document.getElementById('expense-vat-panel');
-      if (pnlVat) pnlVat.style.display = 'none';
+
+      recalculateVatEquation();
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
-      const chkVat = document.getElementById('expense-add-vat');
-      if (chkVat) chkVat.checked = false;
-      const pnlVat = document.getElementById('expense-vat-panel');
-      if (pnlVat) pnlVat.style.display = 'none';
+      const netInput = document.getElementById('expense-net-amount');
+      const bInput = document.getElementById('expense-budget');
+      const chkVat = document.getElementById('expense-has-vat');
+      if (netInput) netInput.value = '';
+      if (bInput) bInput.value = 0;
+      if (chkVat) chkVat.checked = true;
+      const radioRate = document.querySelector(`input[name="vat-rate"][value="22"]`);
+      if (radioRate) radioRate.checked = true;
       const famMInput = document.getElementById('expense-paid-family-michele');
       if (famMInput) famMInput.value = 0;
       const famMirInput = document.getElementById('expense-paid-family-miriana');
@@ -315,6 +335,7 @@
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
+      recalculateVatEquation();
     }
 
     modal.classList.add('open');
@@ -354,6 +375,14 @@
     const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
     const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
 
+    const hasVat = document.getElementById('expense-has-vat')?.checked || false;
+    const netAmount = parseFloat(document.getElementById('expense-net-amount')?.value) || 0;
+    let vatRate = 10;
+    const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
+    if (checkedRadio) vatRate = parseFloat(checkedRadio.value) || 10;
+
+    const isCatering = (uiState.editingExpenseId === 'exp_2') || categoryId === 'location_catering' || item.toLowerCase().includes('catering');
+
     const payload = {
       id: uiState.editingExpenseId,
       item,
@@ -368,7 +397,11 @@
       status,
       splitType,
       isEstimate,
-      staffCount
+      staffCount,
+      hasVat,
+      vatRate,
+      netAmount: isCatering ? null : netAmount,
+      unitPriceNet: isCatering ? netAmount : null
     };
 
     const result = saveExpenseUseCase.execute(payload);
@@ -407,101 +440,119 @@
     });
   }
 
-  // Setup Calcolatore IVA Dinamica per Budget Spesa
-  function setupVatCalculator() {
-    const chkVat = document.getElementById('expense-add-vat');
-    const pnlVat = document.getElementById('expense-vat-panel');
+  // Ricalcola e formatta il resoconto trasparente dell'IVA (es: 150 + 15 = 165 €)
+  function recalculateVatEquation() {
+    const chkVat = document.getElementById('expense-has-vat');
+    const netInput = document.getElementById('expense-net-amount');
     const bInput = document.getElementById('expense-budget');
+    const pnlVat = document.getElementById('expense-vat-panel');
+    const formulaText = document.getElementById('vat-formula-text');
+    const summaryVal = document.getElementById('budget-summary-val');
+    const summaryLbl = document.getElementById('budget-summary-label');
     const catSelect = document.getElementById('expense-category');
     const itemInput = document.getElementById('expense-item');
-    const netDisp = document.getElementById('vat-net-display');
-    const vatDisp = document.getElementById('vat-amount-display');
-    const grossDisp = document.getElementById('vat-gross-display');
+    const lblAmount = document.getElementById('lbl-expense-amount');
 
-    if (!chkVat || !pnlVat || !bInput) return;
+    if (!chkVat || !netInput || !bInput) return;
 
-    let baseNetValue = 0;
+    const cat = catSelect ? catSelect.value : '';
+    const itemName = (itemInput ? itemInput.value : '').toLowerCase();
+    const isCatering = (uiState.editingExpenseId === 'exp_2') || cat === 'location_catering' || itemName.includes('catering');
 
-    function setVatRate(rateVal) {
-      const radio = document.querySelector(`input[name="vat-rate"][value="${rateVal}"]`);
-      if (radio) radio.checked = true;
+    if (lblAmount) {
+      lblAmount.textContent = isCatering ? 'Prezzo a Persona (€)' : 'Importo (€)';
     }
 
-    function autoSelectRateByCategory() {
-      const cat = catSelect ? catSelect.value : '';
-      const text = (itemInput ? itemInput.value : '').toLowerCase();
-      if (cat === 'location_catering' || text.includes('catering') || text.includes('banchetto') || text.includes('pranzo') || text.includes('cena')) {
-        setVatRate(10);
-      } else {
-        setVatRate(22);
+    const netVal = parseFloat(netInput.value) || 0;
+    const hasVat = chkVat.checked;
+
+    let rate = 10;
+    const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
+    if (checkedRadio) rate = parseFloat(checkedRadio.value) || 10;
+
+    let unitWithVat = netVal;
+    let vatPart = 0;
+
+    if (hasVat) {
+      if (pnlVat) pnlVat.style.display = 'flex';
+      vatPart = Math.round((netVal * (rate / 100)) * 100) / 100;
+      unitWithVat = Math.round((netVal + vatPart) * 100) / 100;
+      if (formulaText) {
+        formulaText.innerHTML = `<strong>${netVal.toLocaleString('it-IT')} €</strong> + <strong>${vatPart.toLocaleString('it-IT')} €</strong> (IVA ${rate}%) = <strong class="text-settled">${unitWithVat.toLocaleString('it-IT')} €</strong>`;
       }
+    } else {
+      if (pnlVat) pnlVat.style.display = 'none';
+      if (formulaText) {
+        formulaText.textContent = `${netVal.toLocaleString('it-IT')} € (senza IVA)`;
+      }
+    }
+
+    // Se è catering, calcola il budget totale moltiplicando per il numero effettivo di ospiti e staff
+    let totalBudgetCalculated = unitWithVat;
+    if (isCatering) {
+      const summary = getSummaryUseCase.execute({ referenceDate: uiState.simulatedDate });
+      const guestStats = summary?.finances?.coupleBalance?.guestStats;
+      const adultCount = guestStats?.adultGuestsCount || 101;
+      const childCount = guestStats?.childGuestsCount || 11;
+      const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
+      const halfPrice = Math.round((unitWithVat / 2) * 100) / 100;
+
+      totalBudgetCalculated = Math.round(unitWithVat * adultCount + halfPrice * childCount + halfPrice * staffCount);
+      if (summaryLbl) {
+        summaryLbl.textContent = `Totale Banchetto (${adultCount} adulti + ${childCount} bimbi + ${staffCount} staff):`;
+      }
+    } else {
+      if (summaryLbl) summaryLbl.textContent = 'Budget Complessivo della Spesa:';
+    }
+
+    bInput.value = totalBudgetCalculated;
+    if (summaryVal) {
+      summaryVal.textContent = `${totalBudgetCalculated.toLocaleString('it-IT')} €`;
+    }
+  }
+
+  // Setup Calcolatore IVA Dinamica per Budget Spesa
+  function setupVatCalculator() {
+    const chkVat = document.getElementById('expense-has-vat');
+    const netInput = document.getElementById('expense-net-amount');
+    const catSelect = document.getElementById('expense-category');
+    const itemInput = document.getElementById('expense-item');
+    const staffInput = document.getElementById('expense-staff-count');
+
+    if (chkVat) {
+      chkVat.addEventListener('change', () => recalculateVatEquation());
+    }
+
+    if (netInput) {
+      netInput.addEventListener('input', () => recalculateVatEquation());
+    }
+
+    if (staffInput) {
+      staffInput.addEventListener('input', () => recalculateVatEquation());
     }
 
     if (catSelect) {
       catSelect.addEventListener('change', () => {
-        if (!chkVat.checked) autoSelectRateByCategory();
-        else {
-          autoSelectRateByCategory();
-          updateVatFeedback();
-        }
+        const cat = catSelect.value;
+        const radio = document.querySelector(`input[name="vat-rate"][value="${cat === 'location_catering' ? '10' : '22'}"]`);
+        if (radio) radio.checked = true;
+        recalculateVatEquation();
       });
     }
 
-    function getSelectedVatRate() {
-      const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
-      return checkedRadio ? (parseFloat(checkedRadio.value) || 22) : 22;
-    }
-
-    function updateVatFeedback() {
-      if (!chkVat.checked) {
-        pnlVat.style.display = 'none';
-        return;
-      }
-      pnlVat.style.display = 'flex';
-      const rate = getSelectedVatRate();
-      const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
-      const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
-
-      if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
-      if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
-      if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
-
-      bInput.value = totalGross;
-    }
-
-    chkVat.addEventListener('change', () => {
-      if (chkVat.checked) {
-        autoSelectRateByCategory();
-        // Quando spunti il checkbox, il numero attualmente nel campo diventa l'imponibile netto
-        baseNetValue = parseFloat(bInput.value) || 0;
-        updateVatFeedback();
-      } else {
-        // Se togli la spunta, ripristina il valore imponibile netto
-        if (baseNetValue > 0) {
-          bInput.value = baseNetValue;
+    if (itemInput) {
+      itemInput.addEventListener('input', () => {
+        const text = itemInput.value.toLowerCase();
+        if (text.includes('catering') || text.includes('banchetto')) {
+          const radio = document.querySelector('input[name="vat-rate"][value="10"]');
+          if (radio) radio.checked = true;
         }
-        pnlVat.style.display = 'none';
-      }
-    });
-
-    document.querySelectorAll('input[name="vat-rate"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (chkVat.checked) updateVatFeedback();
+        recalculateVatEquation();
       });
-    });
+    }
 
-    bInput.addEventListener('input', () => {
-      if (chkVat.checked) {
-        // Se l'utente digita mentre il checkbox è attivo, aggiorniamo la base imponibile proporzionalmente
-        // o consideriamo il valore digitato come nuovo imponibile netto
-        baseNetValue = parseFloat(bInput.value) || 0;
-        const rate = getSelectedVatRate();
-        const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
-        const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
-        if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
-        if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
-        if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
-      }
+    document.querySelectorAll('input[name="vat-rate"]').forEach(r => {
+      r.addEventListener('change', () => recalculateVatEquation());
     });
   }
 

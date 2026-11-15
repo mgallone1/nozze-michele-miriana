@@ -255,6 +255,11 @@ window.WeddingApp.UI = (function () {
           ? `<span class="cost-nature-pill staff" title="${exp.staffCount} membri staff contati al catering al 50%">🍽️ ${exp.staffCount} staff</span>`
           : '';
 
+        let vatBadge = '';
+        if (exp.hasVat) {
+          vatBadge = `<span class="cost-nature-pill contract" title="Prezzo con IVA ${exp.vatRate || 10}% inclusa">IVA ${exp.vatRate || 10}%</span>`;
+        }
+
         html += `
           <tr data-id="${exp.id}">
             <td class="col-item">
@@ -263,6 +268,7 @@ window.WeddingApp.UI = (function () {
                 ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
                 ${splitBadge}
                 ${costTypeBadge}
+                ${vatBadge}
                 ${staffBadge}
               </div>
             </td>

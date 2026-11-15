@@ -3668,23 +3668,37 @@ button.btn-editable-val:hover {
   cursor: pointer;
 }
 
-.vat-calc-feedback {
+.vat-formula-equation {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-bronze);
+  background: var(--surface-pure);
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px dashed var(--border-subtle);
+  display: inline-block;
+  margin-top: 4px;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, monospace;
+}
+
+.budget-total-summary-card {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.75rem;
+  justify-content: space-between;
+}
+
+.budget-summary-label {
+  font-size: 0.78rem;
   color: var(--ink-secondary);
-  border-top: 1px dashed var(--border-subtle);
-  padding-top: 6px;
-  margin-top: 2px;
+  font-weight: 600;
 }
 
-.vat-calc-feedback strong {
-  color: var(--ink-primary);
-}
-
-.vat-calc-feedback .text-settled {
-  color: var(--accent-sage);
+.budget-summary-val {
+  font-size: 0.95rem;
   font-weight: 700;
 }

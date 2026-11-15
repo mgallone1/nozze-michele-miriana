@@ -3684,24 +3684,38 @@ button.btn-editable-val:hover {
   cursor: pointer;
 }
 
-.vat-calc-feedback {
+.vat-formula-equation {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-bronze);
+  background: var(--surface-pure);
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px dashed var(--border-subtle);
+  display: inline-block;
+  margin-top: 4px;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, monospace;
+}
+
+.budget-total-summary-card {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.75rem;
+  justify-content: space-between;
+}
+
+.budget-summary-label {
+  font-size: 0.78rem;
   color: var(--ink-secondary);
-  border-top: 1px dashed var(--border-subtle);
-  padding-top: 6px;
-  margin-top: 2px;
+  font-weight: 600;
 }
 
-.vat-calc-feedback strong {
-  color: var(--ink-primary);
-}
-
-.vat-calc-feedback .text-settled {
-  color: var(--accent-sage);
+.budget-summary-val {
+  font-size: 0.95rem;
   font-weight: 700;
 }
 
@@ -4337,38 +4351,44 @@ button.btn-editable-val:hover {
 
             <div class="form-group-noble">
               <div class="budget-label-row">
-                <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
-                <label class="vat-toggle-pill" for="expense-add-vat" title="Seleziona se il prezzo inserito è imponibile e occorre aggiungere l'IVA (es. 22% o 10%)">
-                  <input type="checkbox" id="expense-add-vat">
-                  <span>+ Aggiungi IVA</span>
+                <label class="form-label-noble" id="lbl-expense-amount" for="expense-budget">Importo (€)</label>
+                <label class="vat-toggle-pill" for="expense-has-vat" title="Spunta per scorporare/aggiungere l'IVA in modo trasparente e persistente">
+                  <input type="checkbox" id="expense-has-vat">
+                  <span>Applica IVA</span>
                 </label>
               </div>
-              <input type="number" id="expense-budget" class="form-input-noble num" step="any" min="0" placeholder="0">
+
+              <!-- Input importo base (se catering è il prezzo a persona es. 150€, altrimenti totale imponibile) -->
+              <input type="number" id="expense-net-amount" class="form-input-noble num" step="any" min="0" placeholder="0">
               
-              <!-- Selettore Aliquota IVA (mostrato quando il checkbox è attivo) -->
-              <div class="vat-calculator-bar" id="expense-vat-panel" style="display: none;">
+              <!-- Selettore Aliquota e Resoconto Trasparente IVA -->
+              <div class="vat-calculator-bar" id="expense-vat-panel">
                 <div class="vat-rate-selection">
                   <span class="vat-sub-label">Aliquota:</span>
                   <label class="vat-radio-chip">
-                    <input type="radio" name="vat-rate" value="22" checked>
-                    <span>22% (Standard)</span>
+                    <input type="radio" name="vat-rate" value="10" checked>
+                    <span>10% (Catering / Ristorazione)</span>
                   </label>
                   <label class="vat-radio-chip">
-                    <input type="radio" name="vat-rate" value="10">
-                    <span>10% (Ristorazione)</span>
+                    <input type="radio" name="vat-rate" value="22">
+                    <span>22% (Fornitori standard)</span>
                   </label>
                   <label class="vat-radio-chip">
                     <input type="radio" name="vat-rate" value="4">
                     <span>4% (Agevolata)</span>
                   </label>
                 </div>
-                <div class="vat-calc-feedback">
-                  <span>Imponibile: <strong id="vat-net-display">0 €</strong></span>
-                  <span>•</span>
-                  <span>IVA: <strong id="vat-amount-display">+ 0 €</strong></span>
-                  <span>•</span>
-                  <span>Totale Finale: <strong class="text-settled" id="vat-gross-display">0 €</strong></span>
+                <!-- Resoconto esatto richiesto: 150 + 15 = 165 € -->
+                <div class="vat-formula-equation" id="vat-formula-text">
+                  150 € + 15 € (IVA 10%) = 165 €
                 </div>
+              </div>
+
+              <!-- Campo di riepilogo lordo complessivo calcolato -->
+              <div class="budget-total-summary-card">
+                <span class="budget-summary-label" id="budget-summary-label">Budget Complessivo della Spesa:</span>
+                <strong class="budget-summary-val amount text-settled" id="budget-summary-val">0 €</strong>
+                <input type="hidden" id="expense-budget" value="0">
               </div>
             </div>
           </div>
@@ -5765,7 +5785,11 @@ window.WeddingApp.Domain = (function () {
       splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
       payer = 'both', // indicativo di chi si occupa del pagamento
       isEstimate = undefined, // true = Costo Stimato, false = Costo Reale / a Contratto
-      staffCount = 0 // Membri staff/fornitori presenti al ricevimento (50% catering)
+      staffCount = 0, // Membri staff/fornitori presenti al ricevimento (50% catering)
+      hasVat = false, // Se l'IVA è applicata e calcolata sul netto
+      vatRate = 10,   // Aliquota IVA applicata (es. 10 o 22)
+      netAmount = null, // Imponibile netto prima di IVA
+      unitPriceNet = null // Prezzo unitario netto a persona per catering
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
@@ -5781,6 +5805,11 @@ window.WeddingApp.Domain = (function () {
       this.dueDate = dueDate || '';
       this.splitType = splitType || 'equal';
       this.payer = payer || 'both';
+
+      this.hasVat = Boolean(hasVat);
+      this.vatRate = Number(vatRate) || 10;
+      this.netAmount = (netAmount !== null && netAmount !== undefined) ? Number(netAmount) : null;
+      this.unitPriceNet = (unitPriceNet !== null && unitPriceNet !== undefined) ? Number(unitPriceNet) : null;
 
       // Se non esplicitamente definito, usa l'elenco dei contratti certi; altrimenti stima di default
       if (isEstimate !== undefined && isEstimate !== null) {
@@ -5967,24 +5996,32 @@ window.WeddingApp.Domain = (function () {
       const staffMealsCount = vendorStaffSum > 0 ? vendorStaffSum : Math.max(0, parseInt(safeDetails.staffMealsCount ?? 0, 10) || 0);
 
       // Aggiorna dinamicamente la voce Catering:
-      // Adulti: 150€ + 10% IVA = 165€ a persona
-      // Bambini: 50% = 75€ + 10% IVA = 82,50€
-      // Staff / Fornitori: 50% = 75€ + 10% IVA = 82,50€
+      // Calcolo trasparente sul prezzo a persona:
+      // Default: 150€ imponibile + 10% IVA = 165€ (oppure unitPriceNet se personalizzato)
       const cateringExp = safeExpenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
       if (cateringExp) {
-        const adultTotal = Math.round(150 * 1.1 * adultGuestsCount);
-        const childTotal = Math.round(75 * 1.1 * childGuestsCount);
-        const staffTotal = Math.round(75 * 1.1 * staffMealsCount);
+        const basePrice = cateringExp.unitPriceNet || cateringExp.netAmount || 150;
+        const rate = (cateringExp.hasVat !== false) ? (cateringExp.vatRate || 10) : 0;
+        const adultPrice = Math.round(basePrice * (1 + rate / 100) * 100) / 100;
+        const halfPrice = Math.round((adultPrice / 2) * 100) / 100;
+
+        const adultTotal = Math.round(adultPrice * adultGuestsCount);
+        const childTotal = Math.round(halfPrice * childGuestsCount);
+        const staffTotal = Math.round(halfPrice * staffMealsCount);
         cateringExp.budget = adultTotal + childTotal + staffTotal;
+        cateringExp.unitPriceNet = basePrice;
+        cateringExp.vatRate = rate > 0 ? rate : 10;
+        cateringExp.hasVat = (rate > 0);
         
         let labelDesc = `${adultGuestsCount} adulti`;
         if (childGuestsCount > 0) labelDesc += ` + ${childGuestsCount} bambini (50%)`;
         if (staffMealsCount > 0) labelDesc += ` + ${staffMealsCount} staff (50%)`;
         cateringExp.item = `Banchetto & Catering (${labelDesc})`;
         
-        if (!cateringExp.notes.includes('165€')) {
-          cateringExp.notes = `Menù adulti 150€ + IVA (165€). Bambini e Staff al 50% (82,50€). ${cateringExp.notes}`;
-        }
+        const vatNote = (rate > 0)
+          ? `Menù adulti: ${basePrice}€ + IVA ${rate}% (${basePrice * (rate / 100)}€) = ${adultPrice}€. Bambini e Staff al 50% (${halfPrice}€).`
+          : `Menù adulti: ${basePrice}€ (senza IVA). Bambini e Staff al 50% (${halfPrice}€).`;
+        cateringExp.notes = `${vatNote} Aperitivo, pranzo/cena, bevande (1.500€ Michele + 1.500€ Famiglia Miriana / Amedeo e Anna)`;
       }
 
       // Rapporto Ospiti per ripartizione spese proporzionali
@@ -6782,7 +6819,11 @@ window.WeddingApp.Repositories = (function () {
             splitType: e.splitType || 'equal',
             payer: e.payer || 'both',
             isEstimate: Boolean(e.isEstimate),
-            staffCount: Math.max(0, parseInt(e.staffCount, 10) || 0)
+            staffCount: Math.max(0, parseInt(e.staffCount, 10) || 0),
+            hasVat: Boolean(e.hasVat),
+            vatRate: Number(e.vatRate) || 10,
+            netAmount: (e.netAmount !== null && e.netAmount !== undefined) ? Number(e.netAmount) : null,
+            unitPriceNet: (e.unitPriceNet !== null && e.unitPriceNet !== undefined) ? Number(e.unitPriceNet) : null
           })),
           guests: (dataset.guests || []).map(g => ({
             id: g.id,
@@ -7457,6 +7498,11 @@ window.WeddingApp.UI = (function () {
           ? `<span class="cost-nature-pill staff" title="${exp.staffCount} membri staff contati al catering al 50%">🍽️ ${exp.staffCount} staff</span>`
           : '';
 
+        let vatBadge = '';
+        if (exp.hasVat) {
+          vatBadge = `<span class="cost-nature-pill contract" title="Prezzo con IVA ${exp.vatRate || 10}% inclusa">IVA ${exp.vatRate || 10}%</span>`;
+        }
+
         html += `
           <tr data-id="${exp.id}">
             <td class="col-item">
@@ -7465,6 +7511,7 @@ window.WeddingApp.UI = (function () {
                 ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
                 ${splitBadge}
                 ${costTypeBadge}
+                ${vatBadge}
                 ${staffBadge}
               </div>
             </td>
@@ -8945,7 +8992,25 @@ window.WeddingApp.UI = (function () {
       title.textContent = 'Modifica Voce';
       document.getElementById('expense-item').value = exp.item || '';
       document.getElementById('expense-category').value = exp.categoryId || (data.categories[0]?.id || '');
-      document.getElementById('expense-budget').value = exp.budget ?? 0;
+      
+      const isCatering = (exp.id === 'exp_2' || (exp.categoryId === 'location_catering' && (exp.item || '').toLowerCase().includes('catering')));
+      const netInput = document.getElementById('expense-net-amount');
+      const bInput = document.getElementById('expense-budget');
+      const chkVat = document.getElementById('expense-has-vat');
+      const pnlVat = document.getElementById('expense-vat-panel');
+
+      // Se è catering, l'imponibile è il prezzo a persona (default 150), altrimenti il costo imponibile registrato
+      let baseNet = isCatering ? (exp.unitPriceNet || 150) : (exp.netAmount !== null ? exp.netAmount : exp.budget);
+      if (netInput) netInput.value = baseNet;
+      if (bInput) bInput.value = exp.budget ?? 0;
+
+      if (chkVat) {
+        chkVat.checked = (exp.hasVat !== false); // True di default o se salvato true
+      }
+      const rateToSet = exp.vatRate || (isCatering ? 10 : 22);
+      const radioRate = document.querySelector(`input[name="vat-rate"][value="${rateToSet}"]`);
+      if (radioRate) radioRate.checked = true;
+
       document.getElementById('expense-paid-michele').value = exp.paidMichele ?? 0;
       document.getElementById('expense-paid-miriana').value = exp.paidMiriana ?? 0;
       const famMInput = document.getElementById('expense-paid-family-michele');
@@ -8964,17 +9029,19 @@ window.WeddingApp.UI = (function () {
       if (staffInput) {
         staffInput.value = exp.staffCount ?? 0;
       }
-      const chkVat = document.getElementById('expense-add-vat');
-      if (chkVat) chkVat.checked = false;
-      const pnlVat = document.getElementById('expense-vat-panel');
-      if (pnlVat) pnlVat.style.display = 'none';
+
+      recalculateVatEquation();
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
-      const chkVat = document.getElementById('expense-add-vat');
-      if (chkVat) chkVat.checked = false;
-      const pnlVat = document.getElementById('expense-vat-panel');
-      if (pnlVat) pnlVat.style.display = 'none';
+      const netInput = document.getElementById('expense-net-amount');
+      const bInput = document.getElementById('expense-budget');
+      const chkVat = document.getElementById('expense-has-vat');
+      if (netInput) netInput.value = '';
+      if (bInput) bInput.value = 0;
+      if (chkVat) chkVat.checked = true;
+      const radioRate = document.querySelector(`input[name="vat-rate"][value="22"]`);
+      if (radioRate) radioRate.checked = true;
       const famMInput = document.getElementById('expense-paid-family-michele');
       if (famMInput) famMInput.value = 0;
       const famMirInput = document.getElementById('expense-paid-family-miriana');
@@ -8992,6 +9059,7 @@ window.WeddingApp.UI = (function () {
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
+      recalculateVatEquation();
     }
 
     modal.classList.add('open');
@@ -9031,6 +9099,14 @@ window.WeddingApp.UI = (function () {
     const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
     const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
 
+    const hasVat = document.getElementById('expense-has-vat')?.checked || false;
+    const netAmount = parseFloat(document.getElementById('expense-net-amount')?.value) || 0;
+    let vatRate = 10;
+    const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
+    if (checkedRadio) vatRate = parseFloat(checkedRadio.value) || 10;
+
+    const isCatering = (uiState.editingExpenseId === 'exp_2') || categoryId === 'location_catering' || item.toLowerCase().includes('catering');
+
     const payload = {
       id: uiState.editingExpenseId,
       item,
@@ -9045,7 +9121,11 @@ window.WeddingApp.UI = (function () {
       status,
       splitType,
       isEstimate,
-      staffCount
+      staffCount,
+      hasVat,
+      vatRate,
+      netAmount: isCatering ? null : netAmount,
+      unitPriceNet: isCatering ? netAmount : null
     };
 
     const result = saveExpenseUseCase.execute(payload);
@@ -9084,101 +9164,119 @@ window.WeddingApp.UI = (function () {
     });
   }
 
-  // Setup Calcolatore IVA Dinamica per Budget Spesa
-  function setupVatCalculator() {
-    const chkVat = document.getElementById('expense-add-vat');
-    const pnlVat = document.getElementById('expense-vat-panel');
+  // Ricalcola e formatta il resoconto trasparente dell'IVA (es: 150 + 15 = 165 €)
+  function recalculateVatEquation() {
+    const chkVat = document.getElementById('expense-has-vat');
+    const netInput = document.getElementById('expense-net-amount');
     const bInput = document.getElementById('expense-budget');
+    const pnlVat = document.getElementById('expense-vat-panel');
+    const formulaText = document.getElementById('vat-formula-text');
+    const summaryVal = document.getElementById('budget-summary-val');
+    const summaryLbl = document.getElementById('budget-summary-label');
     const catSelect = document.getElementById('expense-category');
     const itemInput = document.getElementById('expense-item');
-    const netDisp = document.getElementById('vat-net-display');
-    const vatDisp = document.getElementById('vat-amount-display');
-    const grossDisp = document.getElementById('vat-gross-display');
+    const lblAmount = document.getElementById('lbl-expense-amount');
 
-    if (!chkVat || !pnlVat || !bInput) return;
+    if (!chkVat || !netInput || !bInput) return;
 
-    let baseNetValue = 0;
+    const cat = catSelect ? catSelect.value : '';
+    const itemName = (itemInput ? itemInput.value : '').toLowerCase();
+    const isCatering = (uiState.editingExpenseId === 'exp_2') || cat === 'location_catering' || itemName.includes('catering');
 
-    function setVatRate(rateVal) {
-      const radio = document.querySelector(`input[name="vat-rate"][value="${rateVal}"]`);
-      if (radio) radio.checked = true;
+    if (lblAmount) {
+      lblAmount.textContent = isCatering ? 'Prezzo a Persona (€)' : 'Importo (€)';
     }
 
-    function autoSelectRateByCategory() {
-      const cat = catSelect ? catSelect.value : '';
-      const text = (itemInput ? itemInput.value : '').toLowerCase();
-      if (cat === 'location_catering' || text.includes('catering') || text.includes('banchetto') || text.includes('pranzo') || text.includes('cena')) {
-        setVatRate(10);
-      } else {
-        setVatRate(22);
+    const netVal = parseFloat(netInput.value) || 0;
+    const hasVat = chkVat.checked;
+
+    let rate = 10;
+    const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
+    if (checkedRadio) rate = parseFloat(checkedRadio.value) || 10;
+
+    let unitWithVat = netVal;
+    let vatPart = 0;
+
+    if (hasVat) {
+      if (pnlVat) pnlVat.style.display = 'flex';
+      vatPart = Math.round((netVal * (rate / 100)) * 100) / 100;
+      unitWithVat = Math.round((netVal + vatPart) * 100) / 100;
+      if (formulaText) {
+        formulaText.innerHTML = `<strong>${netVal.toLocaleString('it-IT')} €</strong> + <strong>${vatPart.toLocaleString('it-IT')} €</strong> (IVA ${rate}%) = <strong class="text-settled">${unitWithVat.toLocaleString('it-IT')} €</strong>`;
       }
+    } else {
+      if (pnlVat) pnlVat.style.display = 'none';
+      if (formulaText) {
+        formulaText.textContent = `${netVal.toLocaleString('it-IT')} € (senza IVA)`;
+      }
+    }
+
+    // Se è catering, calcola il budget totale moltiplicando per il numero effettivo di ospiti e staff
+    let totalBudgetCalculated = unitWithVat;
+    if (isCatering) {
+      const summary = getSummaryUseCase.execute({ referenceDate: uiState.simulatedDate });
+      const guestStats = summary?.finances?.coupleBalance?.guestStats;
+      const adultCount = guestStats?.adultGuestsCount || 101;
+      const childCount = guestStats?.childGuestsCount || 11;
+      const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
+      const halfPrice = Math.round((unitWithVat / 2) * 100) / 100;
+
+      totalBudgetCalculated = Math.round(unitWithVat * adultCount + halfPrice * childCount + halfPrice * staffCount);
+      if (summaryLbl) {
+        summaryLbl.textContent = `Totale Banchetto (${adultCount} adulti + ${childCount} bimbi + ${staffCount} staff):`;
+      }
+    } else {
+      if (summaryLbl) summaryLbl.textContent = 'Budget Complessivo della Spesa:';
+    }
+
+    bInput.value = totalBudgetCalculated;
+    if (summaryVal) {
+      summaryVal.textContent = `${totalBudgetCalculated.toLocaleString('it-IT')} €`;
+    }
+  }
+
+  // Setup Calcolatore IVA Dinamica per Budget Spesa
+  function setupVatCalculator() {
+    const chkVat = document.getElementById('expense-has-vat');
+    const netInput = document.getElementById('expense-net-amount');
+    const catSelect = document.getElementById('expense-category');
+    const itemInput = document.getElementById('expense-item');
+    const staffInput = document.getElementById('expense-staff-count');
+
+    if (chkVat) {
+      chkVat.addEventListener('change', () => recalculateVatEquation());
+    }
+
+    if (netInput) {
+      netInput.addEventListener('input', () => recalculateVatEquation());
+    }
+
+    if (staffInput) {
+      staffInput.addEventListener('input', () => recalculateVatEquation());
     }
 
     if (catSelect) {
       catSelect.addEventListener('change', () => {
-        if (!chkVat.checked) autoSelectRateByCategory();
-        else {
-          autoSelectRateByCategory();
-          updateVatFeedback();
-        }
+        const cat = catSelect.value;
+        const radio = document.querySelector(`input[name="vat-rate"][value="${cat === 'location_catering' ? '10' : '22'}"]`);
+        if (radio) radio.checked = true;
+        recalculateVatEquation();
       });
     }
 
-    function getSelectedVatRate() {
-      const checkedRadio = document.querySelector('input[name="vat-rate"]:checked');
-      return checkedRadio ? (parseFloat(checkedRadio.value) || 22) : 22;
-    }
-
-    function updateVatFeedback() {
-      if (!chkVat.checked) {
-        pnlVat.style.display = 'none';
-        return;
-      }
-      pnlVat.style.display = 'flex';
-      const rate = getSelectedVatRate();
-      const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
-      const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
-
-      if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
-      if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
-      if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
-
-      bInput.value = totalGross;
-    }
-
-    chkVat.addEventListener('change', () => {
-      if (chkVat.checked) {
-        autoSelectRateByCategory();
-        // Quando spunti il checkbox, il numero attualmente nel campo diventa l'imponibile netto
-        baseNetValue = parseFloat(bInput.value) || 0;
-        updateVatFeedback();
-      } else {
-        // Se togli la spunta, ripristina il valore imponibile netto
-        if (baseNetValue > 0) {
-          bInput.value = baseNetValue;
+    if (itemInput) {
+      itemInput.addEventListener('input', () => {
+        const text = itemInput.value.toLowerCase();
+        if (text.includes('catering') || text.includes('banchetto')) {
+          const radio = document.querySelector('input[name="vat-rate"][value="10"]');
+          if (radio) radio.checked = true;
         }
-        pnlVat.style.display = 'none';
-      }
-    });
-
-    document.querySelectorAll('input[name="vat-rate"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (chkVat.checked) updateVatFeedback();
+        recalculateVatEquation();
       });
-    });
+    }
 
-    bInput.addEventListener('input', () => {
-      if (chkVat.checked) {
-        // Se l'utente digita mentre il checkbox è attivo, aggiorniamo la base imponibile proporzionalmente
-        // o consideriamo il valore digitato come nuovo imponibile netto
-        baseNetValue = parseFloat(bInput.value) || 0;
-        const rate = getSelectedVatRate();
-        const vatAmount = Math.round((baseNetValue * (rate / 100)) * 100) / 100;
-        const totalGross = Math.round((baseNetValue + vatAmount) * 100) / 100;
-        if (netDisp) netDisp.textContent = `${baseNetValue.toLocaleString('it-IT')} €`;
-        if (vatDisp) vatDisp.textContent = `+ ${vatAmount.toLocaleString('it-IT')} € (${rate}%)`;
-        if (grossDisp) grossDisp.textContent = `${totalGross.toLocaleString('it-IT')} €`;
-      }
+    document.querySelectorAll('input[name="vat-rate"]').forEach(r => {
+      r.addEventListener('change', () => recalculateVatEquation());
     });
   }
 

@@ -24,7 +24,11 @@ window.WeddingApp.Domain = (function () {
       splitType = 'equal', // 'equal' (50/50), 'michele' (100% Michele), 'miriana' (100% Miriana), 'guests' (proporzionale invitati)
       payer = 'both', // indicativo di chi si occupa del pagamento
       isEstimate = undefined, // true = Costo Stimato, false = Costo Reale / a Contratto
-      staffCount = 0 // Membri staff/fornitori presenti al ricevimento (50% catering)
+      staffCount = 0, // Membri staff/fornitori presenti al ricevimento (50% catering)
+      hasVat = false, // Se l'IVA è applicata e calcolata sul netto
+      vatRate = 10,   // Aliquota IVA applicata (es. 10 o 22)
+      netAmount = null, // Imponibile netto prima di IVA
+      unitPriceNet = null // Prezzo unitario netto a persona per catering
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
@@ -40,6 +44,11 @@ window.WeddingApp.Domain = (function () {
       this.dueDate = dueDate || '';
       this.splitType = splitType || 'equal';
       this.payer = payer || 'both';
+
+      this.hasVat = Boolean(hasVat);
+      this.vatRate = Number(vatRate) || 10;
+      this.netAmount = (netAmount !== null && netAmount !== undefined) ? Number(netAmount) : null;
+      this.unitPriceNet = (unitPriceNet !== null && unitPriceNet !== undefined) ? Number(unitPriceNet) : null;
 
       // Se non esplicitamente definito, usa l'elenco dei contratti certi; altrimenti stima di default
       if (isEstimate !== undefined && isEstimate !== null) {
@@ -226,24 +235,32 @@ window.WeddingApp.Domain = (function () {
       const staffMealsCount = vendorStaffSum > 0 ? vendorStaffSum : Math.max(0, parseInt(safeDetails.staffMealsCount ?? 0, 10) || 0);
 
       // Aggiorna dinamicamente la voce Catering:
-      // Adulti: 150€ + 10% IVA = 165€ a persona
-      // Bambini: 50% = 75€ + 10% IVA = 82,50€
-      // Staff / Fornitori: 50% = 75€ + 10% IVA = 82,50€
+      // Calcolo trasparente sul prezzo a persona:
+      // Default: 150€ imponibile + 10% IVA = 165€ (oppure unitPriceNet se personalizzato)
       const cateringExp = safeExpenses.find(e => e.id === 'exp_2' || (e.categoryId === 'location_catering' && e.item.toLowerCase().includes('catering')));
       if (cateringExp) {
-        const adultTotal = Math.round(150 * 1.1 * adultGuestsCount);
-        const childTotal = Math.round(75 * 1.1 * childGuestsCount);
-        const staffTotal = Math.round(75 * 1.1 * staffMealsCount);
+        const basePrice = cateringExp.unitPriceNet || cateringExp.netAmount || 150;
+        const rate = (cateringExp.hasVat !== false) ? (cateringExp.vatRate || 10) : 0;
+        const adultPrice = Math.round(basePrice * (1 + rate / 100) * 100) / 100;
+        const halfPrice = Math.round((adultPrice / 2) * 100) / 100;
+
+        const adultTotal = Math.round(adultPrice * adultGuestsCount);
+        const childTotal = Math.round(halfPrice * childGuestsCount);
+        const staffTotal = Math.round(halfPrice * staffMealsCount);
         cateringExp.budget = adultTotal + childTotal + staffTotal;
+        cateringExp.unitPriceNet = basePrice;
+        cateringExp.vatRate = rate > 0 ? rate : 10;
+        cateringExp.hasVat = (rate > 0);
         
         let labelDesc = `${adultGuestsCount} adulti`;
         if (childGuestsCount > 0) labelDesc += ` + ${childGuestsCount} bambini (50%)`;
         if (staffMealsCount > 0) labelDesc += ` + ${staffMealsCount} staff (50%)`;
         cateringExp.item = `Banchetto & Catering (${labelDesc})`;
         
-        if (!cateringExp.notes.includes('165€')) {
-          cateringExp.notes = `Menù adulti 150€ + IVA (165€). Bambini e Staff al 50% (82,50€). ${cateringExp.notes}`;
-        }
+        const vatNote = (rate > 0)
+          ? `Menù adulti: ${basePrice}€ + IVA ${rate}% (${basePrice * (rate / 100)}€) = ${adultPrice}€. Bambini e Staff al 50% (${halfPrice}€).`
+          : `Menù adulti: ${basePrice}€ (senza IVA). Bambini e Staff al 50% (${halfPrice}€).`;
+        cateringExp.notes = `${vatNote} Aperitivo, pranzo/cena, bevande (1.500€ Michele + 1.500€ Famiglia Miriana / Amedeo e Anna)`;
       }
 
       // Rapporto Ospiti per ripartizione spese proporzionali

@@ -120,7 +120,11 @@ window.WeddingApp.Repositories = (function () {
             splitType: e.splitType || 'equal',
             payer: e.payer || 'both',
             isEstimate: Boolean(e.isEstimate),
-            staffCount: Math.max(0, parseInt(e.staffCount, 10) || 0)
+            staffCount: Math.max(0, parseInt(e.staffCount, 10) || 0),
+            hasVat: Boolean(e.hasVat),
+            vatRate: Number(e.vatRate) || 10,
+            netAmount: (e.netAmount !== null && e.netAmount !== undefined) ? Number(e.netAmount) : null,
+            unitPriceNet: (e.unitPriceNet !== null && e.unitPriceNet !== undefined) ? Number(e.unitPriceNet) : null
           })),
           guests: (dataset.guests || []).map(g => ({
             id: g.id,

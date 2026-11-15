@@ -645,38 +645,44 @@
 
             <div class="form-group-noble">
               <div class="budget-label-row">
-                <label class="form-label-noble" for="expense-budget">Budget Previsto (€)</label>
-                <label class="vat-toggle-pill" for="expense-add-vat" title="Seleziona se il prezzo inserito è imponibile e occorre aggiungere l'IVA (es. 22% o 10%)">
-                  <input type="checkbox" id="expense-add-vat">
-                  <span>+ Aggiungi IVA</span>
+                <label class="form-label-noble" id="lbl-expense-amount" for="expense-budget">Importo (€)</label>
+                <label class="vat-toggle-pill" for="expense-has-vat" title="Spunta per scorporare/aggiungere l'IVA in modo trasparente e persistente">
+                  <input type="checkbox" id="expense-has-vat">
+                  <span>Applica IVA</span>
                 </label>
               </div>
-              <input type="number" id="expense-budget" class="form-input-noble num" step="any" min="0" placeholder="0">
+
+              <!-- Input importo base (se catering è il prezzo a persona es. 150€, altrimenti totale imponibile) -->
+              <input type="number" id="expense-net-amount" class="form-input-noble num" step="any" min="0" placeholder="0">
               
-              <!-- Selettore Aliquota IVA (mostrato quando il checkbox è attivo) -->
-              <div class="vat-calculator-bar" id="expense-vat-panel" style="display: none;">
+              <!-- Selettore Aliquota e Resoconto Trasparente IVA -->
+              <div class="vat-calculator-bar" id="expense-vat-panel">
                 <div class="vat-rate-selection">
                   <span class="vat-sub-label">Aliquota:</span>
                   <label class="vat-radio-chip">
-                    <input type="radio" name="vat-rate" value="22" checked>
-                    <span>22% (Standard)</span>
+                    <input type="radio" name="vat-rate" value="10" checked>
+                    <span>10% (Catering / Ristorazione)</span>
                   </label>
                   <label class="vat-radio-chip">
-                    <input type="radio" name="vat-rate" value="10">
-                    <span>10% (Ristorazione)</span>
+                    <input type="radio" name="vat-rate" value="22">
+                    <span>22% (Fornitori standard)</span>
                   </label>
                   <label class="vat-radio-chip">
                     <input type="radio" name="vat-rate" value="4">
                     <span>4% (Agevolata)</span>
                   </label>
                 </div>
-                <div class="vat-calc-feedback">
-                  <span>Imponibile: <strong id="vat-net-display">0 €</strong></span>
-                  <span>•</span>
-                  <span>IVA: <strong id="vat-amount-display">+ 0 €</strong></span>
-                  <span>•</span>
-                  <span>Totale Finale: <strong class="text-settled" id="vat-gross-display">0 €</strong></span>
+                <!-- Resoconto esatto richiesto: 150 + 15 = 165 € -->
+                <div class="vat-formula-equation" id="vat-formula-text">
+                  150 € + 15 € (IVA 10%) = 165 €
                 </div>
+              </div>
+
+              <!-- Campo di riepilogo lordo complessivo calcolato -->
+              <div class="budget-total-summary-card">
+                <span class="budget-summary-label" id="budget-summary-label">Budget Complessivo della Spesa:</span>
+                <strong class="budget-summary-val amount text-settled" id="budget-summary-val">0 €</strong>
+                <input type="hidden" id="expense-budget" value="0">
               </div>
             </div>
           </div>
