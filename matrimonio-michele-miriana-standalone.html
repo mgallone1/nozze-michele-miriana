@@ -4351,15 +4351,18 @@ button.btn-editable-val:hover {
 
             <div class="form-group-noble">
               <div class="budget-label-row">
-                <label class="form-label-noble" id="lbl-expense-amount" for="expense-budget">Importo (€)</label>
-                <label class="vat-toggle-pill" for="expense-has-vat" title="Spunta per scorporare/aggiungere l'IVA in modo trasparente e persistente">
-                  <input type="checkbox" id="expense-has-vat">
+                <label class="form-label-noble" id="lbl-expense-amount" for="expense-net-amount">Prezzo Netto (IVA Esclusa) (€)</label>
+                <label class="vat-toggle-pill" for="expense-has-vat" title="Spunta per applicare l'IVA sul prezzo netto">
+                  <input type="checkbox" id="expense-has-vat" checked>
                   <span>Applica IVA</span>
                 </label>
               </div>
 
-              <!-- Input importo base (se catering è il prezzo a persona es. 150€, altrimenti totale imponibile) -->
-              <input type="number" id="expense-net-amount" class="form-input-noble num" step="any" min="0" placeholder="0">
+              <!-- Input importo base (se catering è il prezzo a persona es. 150€, altrimenti totale netto imponibile) -->
+              <input type="number" id="expense-net-amount" class="form-input-noble num" step="any" min="0" placeholder="Es. 150">
+              <div class="input-hint-sub" id="net-amount-subnote" style="margin-top: 4px; margin-bottom: 6px;">
+                Inserisci il prezzo netto senza IVA (se è il catering inserisci il costo a persona, es. 150€).
+              </div>
               
               <!-- Selettore Aliquota e Resoconto Trasparente IVA -->
               <div class="vat-calculator-bar" id="expense-vat-panel">
@@ -9184,7 +9187,7 @@ window.WeddingApp.UI = (function () {
     const isCatering = (uiState.editingExpenseId === 'exp_2') || cat === 'location_catering' || itemName.includes('catering');
 
     if (lblAmount) {
-      lblAmount.textContent = isCatering ? 'Prezzo a Persona (€)' : 'Importo (€)';
+      lblAmount.textContent = isCatering ? 'Prezzo a Persona Netto (IVA Esclusa) (€)' : 'Prezzo Netto (IVA Esclusa) (€)';
     }
 
     const netVal = parseFloat(netInput.value) || 0;

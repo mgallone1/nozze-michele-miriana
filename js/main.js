@@ -460,7 +460,7 @@
     const isCatering = (uiState.editingExpenseId === 'exp_2') || cat === 'location_catering' || itemName.includes('catering');
 
     if (lblAmount) {
-      lblAmount.textContent = isCatering ? 'Prezzo a Persona (€)' : 'Importo (€)';
+      lblAmount.textContent = isCatering ? 'Prezzo a Persona Netto (IVA Esclusa) (€)' : 'Prezzo Netto (IVA Esclusa) (€)';
     }
 
     const netVal = parseFloat(netInput.value) || 0;
