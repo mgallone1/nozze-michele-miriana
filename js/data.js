@@ -35,13 +35,6 @@ const INITIAL_WEDDING_DATA = {
       "remainingToSave": 3600,
       "projectedTotal": 18500
     },
-    "familyContribution": {
-      "source": "Amedeo e Anna",
-      "totalPledged": 10000,
-      "alreadyAdvanced": 1500,
-      "remainingAvailable": 8500,
-      "notes": "Contributo genitori per matrimonio (1.500€ anticipati per caparra catering)"
-    },
     "weddingGifts": {
       "estimated": 10000,
       "notes": "Stima regali/buste dagli invitati"

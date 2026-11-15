@@ -845,22 +845,11 @@
             </div>
           </div>
 
-          <!-- Sezione Famiglia & Doni -->
+          <!-- Sezione Stime Doni & Ricevimento -->
           <div class="form-section-card">
             <div class="form-section-header">
-              <span class="badge-status acconto">Famiglia & Doni</span>
-              <h4 class="form-section-title">Contributi Dedicati & Stime</h4>
-            </div>
-            <div class="form-grid-row">
-              <div class="form-group-noble">
-                <label class="form-label-noble" for="sp-family-pledged">Stanziamento Amedeo & Anna (€)</label>
-                <input type="number" id="sp-family-pledged" class="form-input-noble" min="0" step="100" required>
-              </div>
-              <div class="form-group-noble">
-                <label class="form-label-noble">Anticipi Spese Pagati dalle Famiglie</label>
-                <div class="form-input-noble static-val text-settled font-semibold" id="sp-family-advanced-display">1.500 € (calcolato da spese)</div>
-                <input type="hidden" id="sp-family-advanced" value="0">
-              </div>
+              <span class="badge-status acconto">Ricevimento & Doni</span>
+              <h4 class="form-section-title">Parametri Ospiti & Stime Doni</h4>
             </div>
             <div class="form-grid-row">
               <div class="form-group-noble">
@@ -877,9 +866,15 @@
                 <label class="form-label-noble" for="sp-gifts-estimated">Stima Doni / Buste (€)</label>
                 <input type="number" id="sp-gifts-estimated" class="form-input-noble" min="0" step="100" required>
               </div>
+              <div class="form-group-noble">
+                <label class="form-label-noble">Anticipi Donati dalle Famiglie</label>
+                <div class="form-input-noble static-val text-settled font-semibold" id="sp-family-advanced-display">0 € (da spese)</div>
+                <input type="hidden" id="sp-family-pledged" value="0">
+                <input type="hidden" id="sp-family-advanced" value="0">
+              </div>
             </div>
             <div class="form-group-noble form-group-last">
-              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato). Lo staff catering è conteggiato al 50% (82,50€ a pasto).</div>
+              <div class="input-hint-sub">La stima calcola automaticamente 100€ a persona (aggiornabile manualmente se desiderato). Le quote anticipate da genitori e famiglie sono calcolate in automatico dalle singole spese registrate.</div>
             </div>
           </div>
 

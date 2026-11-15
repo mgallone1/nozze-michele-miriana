@@ -405,7 +405,7 @@ window.WeddingApp.UI = (function () {
               <div class="statement-header">
                 <div>
                   <div class="statement-title">${mir.title}</div>
-                  <div class="statement-subtitle">CONTO PERSONALE & DOTE DEDICATA</div>
+                  <div class="statement-subtitle">CONTO PERSONALE & ACCUMULO</div>
                 </div>
                 <button type="button" class="btn-card-edit" data-card="miriana" title="Modifica parametri Miriana">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -454,33 +454,25 @@ window.WeddingApp.UI = (function () {
                   <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.grossProjected)}</strong>
                 </div>
 
-                <div class="statement-row">
-                  <div class="statement-row-meta">
-                    <span>Dono Genitori (Amedeo & Anna)</span>
-                    <small class="formula-chip-hint">1.500€ anticipati + 8.500€ a saldo</small>
-                  </div>
-                  <strong class="row-value-amount amount text-positive">+ ${CurrencyFormatter.format(mir.familyPledged || 10000)}</strong>
-                </div>
-
                 <div class="statement-row statement-row-bold border-thick">
                   <div class="statement-row-meta">
-                    <span>Disponibilità Totale Miriana</span>
-                    <small class="formula-chip-hint">Risparmi personali + Dono genitori</small>
+                    <span>Disponibilità Personale Miriana</span>
+                    <small class="formula-chip-hint">Dotazione iniziale + rate maturate e residue</small>
                   </div>
-                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(mir.grossProjected + (mir.familyPledged || 10000))}</strong>
+                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(mir.grossProjected)}</strong>
                 </div>
 
                 <div class="statement-row">
                   <div class="statement-row-meta">
                     <span>Spese anticipate da Miriana</span>
-                    <small class="formula-chip-hint">1.000€ personali + 1.500€ caparra genitori</small>
+                    <small class="formula-chip-hint">Acconti sostenuti con fondi propri</small>
                   </div>
-                  <span class="row-value-negative amount">- ${CurrencyFormatter.format(mir.expensesPaid + (fam.used || 1500), { includeSymbol: false })} €</span>
+                  <span class="row-value-negative amount">- ${CurrencyFormatter.format(mir.expensesPaid, { includeSymbol: false })} €</span>
                 </div>
 
                 <div class="statement-row">
                   <span>Liquidità disponibile oggi</span>
-                  <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.currentNetLiquidity + fam.available)}</strong>
+                  <strong class="row-value-amount amount">${CurrencyFormatter.format(mir.currentNetLiquidity)}</strong>
                 </div>
               </div>
             </div>
@@ -489,7 +481,7 @@ window.WeddingApp.UI = (function () {
               <div class="statement-footer-title">
                 <span>Residuo Finale Stimato Miriana</span>
               </div>
-              <strong class="statement-footer-amount amount">${CurrencyFormatter.format(mir.finalNetResidual + fam.available)}</strong>
+              <strong class="statement-footer-amount amount">${CurrencyFormatter.format(mir.finalNetResidual)}</strong>
             </div>
           </div>
 
@@ -522,8 +514,11 @@ window.WeddingApp.UI = (function () {
                 </div>
 
                 <div class="statement-row">
-                  <span>Regali già ricevuti</span>
-                  <span class="row-value-amount amount">0 €</span>
+                  <div class="statement-row-meta">
+                    <span>Doni già versati dalle Famiglie</span>
+                    <small class="formula-chip-hint">Acconti rilevati dalle spese</small>
+                  </div>
+                  <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(fam.expensesPaid || 0)}</strong>
                 </div>
 
                 <div class="statement-row border-thick">
@@ -532,14 +527,6 @@ window.WeddingApp.UI = (function () {
                     <small class="formula-chip-hint">Margine di serenità e riserva coppia</small>
                   </div>
                   <strong class="row-value-amount amount text-settled">${CurrencyFormatter.format(fam.giftsEstimated)}</strong>
-                </div>
-
-                <div class="statement-row">
-                  <div class="statement-row-meta">
-                    <span>Nota su Stanziamento Genitori</span>
-                    <small class="formula-chip-hint">10.000€ Amedeo & Anna</small>
-                  </div>
-                  <span class="text-settled font-semibold">Attribuito a Miriana</span>
                 </div>
               </div>
             </div>
@@ -925,11 +912,9 @@ window.WeddingApp.UI = (function () {
 
       if (elOwedM) elOwedM.textContent = CurrencyFormatter.format(coupleBalance.micheleOwed || 0);
       if (elOwedMir) {
-        // Se c'è la quota al netto del contributo genitori, mostriamo quella
-        const displayOwedMir = (coupleBalance.mirianaNetOwed !== undefined) ? coupleBalance.mirianaNetOwed : (coupleBalance.mirianaOwed || 0);
-        elOwedMir.textContent = CurrencyFormatter.format(displayOwedMir);
-        if (elOwedMirSub && coupleBalance.familyContributionMiriana) {
-          elOwedMirSub.textContent = `Quota residua (-${CurrencyFormatter.format(coupleBalance.familyContributionMiriana)} donati)`;
+        elOwedMir.textContent = CurrencyFormatter.format(coupleBalance.mirianaOwed || 0);
+        if (elOwedMirSub) {
+          elOwedMirSub.textContent = `Quota a carico di Miriana`;
         }
       }
       if (elPaidHeroM) elPaidHeroM.textContent = CurrencyFormatter.format(coupleBalance.micheleAmount || 0);

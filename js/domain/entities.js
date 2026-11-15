@@ -358,12 +358,13 @@ window.WeddingApp.Domain = (function () {
         ? giftsTotalProjected
         : Number((plan.weddingGifts?.isManual ? plan.weddingGifts?.estimated : null) ?? (estimatedGuests * 100));
 
-      // Dono Famiglia Amedeo & Anna e Regali
-      const famPledged = Number(plan.familyContribution?.totalPledged ?? 10000);
-      const famUsed = totalPaidFamilyMiriana;
-      const famAvailable = Math.max(0, famPledged - famUsed);
-      const famTotalGiftsProjected = famPledged + giftsEstimated;
-      const famFinalNetResidual = famAvailable + giftsEstimated;
+      // Doni delle Famiglie e Stima Regali Nozze
+      // Gli anticipi e doni delle famiglie sono calcolati direttamente dalla somma delle spese reali registrate
+      const famUsed = totalFamilyPaid;
+      const famAvailable = 0; // Nessuna dote fittizia: ogni contributo è tracciato esattamente nelle spese
+      const famPledged = famUsed;
+      const famTotalGiftsProjected = famUsed + giftsEstimated;
+      const famFinalNetResidual = giftsEstimated;
 
       // Calcolo automatico della cronologia in tempo reale o simulata (data inizio, data odierna/simulata, data matrimonio)
       const dateService = window.WeddingApp?.Services?.DateService;
@@ -405,9 +406,8 @@ window.WeddingApp.Domain = (function () {
       const mirPersonalResidual = mirGrossProjected - mirPersonalExpensesPaid;
       const mirFinalNetResidual = mirPersonalResidual;
 
-      // Ripartizione accordi e copertura stanziamento genitori
-      // Lo stanziamento di Amedeo & Anna (famPledged) va a coprire prioritariamente la quota delle spese di Miriana
-      const mirianaNetOwed = Math.max(0, totalOwedMiriana - famPledged);
+      // Ripartizione accordi spese dei due sposi
+      const mirianaNetOwed = totalOwedMiriana;
 
       const totalFundsAvailable = mFinalNetResidual + mirPersonalResidual + famFinalNetResidual;
       const serenityMargin = totalFundsAvailable - totalBudget;
