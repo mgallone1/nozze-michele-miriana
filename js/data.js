@@ -146,9 +146,11 @@ const INITIAL_WEDDING_DATA = {
       "supplier": "Catering convenzionato",
       "budget": 16500,
       "paidMichele": 1500,
-      "paidMiriana": 1500,
+      "paidMiriana": 0,
+      "paidFamilyMichele": 0,
+      "paidFamilyMiriana": 1500,
       "dueDate": "2027-07-02",
-      "notes": "Aperitivo, pranzo/cena, bevande (1.500€ Michele + 1.500€ Miriana da contributo Amedeo/Anna)",
+      "notes": "Aperitivo, pranzo/cena, bevande (1.500€ Michele + 1.500€ Famiglia Miriana / Amedeo e Anna)",
       "status": "acconto",
       "splitType": "guests"
     },

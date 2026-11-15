@@ -869,7 +869,12 @@ window.WeddingApp.UI = (function () {
       setVal('sp-miriana-months-todo', isManual ? (mir.remainingMonths ?? defaultRemaining) : defaultRemaining);
 
       setVal('sp-family-pledged', fam.totalPledged ?? 10000);
-      setVal('sp-family-advanced', fam.alreadyAdvanced ?? 1500);
+      setVal('sp-family-advanced', fam.alreadyAdvanced ?? 0);
+      const advDisplay = document.getElementById('sp-family-advanced-display');
+      if (advDisplay) {
+        const familyTotal = (fam.used !== undefined) ? fam.used : (fam.alreadyAdvanced || 0);
+        advDisplay.textContent = `${CurrencyFormatter.format(familyTotal)} (da spese registrate)`;
+      }
       setVal('sp-gifts-estimated', gifts.estimated ?? 10000);
 
       window.addEventListener('keydown', (e) => {

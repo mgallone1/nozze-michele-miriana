@@ -360,7 +360,7 @@ window.WeddingApp.Domain = (function () {
 
       // Dono Famiglia Amedeo & Anna e Regali
       const famPledged = Number(plan.familyContribution?.totalPledged ?? 10000);
-      const famUsed = Number(plan.familyContribution?.alreadyAdvanced ?? 1500);
+      const famUsed = totalPaidFamilyMiriana;
       const famAvailable = Math.max(0, famPledged - famUsed);
       const famTotalGiftsProjected = famPledged + giftsEstimated;
       const famFinalNetResidual = famAvailable + giftsEstimated;
@@ -400,7 +400,7 @@ window.WeddingApp.Domain = (function () {
       const mirAccCurrent = mirMonthly * mirCurrentMonths;
       const mirAccRemaining = mirMonthly * mirRemainingMonths;
       const mirGrossProjected = mirInitial + mirAccCurrent + mirAccRemaining;
-      const mirPersonalExpensesPaid = Math.max(0, totalPaidMiriana - famUsed);
+      const mirPersonalExpensesPaid = totalPaidMiriana;
       const mirCurrentNetLiquidity = mirInitial + mirAccCurrent - mirPersonalExpensesPaid;
       const mirPersonalResidual = mirGrossProjected - mirPersonalExpensesPaid;
       const mirFinalNetResidual = mirPersonalResidual;
