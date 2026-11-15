@@ -6590,8 +6590,7 @@ window.WeddingApp.Repositories = (function () {
     // Carica la versione fresca da Supabase Cloud
     async syncFromCloud() {
       try {
-        const cacheBuster = Date.now();
-        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*&_t=${cacheBuster}`, {
+        const res = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*`, {
           method: 'GET',
           headers: {
             'apikey': SUPABASE_KEY,
