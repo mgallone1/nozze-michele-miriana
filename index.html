@@ -191,6 +191,7 @@
               <option value="all">Tutti i Contributi</option>
               <option value="michele">Curato da Michele</option>
               <option value="miriana">Curato da Miriana</option>
+              <option value="family">Dono/Famiglie</option>
               <option value="both">Insieme (50/50)</option>
               <option value="unpaid">Da definire</option>
             </select>
@@ -483,6 +484,21 @@
         </div>
       </div>
 
+      <!-- SEZIONE DONI & CONTRIBUTI DELLE FAMIGLIE -->
+      <div class="balance-duo-panel family-balance-panel" id="balance-family-gifts-container" style="display: none; margin-top: 24px;">
+        <div class="reserve-panel-header">
+          <div>
+            <h3 class="reserve-panel-title">🎁 Doni e Anticipi Versati dalle Famiglie</h3>
+            <div class="balance-panel-sub">Quote esterne pagate direttamente ai fornitori (senza intaccare i risparmi personali)</div>
+          </div>
+          <span class="pill-person family-badge" id="badge-count-family">0 doni</span>
+        </div>
+        <div class="balance-hero-amount text-settled amount" id="balance-family-paid-total">0 €</div>
+        <div class="balance-items-list" id="list-family-items">
+          <!-- Generato dinamicamente -->
+        </div>
+      </div>
+
       <div class="suggestion-box">
         <div class="suggestion-title">
           Armonia dei Pagamenti
@@ -655,18 +671,18 @@
             </div>
           </div>
 
-          <!-- Quote Versate -->
+          <!-- Quote Versate dagli Sposi e dalle Famiglie -->
           <div class="modal-advances-box">
-            <label class="form-label-noble mb-xs">Accordi & Anticipi già Sostenuti</label>
+            <label class="form-label-noble mb-xs">Accordi & Anticipi degli Sposi (Conti Personali)</label>
             
             <div class="form-grid-2">
               <div class="form-group-noble mb-xs">
-                <label class="form-label-noble text-michele">Contributo di Michele (€)</label>
+                <label class="form-label-noble text-michele">Quota di Michele (€)</label>
                 <input type="number" id="expense-paid-michele" class="form-input-noble num" step="any" min="0" value="0">
               </div>
 
               <div class="form-group-noble mb-xs">
-                <label class="form-label-noble text-miriana">Contributo di Miriana (€)</label>
+                <label class="form-label-noble text-miriana">Quota di Miriana (€)</label>
                 <input type="number" id="expense-paid-miriana" class="form-input-noble num" step="any" min="0" value="0">
               </div>
             </div>
@@ -676,6 +692,25 @@
               <button type="button" class="split-tag-btn" id="split-all-michele">Curato da Michele</button>
               <button type="button" class="split-tag-btn" id="split-all-miriana">Curato da Miriana</button>
               <button type="button" class="split-tag-btn" id="split-reset">Azzera</button>
+            </div>
+
+            <!-- Sezione Doni & Acconti Famiglie Esterne (Non intacca i conti personali degli sposi) -->
+            <div class="family-gift-advances-section">
+              <div class="family-gift-title">
+                <span>🎁 Dono / Pagato dalle Famiglie (Non tocca i risparmi personali)</span>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group-noble mb-xs">
+                  <label class="form-label-noble" for="expense-paid-family-michele">Famiglia Michele / Sposo (€)</label>
+                  <input type="number" id="expense-paid-family-michele" class="form-input-noble num" step="any" min="0" value="0" placeholder="0">
+                </div>
+
+                <div class="form-group-noble mb-xs">
+                  <label class="form-label-noble" for="expense-paid-family-miriana">Famiglia Miriana / Sposa (€)</label>
+                  <input type="number" id="expense-paid-family-miriana" class="form-input-noble num" step="any" min="0" value="0" placeholder="0">
+                </div>
+              </div>
+              <div class="input-hint-sub">Es. Acconto vestito o regalo abito: il fornitore risulterà regolarmente pagato, senza alterare il piano di accumulo mensile degli sposi.</div>
             </div>
           </div>
 

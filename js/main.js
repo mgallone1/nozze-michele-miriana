@@ -271,6 +271,10 @@
       document.getElementById('expense-budget').value = exp.budget ?? 0;
       document.getElementById('expense-paid-michele').value = exp.paidMichele ?? 0;
       document.getElementById('expense-paid-miriana').value = exp.paidMiriana ?? 0;
+      const famMInput = document.getElementById('expense-paid-family-michele');
+      if (famMInput) famMInput.value = exp.paidFamilyMichele ?? 0;
+      const famMirInput = document.getElementById('expense-paid-family-miriana');
+      if (famMirInput) famMirInput.value = exp.paidFamilyMiriana ?? 0;
       document.getElementById('expense-supplier').value = exp.supplier || '';
       document.getElementById('expense-notes').value = exp.notes || '';
       document.getElementById('expense-status').value = exp.status || 'pianificato';
@@ -286,6 +290,10 @@
     } else {
       title.textContent = 'Nuova Voce';
       form.reset();
+      const famMInput = document.getElementById('expense-paid-family-michele');
+      if (famMInput) famMInput.value = 0;
+      const famMirInput = document.getElementById('expense-paid-family-miriana');
+      if (famMirInput) famMirInput.value = 0;
       document.getElementById('expense-status').value = 'pianificato';
       document.getElementById('expense-split-type').value = 'equal';
       const estimateSelect = document.getElementById('expense-is-estimate');
@@ -329,6 +337,8 @@
     const budget = parseFloat(document.getElementById('expense-budget').value) || 0;
     const paidMichele = parseFloat(document.getElementById('expense-paid-michele').value) || 0;
     const paidMiriana = parseFloat(document.getElementById('expense-paid-miriana').value) || 0;
+    const paidFamilyMichele = parseFloat(document.getElementById('expense-paid-family-michele')?.value) || 0;
+    const paidFamilyMiriana = parseFloat(document.getElementById('expense-paid-family-miriana')?.value) || 0;
     const supplier = document.getElementById('expense-supplier').value.trim();
     const notes = document.getElementById('expense-notes').value.trim();
     const status = document.getElementById('expense-status').value;
@@ -343,6 +353,8 @@
       budget,
       paidMichele,
       paidMiriana,
+      paidFamilyMichele,
+      paidFamilyMiriana,
       supplier,
       notes,
       status,
@@ -427,6 +439,10 @@
       btnReset.addEventListener('click', () => {
         mInput.value = 0;
         mirInput.value = 0;
+        const famM = document.getElementById('expense-paid-family-michele');
+        if (famM) famM.value = 0;
+        const famMir = document.getElementById('expense-paid-family-miriana');
+        if (famMir) famMir.value = 0;
       });
     }
   }
@@ -577,6 +593,8 @@
 
     const form = document.getElementById('expense-form');
     if (form) form.addEventListener('submit', handleSaveForm);
+
+    setupSplitShortcuts();
 
     // Export & Backup
     const btnExportCsv = document.getElementById('btn-export-csv');

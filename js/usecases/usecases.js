@@ -54,8 +54,9 @@ window.WeddingApp.UseCases = (function () {
 
         if (payer === 'michele' && exp.paidMichele <= 0) return false;
         if (payer === 'miriana' && exp.paidMiriana <= 0) return false;
+        if (payer === 'family' && (exp.paidFamilyMichele <= 0 && exp.paidFamilyMiriana <= 0)) return false;
         if (payer === 'both' && (exp.paidMichele <= 0 || exp.paidMiriana <= 0)) return false;
-        if (payer === 'unpaid' && (exp.paidMichele > 0 || exp.paidMiriana > 0)) return false;
+        if (payer === 'unpaid' && (exp.paidMichele > 0 || exp.paidMiriana > 0 || exp.paidFamilyMichele > 0 || exp.paidFamilyMiriana > 0)) return false;
 
         if (status !== 'all') {
           const currentStatus = exp.resolveStatus();

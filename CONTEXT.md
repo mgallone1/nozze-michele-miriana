@@ -13,14 +13,15 @@
 - Budget complessivo: 46.673 €.
 
 ## 3. Ultime Modifiche Applicate (Pronte per il Commit/Push)
-1. **Sincronizzazione Cloud in Tempo Reale (iPhone Miriana & Desktop)**:
-   - `js/repositories/expense-repository.js`: confronto dinamico di `updated_at` e contenuto raw per rilevare e applicare istantaneamente modifiche dal cloud senza overhead.
-   - `js/main.js`: polling continuo ogni 4 secondi a pagina attiva + auto-sync immediato su ogni risveglio iOS (`pageshow`, `focus`, `visibilitychange` quando si riapre l'iPhone o si sblocca lo schermo).
-   - `index.html` & `css/style.css`: badge interattivo con LED animato `Sincronizzato` (`#btn-manual-cloud-sync`) per forzare con un tocco l'aggiornamento manuale con feedback visivo.
-2. **Scroll Memory Indipendente tra Schede**:
-   - `js/main.js`: memorizzazione della coordinata di scorrimento per singola scheda (`overview`, `expenses`, `savings`, `balance`, `guests`), eliminando salti di scroll tra una vista e l'altra.
-3. **Service Worker v16**:
-   - `sw.js`: cache version aggiornata a `nozze-mm-v2027-v16` per distribuzione istantanea della nuova versione.
+1. **Gestione Doni & Acconti Famiglie Esterne (Abiti Sposi / Regali Genitori)**:
+   - `js/domain/entities.js`: estesa entità `Expense` con `paidFamilyMichele` e `paidFamilyMiriana`. `calculateOwed` sconta i doni esterni prima di ripartire la spesa, così il fornitore risulta saldato/anticipato senza alterare la quota mensile o la liquidità personale degli sposi.
+   - `index.html` & `css/style.css`: aggiunto box dedicato nel modale spese *"🎁 Dono / Pagato dalle Famiglie (Non tocca i risparmi personali)"* con campi distinti per Famiglia Michele e Famiglia Miriana.
+   - `js/ui/views.js`: badge personalizzati `Fam. Michele` e `Fam. Miriana` nella tabella mastro e pannello dedicato nel "Bilancio di Coppia" per riepilogare tutti i doni esterni versati ai fornitori.
+   - `js/repositories/expense-repository.js`: persistenza e sincronizzazione Supabase di `paidFamilyMichele` e `paidFamilyMiriana`.
+2. **Filtro Fornitori / Spese**:
+   - `js/usecases/usecases.js` & `index.html`: aggiunto filtro rapido `Dono/Famiglie` tra i contribuenti del registro spese.
+3. **Service Worker v17**:
+   - `sw.js`: bump a `nozze-mm-v2027-v17` per forzare l'aggiornamento immediato su iPhone e desktop.
 
 ## 4. Azione da eseguire subito dall'Agente:
-- Eseguire `git status`, `git add .`, `git commit -m "Sincronizzazione in tempo reale iPhone, pulsante sync e bump SW v16"` e `git push origin main`.
+- Eseguire `git status`, `git add .`, `git commit -m "Gestione doni e acconti vestiti da famiglie senza toccare risparmi personali e bump SW v17"` e `git push origin main`.

@@ -620,6 +620,45 @@ body::before {
   border: 1px solid var(--person-miriana-border);
 }
 
+.pill-person.family-michele {
+  background: #F2F5F8;
+  color: #2F4858;
+  border: 1px solid #C4D3DE;
+}
+
+.pill-person.family-miriana {
+  background: #FAF0F4;
+  color: #7A3B57;
+  border: 1px solid #E6CAD7;
+}
+
+.pill-person.family-badge {
+  background: var(--accent-bronze-light);
+  color: var(--accent-bronze);
+  border: 1px solid var(--accent-bronze-border);
+}
+
+/* Sezione Doni Famiglie nel Modale Spese */
+.family-gift-advances-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.family-gift-title {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-bronze);
+  margin-bottom: 8px;
+}
+
+.family-balance-panel {
+  border-left: 3px solid var(--accent-bronze);
+}
+
 .payer-badges-stack {
   display: inline-flex;
   flex-direction: column;

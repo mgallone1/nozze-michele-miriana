@@ -111,6 +111,8 @@ window.WeddingApp.Repositories = (function () {
             budget: e.budget,
             paidMichele: e.paidMichele,
             paidMiriana: e.paidMiriana,
+            paidFamilyMichele: e.paidFamilyMichele || 0,
+            paidFamilyMiriana: e.paidFamilyMiriana || 0,
             status: e.status,
             notes: e.notes,
             dueDate: e.dueDate,

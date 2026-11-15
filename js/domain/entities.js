@@ -16,6 +16,8 @@ window.WeddingApp.Domain = (function () {
       budget = 0,
       paidMichele = 0,
       paidMiriana = 0,
+      paidFamilyMichele = 0,
+      paidFamilyMiriana = 0,
       status = 'pianificato',
       notes = '',
       dueDate = '',
@@ -31,6 +33,8 @@ window.WeddingApp.Domain = (function () {
       this.budget = Math.max(0, Number(budget) || 0);
       this.paidMichele = Math.max(0, Number(paidMichele) || 0);
       this.paidMiriana = Math.max(0, Number(paidMiriana) || 0);
+      this.paidFamilyMichele = Math.max(0, Number(paidFamilyMichele) || 0);
+      this.paidFamilyMiriana = Math.max(0, Number(paidFamilyMiriana) || 0);
       this.status = status || 'pianificato';
       this.notes = (notes || '').trim();
       this.dueDate = dueDate || '';
@@ -49,7 +53,10 @@ window.WeddingApp.Domain = (function () {
     }
 
     calculateOwed(micheleGuestRatio = 0.5) {
-      const b = this.budget;
+      // Il costo da ripartire tra gli sposi è il budget al netto di quanto offerto/pagato dalle famiglie
+      const familyGiftTotal = (this.paidFamilyMichele || 0) + (this.paidFamilyMiriana || 0);
+      const b = Math.max(0, this.budget - familyGiftTotal);
+
       if (this.splitType === 'michele') {
         return { micheleOwed: b, mirianaOwed: 0 };
       }
@@ -66,7 +73,7 @@ window.WeddingApp.Domain = (function () {
     }
 
     totalPaid() {
-      return this.paidMichele + this.paidMiriana;
+      return this.paidMichele + this.paidMiriana + (this.paidFamilyMichele || 0) + (this.paidFamilyMiriana || 0);
     }
 
     remaining() {
@@ -94,6 +101,8 @@ window.WeddingApp.Domain = (function () {
       if (isNaN(this.budget) || this.budget < 0) errors.push('Il budget previsto deve essere un valore positivo.');
       if (isNaN(this.paidMichele) || this.paidMichele < 0) errors.push('La quota di Michele deve essere un valore positivo.');
       if (isNaN(this.paidMiriana) || this.paidMiriana < 0) errors.push('La quota di Miriana deve essere un valore positivo.');
+      if (isNaN(this.paidFamilyMichele) || this.paidFamilyMichele < 0) errors.push('La quota famiglia Michele deve essere un valore positivo.');
+      if (isNaN(this.paidFamilyMiriana) || this.paidFamilyMiriana < 0) errors.push('La quota famiglia Miriana deve essere un valore positivo.');
       return {
         isValid: errors.length === 0,
         errors
@@ -244,6 +253,8 @@ window.WeddingApp.Domain = (function () {
       let totalBudget = 0;
       let totalPaidMichele = 0;
       let totalPaidMiriana = 0;
+      let totalPaidFamilyMichele = 0;
+      let totalPaidFamilyMiriana = 0;
       let totalOwedMichele = 0;
       let totalOwedMiriana = 0;
 
@@ -254,6 +265,8 @@ window.WeddingApp.Domain = (function () {
           budget: 0,
           paidMichele: 0,
           paidMiriana: 0,
+          paidFamilyMichele: 0,
+          paidFamilyMiriana: 0,
           totalPaid: 0,
           remaining: 0,
           count: 0
@@ -264,20 +277,26 @@ window.WeddingApp.Domain = (function () {
         const b = exp.budget || 0;
         const pm = exp.paidMichele || 0;
         const pmi = exp.paidMiriana || 0;
-        const tp = typeof exp.totalPaid === 'function' ? exp.totalPaid() : (pm + pmi);
+        const pfm = exp.paidFamilyMichele || 0;
+        const pfmir = exp.paidFamilyMiriana || 0;
+        const tp = typeof exp.totalPaid === 'function' ? exp.totalPaid() : (pm + pmi + pfm + pfmir);
 
         totalBudget += b;
         totalPaidMichele += pm;
         totalPaidMiriana += pmi;
+        totalPaidFamilyMichele += pfm;
+        totalPaidFamilyMiriana += pfmir;
 
         if (typeof exp.calculateOwed === 'function') {
           const owed = exp.calculateOwed(micheleGuestRatio);
           totalOwedMichele += owed.micheleOwed;
           totalOwedMiriana += owed.mirianaOwed;
         } else {
-          const half = Math.round((b / 2) * 100) / 100;
+          const familyGift = pfm + pfmir;
+          const netB = Math.max(0, b - familyGift);
+          const half = Math.round((netB / 2) * 100) / 100;
           totalOwedMichele += half;
-          totalOwedMiriana += (b - half);
+          totalOwedMiriana += (netB - half);
         }
 
         if (categoryAggregates[exp.categoryId]) {
@@ -285,13 +304,16 @@ window.WeddingApp.Domain = (function () {
           c.budget += b;
           c.paidMichele += pm;
           c.paidMiriana += pmi;
+          c.paidFamilyMichele += pfm;
+          c.paidFamilyMiriana += pfmir;
           c.totalPaid += tp;
           c.remaining += Math.max(0, b - tp);
           c.count += 1;
         }
       });
 
-      const totalPaid = totalPaidMichele + totalPaidMiriana;
+      const totalFamilyPaid = totalPaidFamilyMichele + totalPaidFamilyMiriana;
+      const totalPaid = totalPaidMichele + totalPaidMiriana + totalFamilyPaid;
       const totalRemaining = Math.max(0, totalBudget - totalPaid);
       const progressPercentage = totalBudget > 0 ? (totalPaid / totalBudget) * 100 : 0;
 
@@ -430,6 +452,9 @@ window.WeddingApp.Domain = (function () {
         totalBudget,
         totalPaidMichele,
         totalPaidMiriana,
+        totalPaidFamilyMichele,
+        totalPaidFamilyMiriana,
+        totalFamilyPaid,
         totalPaid,
         totalRemaining,
         progressPercentage,
@@ -438,6 +463,9 @@ window.WeddingApp.Domain = (function () {
         coupleBalance: {
           micheleAmount: totalPaidMichele,
           mirianaAmount: totalPaidMiriana,
+          paidFamilyMichele: totalPaidFamilyMichele,
+          paidFamilyMiriana: totalPaidFamilyMiriana,
+          totalFamilyPaid,
           micheleOwed: totalOwedMichele,
           mirianaOwed: totalOwedMiriana,
           mirianaGrossOwed: totalOwedMiriana,

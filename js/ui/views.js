@@ -222,6 +222,12 @@ window.WeddingApp.UI = (function () {
         if (exp.paidMiriana > 0) {
           payerBadges += `<span class="pill-person miriana">Miriana: ${CurrencyFormatter.format(exp.paidMiriana)}</span>`;
         }
+        if (exp.paidFamilyMichele > 0) {
+          payerBadges += `<span class="pill-person family-michele" title="Dono/Acconto offerto dalla Famiglia di Michele">Fam. Michele: ${CurrencyFormatter.format(exp.paidFamilyMichele)}</span>`;
+        }
+        if (exp.paidFamilyMiriana > 0) {
+          payerBadges += `<span class="pill-person family-miriana" title="Dono/Acconto offerto dalla Famiglia di Miriana">Fam. Miriana: ${CurrencyFormatter.format(exp.paidFamilyMiriana)}</span>`;
+        }
         if (!payerBadges) {
           payerBadges = `<span class="badge-unpaid">In attesa</span>`;
         } else {
@@ -973,6 +979,45 @@ window.WeddingApp.UI = (function () {
               <div class="balance-chip-amount miriana amount">${CurrencyFormatter.format(exp.paidMiriana)}</div>
             </div>
           `).join('');
+        }
+      }
+
+      // Riquadro doni e acconti versati dalle Famiglie
+      const familyPanel = document.getElementById('balance-family-gifts-container');
+      const listFamily = document.getElementById('list-family-items');
+      const badgeCountFamily = document.getElementById('badge-count-family');
+      const totalFamilyEl = document.getElementById('balance-family-paid-total');
+
+      const familyExpenses = expenses.filter(e => (e.paidFamilyMichele > 0 || e.paidFamilyMiriana > 0));
+
+      if (familyPanel) {
+        if (familyExpenses.length > 0) {
+          familyPanel.style.display = 'block';
+          const totalFamilyAmount = familyExpenses.reduce((s, e) => s + (e.paidFamilyMichele || 0) + (e.paidFamilyMiriana || 0), 0);
+          if (totalFamilyEl) totalFamilyEl.textContent = CurrencyFormatter.format(totalFamilyAmount);
+          if (badgeCountFamily) badgeCountFamily.textContent = `${familyExpenses.length} ${familyExpenses.length === 1 ? 'dono' : 'doni'}`;
+
+          if (listFamily) {
+            listFamily.innerHTML = familyExpenses.map(exp => {
+              let tagFamily = '';
+              let amounts = [];
+              if (exp.paidFamilyMiriana > 0) amounts.push(`Fam. Miriana: ${CurrencyFormatter.format(exp.paidFamilyMiriana)}`);
+              if (exp.paidFamilyMichele > 0) amounts.push(`Fam. Michele: ${CurrencyFormatter.format(exp.paidFamilyMichele)}`);
+              tagFamily = amounts.join(' • ');
+
+              return `
+                <div class="balance-expense-chip">
+                  <div class="balance-chip-info">
+                    <div class="balance-chip-title">${exp.item}</div>
+                    <div class="balance-chip-supplier">${tagFamily}${exp.supplier ? ` • ${exp.supplier}` : ''}</div>
+                  </div>
+                  <div class="balance-chip-amount text-settled amount">${CurrencyFormatter.format((exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0))}</div>
+                </div>
+              `;
+            }).join('');
+          }
+        } else {
+          familyPanel.style.display = 'none';
         }
       }
     }
