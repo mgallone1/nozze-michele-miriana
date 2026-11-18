@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Nozze M&M">
@@ -87,6 +87,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html, body {
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -10204,8 +10210,44 @@ window.WeddingApp.UI = (function () {
     await triggerCloudSync(false);
   }
 
+  // Prevenzione assoluta zoom su iOS Safari / PWA (pinch-to-zoom & double-tap)
+  function preventPageZoom() {
+    // 1. Blocco gesturestart (pinch nativo iOS)
+    document.addEventListener('gesturestart', function (e) {
+      e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('gesturechange', function (e) {
+      e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('gestureend', function (e) {
+      e.preventDefault();
+    }, { passive: false });
+
+    // 2. Blocco multi-touch pinch su touchmove
+    document.addEventListener('touchmove', function (e) {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // 3. Blocco double-tap to zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+          e.preventDefault();
+        }
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+  }
+
   // Bootstrap dell'Applicazione
   document.addEventListener('DOMContentLoaded', async () => {
+    preventPageZoom();
     registerServiceWorker();
 
     // 1. Rendering immediato dai dati locali per non bloccare l'interfaccia né il countdown
