@@ -75,6 +75,14 @@ window.WeddingApp.Repositories = (function () {
             this._cachedData = this._hydrate(cloudPlain);
             localStorage.setItem(STORAGE_KEY, cloudRawString);
 
+            // Se il Cloud ha un PIN personalizzato salvato, sincronizzalo nel LocalStorage per coerenza PWA / Browser
+            if (cloudPlain.security && cloudPlain.security.pinHash) {
+              const currentPin = localStorage.getItem('matrimonio_mm_pin_pbkdf2_v2');
+              if (currentPin !== cloudPlain.security.pinHash) {
+                localStorage.setItem('matrimonio_mm_pin_pbkdf2_v2', cloudPlain.security.pinHash);
+              }
+            }
+
             return { success: true, updated: hasChanged, data: this._cachedData, updatedAt: cloudUpdatedAt };
           }
         } else {
@@ -93,7 +101,13 @@ window.WeddingApp.Repositories = (function () {
     persist(dataset) {
       try {
         this._cachedData = dataset;
+        // Preserva lo stato di sicurezza presente nel cloud o locale
+        const currentPinHash = localStorage.getItem('matrimonio_mm_pin_pbkdf2_v2') || 'a9391465d635a6a0949970493bbf9357db9804e0432ce426b668b402dca19c97';
         const plainData = {
+          security: {
+            pinHash: currentPinHash,
+            updatedAt: new Date().toISOString()
+          },
           couple: dataset.couple,
           details: dataset.details,
           savingsPlan: dataset.savingsPlan,

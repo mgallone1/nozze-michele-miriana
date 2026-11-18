@@ -344,7 +344,43 @@ window.WeddingApp.Services = (function () {
       localStorage.setItem(this.PIN_STORAGE_KEY, newHash);
       this.resetAttempts();
       sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+
+      // Sincronizza hash PIN su Supabase per PWA e tutti i dispositivi
+      this.syncPinToCloud(newHash);
       return true;
+    }
+
+    static async syncPinToCloud(hash) {
+      try {
+        const SUPABASE_URL = 'https://rpccqbydibkmkpmrlxgv.supabase.co/rest/v1/wedding_vault';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2NxYnlkaWJrbWtwbXJseGd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MDI1OTUsImV4cCI6MjEwODk3ODU5NX0.1Gz2KzPHDCUq4ub_5OY5RuUz3eRQ6G3-p33GXyxojro';
+        const VAULT_ID = 'matrimonio_mm_vault_master';
+
+        const getRes = await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}&select=*`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+        if (getRes.ok) {
+          const recs = await getRes.json();
+          if (recs && recs[0] && recs[0].data) {
+            const data = recs[0].data;
+            data.security = data.security || {};
+            data.security.pinHash = hash;
+            data.security.updatedAt = new Date().toISOString();
+
+            await fetch(`${SUPABASE_URL}?id=eq.${VAULT_ID}`, {
+              method: 'PATCH',
+              headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ data, updated_at: new Date().toISOString() })
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Sync PIN su cloud non riuscito (offline o rete lenta):', err);
+      }
     }
 
     // Supporto Biometrico WebAuthn / Face ID / Touch ID
