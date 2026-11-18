@@ -37,8 +37,6 @@
     TimelineView,
     GuestsView,
     GuestModalView,
-    ScheduleView,
-    VendorHubView,
     ToastView
   } = window.WeddingApp.UI;
 
@@ -55,10 +53,6 @@
     searchGuestsQuery: '',
     filterGuestsParty: 'all',
     filterGuestsGift: 'all',
-    // Filtri Scadenziario & Fornitori
-    filterScheduleTime: 'all',
-    filterVendorsStatus: 'all',
-    searchVendorsQuery: '',
     // Stato Privacy Bancaria (Offuscamento Cifre)
     isPrivacyMasked: localStorage.getItem('matrimonio_mm_privacy_masked') === 'true',
     // Posizioni di scorrimento indipendenti per ciascuna tab
@@ -67,9 +61,7 @@
       expenses: 0,
       savings: 0,
       balance: 0,
-      guests: 0,
-      schedule: 0,
-      vendors: 0
+      guests: 0
     }
   };
 
@@ -146,16 +138,10 @@
     // 6. Aggiorna Ospiti & Doni
     renderGuestsList(data.guests || [], summary.finances);
 
-    // 7. Aggiorna Scadenziario & Cash Flow (Calendario Pagamenti)
-    ScheduleView.render(data.expenses, uiState.filterScheduleTime, (id) => openExpenseModal(id));
-
-    // 8. Aggiorna Fornitori & Contratti (Vendor Hub)
-    VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
-
-    // 9. Aggiorna Countdown e Dettagli Intestazione
+    // 7. Aggiorna Countdown e Dettagli Intestazione
     updateCountdownTick(summary.details, summary.finances.timeline.currentDate);
 
-    // 10. Applica Stato Privacy Bancaria (Offuscamento Cifre)
+    // 8. Applica Stato Privacy Bancaria (Offuscamento Cifre)
     applyPrivacyMask();
   }
 
@@ -233,9 +219,7 @@
       expenses: document.getElementById('view-expenses'),
       savings: document.getElementById('view-savings'),
       balance: document.getElementById('view-balance'),
-      guests: document.getElementById('view-guests'),
-      schedule: document.getElementById('view-schedule'),
-      vendors: document.getElementById('view-vendors')
+      guests: document.getElementById('view-guests')
     };
 
     tabs.forEach(tab => {
@@ -870,35 +854,6 @@
         } catch (err) {
           window.alert(err.message || 'Errore durante l\'aggiornamento del PIN.');
         }
-      });
-    }
-
-    // Intercettazione filtri Scadenziario
-    const filterSched = document.getElementById('filter-schedule-time');
-    if (filterSched) {
-      filterSched.addEventListener('change', (e) => {
-        uiState.filterScheduleTime = e.target.value;
-        const data = repository.load();
-        ScheduleView.render(data.expenses, uiState.filterScheduleTime, (id) => openExpenseModal(id));
-      });
-    }
-
-    // Intercettazione filtri e ricerca Fornitori & Contratti
-    const searchVendors = document.getElementById('search-vendors');
-    if (searchVendors) {
-      searchVendors.addEventListener('input', (e) => {
-        uiState.searchVendorsQuery = e.target.value;
-        const data = repository.load();
-        VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
-      });
-    }
-
-    const filterVendorsStatus = document.getElementById('filter-vendors-status');
-    if (filterVendorsStatus) {
-      filterVendorsStatus.addEventListener('change', (e) => {
-        uiState.filterVendorsStatus = e.target.value;
-        const data = repository.load();
-        VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
       });
     }
 
