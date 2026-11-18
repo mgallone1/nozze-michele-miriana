@@ -31,23 +31,21 @@ window.WeddingApp.UI = (function () {
       const h = document.getElementById('countdown-hours');
       const m = document.getElementById('countdown-mins');
 
-      if (d) d.textContent = isPassed ? '0' : days;
-      if (h) h.textContent = isPassed ? '0' : hours;
-      if (m) m.textContent = isPassed ? '0' : minutes;
+      if (d) d.textContent = isPassed ? '0' : String(days);
+      if (h) h.textContent = isPassed ? '0' : String(hours);
+      if (m) m.textContent = isPassed ? '0' : String(minutes);
 
       const dateEl = document.getElementById('header-current-date');
       if (dateEl && window.WeddingApp?.Services?.DateService) {
         dateEl.textContent = window.WeddingApp.Services.DateService.formatItalianDate(referenceDate || new Date());
       }
 
-      if (details) {
-        const guestsEl = document.getElementById('header-guests-count');
-        const heroGuestsEl = document.getElementById('hero-guests-note');
-        const count = details.estimatedGuests || 112;
+      const guestsEl = document.getElementById('header-guests-count');
+      const heroGuestsEl = document.getElementById('hero-guests-note');
+      const count = details?.estimatedGuests || 112;
 
-        if (guestsEl) guestsEl.textContent = `${count} Ospiti`;
-        if (heroGuestsEl) heroGuestsEl.textContent = count;
-      }
+      if (guestsEl) guestsEl.textContent = `${count} Ospiti`;
+      if (heroGuestsEl) heroGuestsEl.textContent = count;
     }
   }
 

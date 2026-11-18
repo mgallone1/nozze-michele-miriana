@@ -211,9 +211,10 @@
   }
 
   function updateCountdownTick(details, referenceDate = null) {
-    if (!details?.date) return;
-    const result = CountdownService.calculate(details.date, details.time || '17:00', referenceDate);
-    HeaderView.updateCountdown(result, details);
+    const targetDate = details?.date || '2027-07-02';
+    const targetTime = details?.time || '17:00';
+    const result = CountdownService.calculate(targetDate, targetTime, referenceDate);
+    HeaderView.updateCountdown(result, details || { estimatedGuests: 112 });
   }
 
   // Gestione Tab con Scroll Memory indipendente per ciascuna vista
