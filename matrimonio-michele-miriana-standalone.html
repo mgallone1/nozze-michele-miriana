@@ -3880,6 +3880,393 @@ button.btn-editable-val:hover {
   color: var(--accent-sage);
 }
 
+/* ==========================================================================
+   MODALITÀ PRIVACY BANCARIA (OFFUSCAMENTO CIFRE & IMPORTI)
+   ========================================================================== */
+.header-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-privacy-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-privacy-toggle:hover {
+  background: var(--surface-tint);
+  border-color: var(--accent-bronze);
+  color: var(--ink-primary);
+}
+
+.btn-privacy-toggle.is-active {
+  background: var(--accent-bronze-light);
+  border-color: var(--accent-bronze);
+  color: var(--accent-bronze);
+  font-weight: 600;
+}
+
+/* Regole di offuscamento attivo per tutte le cifre */
+body.privacy-masked .amount,
+body.privacy-masked .num,
+body.privacy-masked .currency,
+body.privacy-masked .col-investment,
+body.privacy-masked .col-remaining,
+body.privacy-masked .stat-hero-number,
+body.privacy-masked .cat-card-amounts,
+body.privacy-masked .balance-chip-amount,
+body.privacy-masked .balance-hero-amount,
+body.privacy-masked .gift-amount,
+body.privacy-masked .pricing-total-number,
+body.privacy-masked .statement-footer-amount,
+body.privacy-masked .settlement-amount {
+  filter: blur(7px);
+  user-select: none;
+  cursor: pointer;
+  transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover temporaneo su desktop se l'utente vuole sbirciare un singolo valore */
+body.privacy-masked .amount:hover,
+body.privacy-masked .num:hover,
+body.privacy-masked .stat-hero-number:hover,
+body.privacy-masked .balance-chip-amount:hover {
+  filter: blur(0px);
+}
+
+/* Griglia form a 3 colonne per dettagli fornitore e scadenze */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   VISTA SCADENZIARIO & CASH FLOW (CALENDARIO PAGAMENTI)
+   ========================================================================== */
+.schedule-hero-panel,
+.vendors-hero-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 840px) {
+  .schedule-hero-panel,
+  .vendors-hero-panel {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.schedule-stat-card,
+.vendors-stat-card {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.schedule-toolbar,
+.vendors-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.schedule-timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.schedule-month-group {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.schedule-month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-hairline);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.schedule-month-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-month-total {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent-bronze);
+}
+
+.schedule-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface-tint);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  border-left: 4px solid var(--accent-bronze);
+  transition: all 0.2s ease;
+}
+
+.schedule-item-card:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-item-card.is-settled {
+  border-left-color: var(--accent-sage);
+  opacity: 0.85;
+}
+
+.schedule-item-card.is-urgent {
+  border-left-color: var(--accent-terracotta);
+  background: var(--accent-terracotta-soft);
+}
+
+.schedule-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.schedule-item-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink-primary);
+}
+
+.schedule-item-meta {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.schedule-item-amounts {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.schedule-due-tag {
+  font-size: 0.76rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.schedule-due-tag.urgent {
+  background: #FFE8E5;
+  color: var(--accent-terracotta);
+}
+
+.schedule-due-tag.upcoming {
+  background: var(--accent-bronze-light);
+  color: var(--accent-bronze);
+}
+
+.schedule-due-tag.settled {
+  background: var(--accent-sage-soft);
+  color: var(--accent-sage);
+}
+
+/* ==========================================================================
+   VISTA FORNITORI & CONTRATTI (VENDOR HUB)
+   ========================================================================== */
+.vendors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 600px) {
+  .vendors-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vendor-card {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vendor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.vendor-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vendor-name {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  line-height: 1.25;
+}
+
+.vendor-service-tag {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+.vendor-status-pill {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.vendor-status-pill.da_contattare {
+  background: var(--surface-warm);
+  color: var(--ink-muted);
+}
+
+.vendor-status-pill.preventivo {
+  background: #FFF3DB;
+  color: #B58500;
+}
+
+.vendor-status-pill.firmato {
+  background: var(--accent-bronze-light);
+  color: var(--accent-bronze);
+}
+
+.vendor-status-pill.acconto {
+  background: #E8F0FE;
+  color: #1A73E8;
+}
+
+.vendor-status-pill.saldato {
+  background: var(--accent-sage-soft);
+  color: var(--accent-sage);
+}
+
+.vendor-financial-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--surface-tint);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.vendor-notes-box {
+  font-size: 0.82rem;
+  color: var(--ink-secondary);
+  background: var(--surface-warm);
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.vendor-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-vendor-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-vendor-action:hover {
+  background: var(--accent-bronze-light);
+  border-color: var(--accent-bronze);
+  color: var(--accent-bronze);
+}
+
+.btn-vendor-action.call {
+  color: var(--accent-sage);
+  border-color: rgba(69, 97, 81, 0.3);
+}
+
+.btn-vendor-action.call:hover {
+  background: var(--accent-sage-soft);
+  border-color: var(--accent-sage);
+}
+
 </style>
 </head>
 <body>
@@ -3913,10 +4300,21 @@ button.btn-editable-val:hover {
               <span id="countdown-mins">—</span><small>min</small>
             </div>
           </div>
-          <button type="button" class="btn-sync-badge" id="btn-manual-cloud-sync" title="Tocca per aggiornare subito dal Cloud">
-            <span class="sync-dot" id="sync-status-dot"></span>
-            <span id="sync-status-text">Sincronizzato</span>
-          </button>
+          <div class="header-actions-row">
+            <button type="button" class="btn-privacy-toggle" id="btn-privacy-toggle" title="Nascondi o mostra importi sensibili">
+              <span id="privacy-icon-wrap">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </span>
+              <span id="privacy-label">Offusca Importi</span>
+            </button>
+            <button type="button" class="btn-sync-badge" id="btn-manual-cloud-sync" title="Tocca per aggiornare subito dal Cloud">
+              <span class="sync-dot" id="sync-status-dot"></span>
+              <span id="sync-status-text">Sincronizzato</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3942,6 +4340,14 @@ button.btn-editable-val:hover {
           <button class="nav-link-btn" data-tab="guests">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Ospiti &<br>Doni</span>
+          </button>
+          <button class="nav-link-btn" data-tab="schedule">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Scadenze &<br>Cash Flow</span>
+          </button>
+          <button class="nav-link-btn" data-tab="vendors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Fornitori &<br>Contratti</span>
           </button>
         </nav>
       </div>
@@ -4444,6 +4850,106 @@ button.btn-editable-val:hover {
       </div>
     </div>
 
+    <!-- ======================================================================
+         VISTA 6: SCADENZIARIO & CASH FLOW (CALENDARIO PAGAMENTI)
+         ====================================================================== -->
+    <div id="view-schedule" class="app-view-tab is-hidden">
+      <!-- HERO SCADENZIARIO -->
+      <section class="schedule-hero-panel">
+        <div class="schedule-stat-card">
+          <span class="stat-eyebrow">Scadenze Imminenti (30 gg)</span>
+          <div class="stat-hero-number amount text-accent-terracotta" id="schedule-urgent-amount">0 €</div>
+          <div class="stat-caption">
+            <span id="schedule-urgent-count">0 pagamenti</span> in scadenza a breve
+          </div>
+        </div>
+
+        <div class="schedule-stat-card">
+          <span class="stat-eyebrow">Totale da Saldare Entro il Matrimonio</span>
+          <div class="stat-hero-number amount" id="schedule-total-pending">0 €</div>
+          <div class="stat-caption">
+            Distribuiti sui mesi fino al 2 Luglio 2027
+          </div>
+        </div>
+
+        <div class="schedule-stat-card">
+          <span class="stat-eyebrow">Stato Copertura Mese Corrente</span>
+          <div class="stat-hero-number text-accent-sage" id="schedule-month-status">Regolare</div>
+          <div class="stat-caption" id="schedule-month-desc">
+            Pianificazione allineata con l'accumulo mensile
+          </div>
+        </div>
+      </section>
+
+      <!-- BARRA FILTRI SCADENZIARIO -->
+      <div class="schedule-toolbar">
+        <div class="filter-controls-group">
+          <select id="filter-schedule-time" class="filter-select-noble">
+            <option value="all">Tutte le Scadenze</option>
+            <option value="upcoming">Prossimi 30 giorni</option>
+            <option value="overdue">Scadute / In ritardo</option>
+            <option value="settled">Già saldate</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TIMELINE / LISTA SCADENZE PER MESE -->
+      <div class="schedule-timeline-container" id="schedule-timeline-container">
+        <!-- Generato dinamicamente -->
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         VISTA 7: FORNITORI & CONTRATTI (VENDOR HUB DEDICATO)
+         ====================================================================== -->
+    <div id="view-vendors" class="app-view-tab is-hidden">
+      <!-- HERO VENDOR HUB -->
+      <section class="vendors-hero-panel">
+        <div class="vendors-stat-card">
+          <span class="stat-eyebrow">Atelier & Partner Registrati</span>
+          <div class="stat-hero-number" id="vendors-total-count">0</div>
+          <div class="stat-caption">Fornitori e professionisti coinvolti</div>
+        </div>
+
+        <div class="vendors-stat-card">
+          <span class="stat-eyebrow">Stato Accordi Contrattuali</span>
+          <div class="vendors-pipeline-summary" id="vendors-pipeline-summary">
+            <!-- Badges pipeline contratti -->
+          </div>
+          <div class="stat-caption">Dalla ricerca iniziale al saldo completo</div>
+        </div>
+
+        <div class="vendors-stat-card">
+          <span class="stat-eyebrow">Importo Contrattualizzato</span>
+          <div class="stat-hero-number amount" id="vendors-contract-amount">0 €</div>
+          <div class="stat-caption">Copertura contrattuale garantita</div>
+        </div>
+      </section>
+
+      <!-- BARRA FILTRI FORNITORI -->
+      <div class="vendors-toolbar">
+        <div class="filter-controls-group">
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-vendors" class="search-field" placeholder="Cerca fornitore o servizio...">
+          </div>
+          <select id="filter-vendors-status" class="filter-select-noble">
+            <option value="all">Tutti gli Stati Contratto</option>
+            <option value="da_contattare">Da Contattare</option>
+            <option value="preventivo">In Preventivo</option>
+            <option value="firmato">Contratto Firmato</option>
+            <option value="acconto">Acconto Versato</option>
+            <option value="saldato">Completamente Saldato</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- GRIGLIA SCHEDE FORNITORI CON CALL / EMAIL RAPIDA -->
+      <div class="vendors-grid" id="vendors-grid-container">
+        <!-- Generato dinamicamente -->
+      </div>
+    </div>
+
     <!-- ARCHIVIO PERSONALE & SINCRONIZZAZIONE -->
     <div class="archive-vault-card">
       <div>
@@ -4642,6 +5148,30 @@ button.btn-editable-val:hover {
                 <option value="pianificato">In pianificazione</option>
                 <option value="acconto">Acconto versato</option>
                 <option value="saldato">Completamente saldato</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dettagli Fornitore & Scadenziario -->
+          <div class="form-grid-3">
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-due-date">Data Scadenza / Saldo</label>
+              <input type="date" id="expense-due-date" class="form-input-noble">
+            </div>
+
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-supplier-phone">Telefono Fornitore</label>
+              <input type="tel" id="expense-supplier-phone" class="form-input-noble" placeholder="Es. +39 340 1234567">
+            </div>
+
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-contract-status">Fase Contratto</label>
+              <select id="expense-contract-status" class="form-select-noble">
+                <option value="da_contattare">Da Contattare</option>
+                <option value="preventivo">In Preventivo</option>
+                <option value="firmato">Contratto Firmato</option>
+                <option value="acconto">Acconto Versato</option>
+                <option value="saldato">Completamente Saldato</option>
               </select>
             </div>
           </div>
@@ -5974,12 +6504,18 @@ window.WeddingApp.Domain = (function () {
       hasVat = false, // Se l'IVA è applicata e calcolata sul netto
       vatRate = 10,   // Aliquota IVA applicata (es. 10 o 22)
       netAmount = null, // Imponibile netto prima di IVA
-      unitPriceNet = null // Prezzo unitario netto a persona per catering
+      unitPriceNet = null, // Prezzo unitario netto a persona per catering
+      supplierPhone = '',
+      supplierEmail = '',
+      supplierContractStatus = 'da_contattare' // 'da_contattare', 'preventivo', 'firmato', 'acconto', 'saldato'
     }) {
       this.id = id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       this.categoryId = categoryId;
       this.item = (item || '').trim();
       this.supplier = (supplier || '').trim();
+      this.supplierPhone = (supplierPhone || '').trim();
+      this.supplierEmail = (supplierEmail || '').trim();
+      this.supplierContractStatus = supplierContractStatus || 'da_contattare';
       this.budget = Math.max(0, Number(budget) || 0);
       this.paidMichele = Math.max(0, Number(paidMichele) || 0);
       this.paidMiriana = Math.max(0, Number(paidMiriana) || 0);
@@ -7227,6 +7763,9 @@ window.WeddingApp.Repositories = (function () {
             status: e.status,
             notes: e.notes,
             dueDate: e.dueDate,
+            supplierPhone: e.supplierPhone || '',
+            supplierEmail: e.supplierEmail || '',
+            supplierContractStatus: e.supplierContractStatus || 'da_contattare',
             splitType: e.splitType || 'equal',
             payer: e.payer || 'both',
             isEstimate: Boolean(e.isEstimate),
@@ -9147,6 +9686,351 @@ window.WeddingApp.UI = (function () {
     }
   }
 
+  // =========================================================================
+  // VISTA 6: SCADENZIARIO & CASH FLOW (CALENDARIO PAGAMENTI)
+  // =========================================================================
+  class ScheduleView {
+    static render(expenses, filter = 'all', onEditExpense = null) {
+      const container = document.getElementById('schedule-timeline-container');
+      const urgentAmountEl = document.getElementById('schedule-urgent-amount');
+      const urgentCountEl = document.getElementById('schedule-urgent-count');
+      const totalPendingEl = document.getElementById('schedule-total-pending');
+      const monthStatusEl = document.getElementById('schedule-month-status');
+      if (!container) return;
+
+      const now = new Date();
+      const thirtyDaysAhead = new Date();
+      thirtyDaysAhead.setDate(now.getDate() + 30);
+
+      let urgentAmount = 0;
+      let urgentCount = 0;
+      let totalPending = 0;
+
+      // Filtra e raggruppa le spese con scadenza o da saldare
+      const validExpenses = (expenses || []).map(exp => {
+        const remaining = exp.remaining ? exp.remaining() : Math.max(0, exp.budget - ((exp.paidMichele || 0) + (exp.paidMiriana || 0) + (exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0)));
+        const dueDate = exp.dueDate || '2027-07-02';
+        const dObj = new Date(dueDate);
+        const isSettled = remaining <= 0 || exp.status === 'saldato';
+        
+        let isUrgent = false;
+        let isOverdue = false;
+        if (!isSettled && !isNaN(dObj.getTime())) {
+          if (dObj < now) {
+            isOverdue = true;
+            isUrgent = true;
+          } else if (dObj <= thirtyDaysAhead) {
+            isUrgent = true;
+          }
+        }
+
+        if (isUrgent && !isSettled) {
+          urgentAmount += remaining;
+          urgentCount++;
+        }
+        if (!isSettled) {
+          totalPending += remaining;
+        }
+
+        return {
+          exp,
+          remaining,
+          dueDate,
+          dObj,
+          isSettled,
+          isUrgent,
+          isOverdue
+        };
+      });
+
+      if (urgentAmountEl) urgentAmountEl.textContent = CurrencyFormatter.format(urgentAmount);
+      if (urgentCountEl) urgentCountEl.textContent = `${urgentCount} pagamenti`;
+      if (totalPendingEl) totalPendingEl.textContent = CurrencyFormatter.format(totalPending);
+
+      // Applica filtro
+      const filtered = validExpenses.filter(item => {
+        if (filter === 'upcoming') return item.isUrgent && !item.isSettled;
+        if (filter === 'overdue') return item.isOverdue && !item.isSettled;
+        if (filter === 'settled') return item.isSettled;
+        return true;
+      });
+
+      // Ordina cronologicamente per data scadenza
+      filtered.sort((a, b) => a.dObj - b.dObj);
+
+      // Raggruppa per Mese/Anno (es. "Luglio 2027", "Maggio 2027")
+      const groups = {};
+      filtered.forEach(item => {
+        const monthKey = !isNaN(item.dObj.getTime())
+          ? item.dObj.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+          : 'Senza Scadenza';
+        const capKey = monthKey.charAt(0).toUpperCase() + monthKey.slice(1);
+        if (!groups[capKey]) groups[capKey] = { items: [], totalRemaining: 0 };
+        groups[capKey].items.push(item);
+        groups[capKey].totalRemaining += item.remaining;
+      });
+
+      if (Object.keys(groups).length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--ink-muted); background: var(--surface-pure); border-radius: var(--radius-md); border: 1px dashed var(--border-hairline);">
+            Nessuna scadenza trovata per il filtro selezionato.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      Object.keys(groups).forEach(monthLabel => {
+        const grp = groups[monthLabel];
+        html += `
+          <div class="schedule-month-group">
+            <div class="schedule-month-header">
+              <div class="schedule-month-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>${monthLabel}</span>
+              </div>
+              <div class="schedule-month-total amount">
+                Da saldare: ${CurrencyFormatter.format(grp.totalRemaining)}
+              </div>
+            </div>
+            <div class="schedule-items-list">
+        `;
+
+        grp.items.forEach(item => {
+          const exp = item.exp;
+          const safeItem = SecurityService.escapeHtml(exp.item);
+          const safeSupplier = SecurityService.escapeHtml(exp.supplier || 'Fornitore non specificato');
+          const formattedDate = !isNaN(item.dObj.getTime())
+            ? item.dObj.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' })
+            : 'Entro il 02/07/2027';
+
+          let tagClass = 'upcoming';
+          let tagText = `Scade il ${formattedDate}`;
+          if (item.isSettled) {
+            tagClass = 'settled';
+            tagText = '✓ Saldato';
+          } else if (item.isOverdue) {
+            tagClass = 'urgent';
+            tagText = `⚠ Scaduto il ${formattedDate}`;
+          } else if (item.isUrgent) {
+            tagClass = 'urgent';
+            tagText = `⚡ Entro 30 gg (${formattedDate})`;
+          }
+
+          html += `
+            <div class="schedule-item-card ${item.isSettled ? 'is-settled' : ''} ${item.isUrgent ? 'is-urgent' : ''}" data-id="${exp.id}">
+              <div class="schedule-item-info">
+                <div class="schedule-item-title">${safeItem}</div>
+                <div class="schedule-item-meta">
+                  <span><strong>${safeSupplier}</strong></span>
+                  <span>•</span>
+                  <span class="schedule-due-tag ${tagClass}">${tagText}</span>
+                  ${exp.supplierPhone ? `<span>• 📞 ${SecurityService.escapeHtml(exp.supplierPhone)}</span>` : ''}
+                </div>
+              </div>
+              <div class="schedule-item-amounts">
+                <div class="amount" style="font-weight: 700; color: ${item.isSettled ? 'var(--accent-sage)' : 'var(--ink-primary)'};">
+                  ${item.isSettled ? 'Saldato' : CurrencyFormatter.format(item.remaining)}
+                </div>
+                <div class="amount" style="font-size: 0.78rem; color: var(--ink-muted);">
+                  Budget: ${CurrencyFormatter.format(exp.budget)}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      // Click su scheda per aprire modifica voce
+      if (onEditExpense) {
+        container.querySelectorAll('.schedule-item-card').forEach(card => {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => {
+            const expId = card.dataset.id;
+            if (expId) onEditExpense(expId);
+          });
+        });
+      }
+    }
+  }
+
+  // =========================================================================
+  // VISTA 7: FORNITORI & CONTRATTI (VENDOR HUB)
+  // =========================================================================
+  class VendorHubView {
+    static render(expenses, filterStatus = 'all', searchQuery = '', onEditExpense = null) {
+      const grid = document.getElementById('vendors-grid-container');
+      const totalCountEl = document.getElementById('vendors-total-count');
+      const contractAmountEl = document.getElementById('vendors-contract-amount');
+      const pipelineSummaryEl = document.getElementById('vendors-pipeline-summary');
+      if (!grid) return;
+
+      // Estrai fornitori univoci o spese con fornitori
+      const vendorsMap = new Map();
+      let contractTotal = 0;
+      const statusCounts = {
+        da_contattare: 0,
+        preventivo: 0,
+        firmato: 0,
+        acconto: 0,
+        saldato: 0
+      };
+
+      (expenses || []).forEach(exp => {
+        const supplierName = (exp.supplier || '').trim();
+        if (!supplierName && !exp.item) return;
+        const key = supplierName ? supplierName.toLowerCase() : exp.item.toLowerCase();
+
+        const st = exp.supplierContractStatus || (exp.status === 'saldato' ? 'saldato' : (exp.status === 'acconto' ? 'acconto' : (exp.isEstimate ? 'preventivo' : 'firmato')));
+        if (statusCounts[st] !== undefined) statusCounts[st]++;
+
+        if (st === 'firmato' || st === 'acconto' || st === 'saldato') {
+          contractTotal += (exp.budget || 0);
+        }
+
+        if (!vendorsMap.has(key)) {
+          vendorsMap.set(key, {
+            key,
+            displayName: supplierName || exp.item,
+            service: exp.item,
+            category: exp.categoryId,
+            budget: exp.budget,
+            paid: (exp.paidMichele || 0) + (exp.paidMiriana || 0) + (exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0),
+            phone: exp.supplierPhone || '',
+            email: exp.supplierEmail || '',
+            notes: exp.notes || '',
+            status: st,
+            dueDate: exp.dueDate,
+            expenseId: exp.id
+          });
+        } else {
+          // Unisci voci dello stesso fornitore
+          const curr = vendorsMap.get(key);
+          curr.budget += (exp.budget || 0);
+          curr.paid += ((exp.paidMichele || 0) + (exp.paidMiriana || 0) + (exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0));
+          if (exp.supplierPhone && !curr.phone) curr.phone = exp.supplierPhone;
+          if (exp.notes && !curr.notes.includes(exp.notes)) curr.notes += ' • ' + exp.notes;
+        }
+      });
+
+      const vendorList = Array.from(vendorsMap.values());
+      if (totalCountEl) totalCountEl.textContent = vendorList.length;
+      if (contractAmountEl) contractAmountEl.textContent = CurrencyFormatter.format(contractTotal);
+
+      if (pipelineSummaryEl) {
+        pipelineSummaryEl.innerHTML = `
+          <span class="vendor-status-pill firmato" style="font-size:0.75rem;">${statusCounts.firmato + statusCounts.acconto + statusCounts.saldato} Conclusi</span>
+          <span class="vendor-status-pill preventivo" style="font-size:0.75rem;">${statusCounts.preventivo} Preventivi</span>
+        `;
+      }
+
+      // Filtra
+      const filtered = vendorList.filter(v => {
+        if (filterStatus !== 'all' && v.status !== filterStatus) return false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          return v.displayName.toLowerCase().includes(q) || v.service.toLowerCase().includes(q) || v.notes.toLowerCase().includes(q);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--ink-muted); background: var(--surface-pure); border-radius: var(--radius-md); border: 1px dashed var(--border-hairline);">
+            Nessun fornitore corrisponde ai criteri di ricerca.
+          </div>
+        `;
+        return;
+      }
+
+      const statusLabels = {
+        da_contattare: 'Da Contattare',
+        preventivo: 'Preventivo Richiesto',
+        firmato: 'Contratto Firmato',
+        acconto: 'Acconto Versato',
+        saldato: 'Completamente Saldato'
+      };
+
+      let html = '';
+      filtered.forEach(v => {
+        const safeName = SecurityService.escapeHtml(v.displayName);
+        const safeService = SecurityService.escapeHtml(v.service);
+        const safeNotes = SecurityService.escapeHtml(v.notes);
+        const safePhone = SecurityService.escapeHtml(v.phone);
+        const cleanPhone = v.phone ? v.phone.replace(/[^0-9+]/g, '') : '';
+        const remaining = Math.max(0, v.budget - v.paid);
+
+        html += `
+          <div class="vendor-card" data-id="${v.expenseId}">
+            <div>
+              <div class="vendor-card-header">
+                <div>
+                  <h3 class="vendor-name">${safeName}</h3>
+                  <div class="vendor-service-tag">${safeService}</div>
+                </div>
+                <span class="vendor-status-pill ${v.status}">${statusLabels[v.status] || v.status}</span>
+              </div>
+
+              <div class="vendor-financial-row" style="margin: 14px 0 10px 0;">
+                <div>
+                  <div style="font-size:0.72rem; color: var(--ink-muted); text-transform: uppercase;">Investimento</div>
+                  <div class="amount" style="font-weight: 700; color: var(--ink-primary);">${CurrencyFormatter.format(v.budget)}</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color: var(--ink-muted); text-transform: uppercase;">Versato</div>
+                  <div class="amount" style="font-weight: 700; color: var(--accent-sage);">${CurrencyFormatter.format(v.paid)}</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color: var(--ink-muted); text-transform: uppercase;">Rimanente</div>
+                  <div class="amount" style="font-weight: 700; color: ${remaining === 0 ? 'var(--accent-sage)' : 'var(--accent-terracotta)'};">
+                    ${remaining === 0 ? 'Saldato' : CurrencyFormatter.format(remaining)}
+                  </div>
+                </div>
+              </div>
+
+              ${v.notes ? `<div class="vendor-notes-box">« ${safeNotes} »</div>` : ''}
+            </div>
+
+            <div class="vendor-actions-row">
+              ${cleanPhone ? `
+                <a href="tel:${cleanPhone}" class="btn-vendor-action call" title="Chiama subito">
+                  📞 Chiama (${safePhone})
+                </a>
+              ` : `
+                <button type="button" class="btn-vendor-action edit-vendor-btn" data-id="${v.expenseId}">
+                  + Aggiungi Telefono
+                </button>
+              `}
+              <button type="button" class="btn-vendor-action edit-vendor-btn" data-id="${v.expenseId}">
+                Modifica
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+
+      // Collega click pulsanti modifica
+      if (onEditExpense) {
+        grid.querySelectorAll('.edit-vendor-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            if (id) onEditExpense(id);
+          });
+        });
+      }
+    }
+  }
+
   return {
     HeaderView,
     FinancialHeroView,
@@ -9158,6 +10042,8 @@ window.WeddingApp.UI = (function () {
     TimelineView,
     GuestsView,
     GuestModalView,
+    ScheduleView,
+    VendorHubView,
     ToastView
   };
 })();
@@ -9203,6 +10089,8 @@ window.WeddingApp.UI = (function () {
     TimelineView,
     GuestsView,
     GuestModalView,
+    ScheduleView,
+    VendorHubView,
     ToastView
   } = window.WeddingApp.UI;
 
@@ -9219,13 +10107,21 @@ window.WeddingApp.UI = (function () {
     searchGuestsQuery: '',
     filterGuestsParty: 'all',
     filterGuestsGift: 'all',
+    // Filtri Scadenziario & Fornitori
+    filterScheduleTime: 'all',
+    filterVendorsStatus: 'all',
+    searchVendorsQuery: '',
+    // Stato Privacy Bancaria (Offuscamento Cifre)
+    isPrivacyMasked: localStorage.getItem('matrimonio_mm_privacy_masked') === 'true',
     // Posizioni di scorrimento indipendenti per ciascuna tab
     scrollPositions: {
       overview: 0,
       expenses: 0,
       savings: 0,
       balance: 0,
-      guests: 0
+      guests: 0,
+      schedule: 0,
+      vendors: 0
     }
   };
 
@@ -9302,8 +10198,17 @@ window.WeddingApp.UI = (function () {
     // 6. Aggiorna Ospiti & Doni
     renderGuestsList(data.guests || [], summary.finances);
 
-    // 7. Aggiorna Countdown e Dettagli Intestazione
+    // 7. Aggiorna Scadenziario & Cash Flow (Calendario Pagamenti)
+    ScheduleView.render(data.expenses, uiState.filterScheduleTime, (id) => openExpenseModal(id));
+
+    // 8. Aggiorna Fornitori & Contratti (Vendor Hub)
+    VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
+
+    // 9. Aggiorna Countdown e Dettagli Intestazione
     updateCountdownTick(summary.details, summary.finances.timeline.currentDate);
+
+    // 10. Applica Stato Privacy Bancaria (Offuscamento Cifre)
+    applyPrivacyMask();
   }
 
   function renderGuestsList(guests = [], finances = null) {
@@ -9379,7 +10284,9 @@ window.WeddingApp.UI = (function () {
       expenses: document.getElementById('view-expenses'),
       savings: document.getElementById('view-savings'),
       balance: document.getElementById('view-balance'),
-      guests: document.getElementById('view-guests')
+      guests: document.getElementById('view-guests'),
+      schedule: document.getElementById('view-schedule'),
+      vendors: document.getElementById('view-vendors')
     };
 
     tabs.forEach(tab => {
@@ -9472,6 +10379,15 @@ window.WeddingApp.UI = (function () {
         staffInput.value = exp.staffCount ?? 0;
       }
 
+      const dueDateInput = document.getElementById('expense-due-date');
+      if (dueDateInput) dueDateInput.value = exp.dueDate || '';
+      const phoneInput = document.getElementById('expense-supplier-phone');
+      if (phoneInput) phoneInput.value = exp.supplierPhone || '';
+      const contractStatusSelect = document.getElementById('expense-contract-status');
+      if (contractStatusSelect) {
+        contractStatusSelect.value = exp.supplierContractStatus || (exp.status === 'saldato' ? 'saldato' : (exp.status === 'acconto' ? 'acconto' : (exp.isEstimate ? 'preventivo' : 'firmato')));
+      }
+
       recalculateVatEquation();
     } else {
       title.textContent = 'Nuova Voce';
@@ -9498,6 +10414,13 @@ window.WeddingApp.UI = (function () {
       if (staffInput) {
         staffInput.value = 0;
       }
+      const dueDateInput = document.getElementById('expense-due-date');
+      if (dueDateInput) dueDateInput.value = '';
+      const phoneInput = document.getElementById('expense-supplier-phone');
+      if (phoneInput) phoneInput.value = '';
+      const contractStatusSelect = document.getElementById('expense-contract-status');
+      if (contractStatusSelect) contractStatusSelect.value = 'da_contattare';
+
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
@@ -9540,6 +10463,9 @@ window.WeddingApp.UI = (function () {
     const splitType = document.getElementById('expense-split-type').value || 'equal';
     const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
     const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
+    const dueDate = document.getElementById('expense-due-date')?.value || '';
+    const supplierPhone = document.getElementById('expense-supplier-phone')?.value.trim() || '';
+    const supplierContractStatus = document.getElementById('expense-contract-status')?.value || 'da_contattare';
 
     const hasVat = document.getElementById('expense-has-vat')?.checked || false;
     const netAmount = parseFloat(document.getElementById('expense-net-amount')?.value) || 0;
@@ -9560,6 +10486,9 @@ window.WeddingApp.UI = (function () {
       paidFamilyMiriana,
       supplier,
       notes,
+      dueDate,
+      supplierPhone,
+      supplierContractStatus,
       status,
       splitType,
       isEstimate,
@@ -9995,8 +10924,83 @@ window.WeddingApp.UI = (function () {
       });
     }
 
+    // Intercettazione filtri Scadenziario
+    const filterSched = document.getElementById('filter-schedule-time');
+    if (filterSched) {
+      filterSched.addEventListener('change', (e) => {
+        uiState.filterScheduleTime = e.target.value;
+        const data = repository.load();
+        ScheduleView.render(data.expenses, uiState.filterScheduleTime, (id) => openExpenseModal(id));
+      });
+    }
+
+    // Intercettazione filtri e ricerca Fornitori & Contratti
+    const searchVendors = document.getElementById('search-vendors');
+    if (searchVendors) {
+      searchVendors.addEventListener('input', (e) => {
+        uiState.searchVendorsQuery = e.target.value;
+        const data = repository.load();
+        VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
+      });
+    }
+
+    const filterVendorsStatus = document.getElementById('filter-vendors-status');
+    if (filterVendorsStatus) {
+      filterVendorsStatus.addEventListener('change', (e) => {
+        uiState.filterVendorsStatus = e.target.value;
+        const data = repository.load();
+        VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
+      });
+    }
+
+    // Pulsante Modalità Privacy Bancaria (Offusca Cifre)
+    const btnPrivacy = document.getElementById('btn-privacy-toggle');
+    if (btnPrivacy) {
+      btnPrivacy.addEventListener('click', togglePrivacyMask);
+    }
+
     setupSplitShortcuts();
     setupPinGate();
+  }
+
+  // Gestione Privacy Bancaria (Offuscamento Cifre e Importi)
+  function applyPrivacyMask() {
+    const btn = document.getElementById('btn-privacy-toggle');
+    const label = document.getElementById('privacy-label');
+    const iconWrap = document.getElementById('privacy-icon-wrap');
+
+    if (uiState.isPrivacyMasked) {
+      document.body.classList.add('privacy-masked');
+      if (btn) btn.classList.add('is-active');
+      if (label) label.textContent = 'Mostra Importi';
+      if (iconWrap) {
+        iconWrap.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        `;
+      }
+    } else {
+      document.body.classList.remove('privacy-masked');
+      if (btn) btn.classList.remove('is-active');
+      if (label) label.textContent = 'Offusca Importi';
+      if (iconWrap) {
+        iconWrap.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="3" r="3"></circle>
+          </svg>
+        `;
+      }
+    }
+  }
+
+  function togglePrivacyMask() {
+    uiState.isPrivacyMasked = !uiState.isPrivacyMasked;
+    localStorage.setItem('matrimonio_mm_privacy_masked', String(uiState.isPrivacyMasked));
+    applyPrivacyMask();
+    ToastView.show(uiState.isPrivacyMasked ? 'Modalità riservata attiva: cifre offuscate' : 'Cifre e importi visibili');
   }
 
   // Cortina di Sicurezza e Tastierino PIN (6 Cifre) & Face ID

@@ -1493,6 +1493,351 @@ window.WeddingApp.UI = (function () {
     }
   }
 
+  // =========================================================================
+  // VISTA 6: SCADENZIARIO & CASH FLOW (CALENDARIO PAGAMENTI)
+  // =========================================================================
+  class ScheduleView {
+    static render(expenses, filter = 'all', onEditExpense = null) {
+      const container = document.getElementById('schedule-timeline-container');
+      const urgentAmountEl = document.getElementById('schedule-urgent-amount');
+      const urgentCountEl = document.getElementById('schedule-urgent-count');
+      const totalPendingEl = document.getElementById('schedule-total-pending');
+      const monthStatusEl = document.getElementById('schedule-month-status');
+      if (!container) return;
+
+      const now = new Date();
+      const thirtyDaysAhead = new Date();
+      thirtyDaysAhead.setDate(now.getDate() + 30);
+
+      let urgentAmount = 0;
+      let urgentCount = 0;
+      let totalPending = 0;
+
+      // Filtra e raggruppa le spese con scadenza o da saldare
+      const validExpenses = (expenses || []).map(exp => {
+        const remaining = exp.remaining ? exp.remaining() : Math.max(0, exp.budget - ((exp.paidMichele || 0) + (exp.paidMiriana || 0) + (exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0)));
+        const dueDate = exp.dueDate || '2027-07-02';
+        const dObj = new Date(dueDate);
+        const isSettled = remaining <= 0 || exp.status === 'saldato';
+        
+        let isUrgent = false;
+        let isOverdue = false;
+        if (!isSettled && !isNaN(dObj.getTime())) {
+          if (dObj < now) {
+            isOverdue = true;
+            isUrgent = true;
+          } else if (dObj <= thirtyDaysAhead) {
+            isUrgent = true;
+          }
+        }
+
+        if (isUrgent && !isSettled) {
+          urgentAmount += remaining;
+          urgentCount++;
+        }
+        if (!isSettled) {
+          totalPending += remaining;
+        }
+
+        return {
+          exp,
+          remaining,
+          dueDate,
+          dObj,
+          isSettled,
+          isUrgent,
+          isOverdue
+        };
+      });
+
+      if (urgentAmountEl) urgentAmountEl.textContent = CurrencyFormatter.format(urgentAmount);
+      if (urgentCountEl) urgentCountEl.textContent = `${urgentCount} pagamenti`;
+      if (totalPendingEl) totalPendingEl.textContent = CurrencyFormatter.format(totalPending);
+
+      // Applica filtro
+      const filtered = validExpenses.filter(item => {
+        if (filter === 'upcoming') return item.isUrgent && !item.isSettled;
+        if (filter === 'overdue') return item.isOverdue && !item.isSettled;
+        if (filter === 'settled') return item.isSettled;
+        return true;
+      });
+
+      // Ordina cronologicamente per data scadenza
+      filtered.sort((a, b) => a.dObj - b.dObj);
+
+      // Raggruppa per Mese/Anno (es. "Luglio 2027", "Maggio 2027")
+      const groups = {};
+      filtered.forEach(item => {
+        const monthKey = !isNaN(item.dObj.getTime())
+          ? item.dObj.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+          : 'Senza Scadenza';
+        const capKey = monthKey.charAt(0).toUpperCase() + monthKey.slice(1);
+        if (!groups[capKey]) groups[capKey] = { items: [], totalRemaining: 0 };
+        groups[capKey].items.push(item);
+        groups[capKey].totalRemaining += item.remaining;
+      });
+
+      if (Object.keys(groups).length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--ink-muted); background: var(--surface-pure); border-radius: var(--radius-md); border: 1px dashed var(--border-hairline);">
+            Nessuna scadenza trovata per il filtro selezionato.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      Object.keys(groups).forEach(monthLabel => {
+        const grp = groups[monthLabel];
+        html += `
+          <div class="schedule-month-group">
+            <div class="schedule-month-header">
+              <div class="schedule-month-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>${monthLabel}</span>
+              </div>
+              <div class="schedule-month-total amount">
+                Da saldare: ${CurrencyFormatter.format(grp.totalRemaining)}
+              </div>
+            </div>
+            <div class="schedule-items-list">
+        `;
+
+        grp.items.forEach(item => {
+          const exp = item.exp;
+          const safeItem = SecurityService.escapeHtml(exp.item);
+          const safeSupplier = SecurityService.escapeHtml(exp.supplier || 'Fornitore non specificato');
+          const formattedDate = !isNaN(item.dObj.getTime())
+            ? item.dObj.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' })
+            : 'Entro il 02/07/2027';
+
+          let tagClass = 'upcoming';
+          let tagText = `Scade il ${formattedDate}`;
+          if (item.isSettled) {
+            tagClass = 'settled';
+            tagText = '✓ Saldato';
+          } else if (item.isOverdue) {
+            tagClass = 'urgent';
+            tagText = `⚠ Scaduto il ${formattedDate}`;
+          } else if (item.isUrgent) {
+            tagClass = 'urgent';
+            tagText = `⚡ Entro 30 gg (${formattedDate})`;
+          }
+
+          html += `
+            <div class="schedule-item-card ${item.isSettled ? 'is-settled' : ''} ${item.isUrgent ? 'is-urgent' : ''}" data-id="${exp.id}">
+              <div class="schedule-item-info">
+                <div class="schedule-item-title">${safeItem}</div>
+                <div class="schedule-item-meta">
+                  <span><strong>${safeSupplier}</strong></span>
+                  <span>•</span>
+                  <span class="schedule-due-tag ${tagClass}">${tagText}</span>
+                  ${exp.supplierPhone ? `<span>• 📞 ${SecurityService.escapeHtml(exp.supplierPhone)}</span>` : ''}
+                </div>
+              </div>
+              <div class="schedule-item-amounts">
+                <div class="amount" style="font-weight: 700; color: ${item.isSettled ? 'var(--accent-sage)' : 'var(--ink-primary)'};">
+                  ${item.isSettled ? 'Saldato' : CurrencyFormatter.format(item.remaining)}
+                </div>
+                <div class="amount" style="font-size: 0.78rem; color: var(--ink-muted);">
+                  Budget: ${CurrencyFormatter.format(exp.budget)}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      // Click su scheda per aprire modifica voce
+      if (onEditExpense) {
+        container.querySelectorAll('.schedule-item-card').forEach(card => {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => {
+            const expId = card.dataset.id;
+            if (expId) onEditExpense(expId);
+          });
+        });
+      }
+    }
+  }
+
+  // =========================================================================
+  // VISTA 7: FORNITORI & CONTRATTI (VENDOR HUB)
+  // =========================================================================
+  class VendorHubView {
+    static render(expenses, filterStatus = 'all', searchQuery = '', onEditExpense = null) {
+      const grid = document.getElementById('vendors-grid-container');
+      const totalCountEl = document.getElementById('vendors-total-count');
+      const contractAmountEl = document.getElementById('vendors-contract-amount');
+      const pipelineSummaryEl = document.getElementById('vendors-pipeline-summary');
+      if (!grid) return;
+
+      // Estrai fornitori univoci o spese con fornitori
+      const vendorsMap = new Map();
+      let contractTotal = 0;
+      const statusCounts = {
+        da_contattare: 0,
+        preventivo: 0,
+        firmato: 0,
+        acconto: 0,
+        saldato: 0
+      };
+
+      (expenses || []).forEach(exp => {
+        const supplierName = (exp.supplier || '').trim();
+        if (!supplierName && !exp.item) return;
+        const key = supplierName ? supplierName.toLowerCase() : exp.item.toLowerCase();
+
+        const st = exp.supplierContractStatus || (exp.status === 'saldato' ? 'saldato' : (exp.status === 'acconto' ? 'acconto' : (exp.isEstimate ? 'preventivo' : 'firmato')));
+        if (statusCounts[st] !== undefined) statusCounts[st]++;
+
+        if (st === 'firmato' || st === 'acconto' || st === 'saldato') {
+          contractTotal += (exp.budget || 0);
+        }
+
+        if (!vendorsMap.has(key)) {
+          vendorsMap.set(key, {
+            key,
+            displayName: supplierName || exp.item,
+            service: exp.item,
+            category: exp.categoryId,
+            budget: exp.budget,
+            paid: (exp.paidMichele || 0) + (exp.paidMiriana || 0) + (exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0),
+            phone: exp.supplierPhone || '',
+            email: exp.supplierEmail || '',
+            notes: exp.notes || '',
+            status: st,
+            dueDate: exp.dueDate,
+            expenseId: exp.id
+          });
+        } else {
+          // Unisci voci dello stesso fornitore
+          const curr = vendorsMap.get(key);
+          curr.budget += (exp.budget || 0);
+          curr.paid += ((exp.paidMichele || 0) + (exp.paidMiriana || 0) + (exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0));
+          if (exp.supplierPhone && !curr.phone) curr.phone = exp.supplierPhone;
+          if (exp.notes && !curr.notes.includes(exp.notes)) curr.notes += ' • ' + exp.notes;
+        }
+      });
+
+      const vendorList = Array.from(vendorsMap.values());
+      if (totalCountEl) totalCountEl.textContent = vendorList.length;
+      if (contractAmountEl) contractAmountEl.textContent = CurrencyFormatter.format(contractTotal);
+
+      if (pipelineSummaryEl) {
+        pipelineSummaryEl.innerHTML = `
+          <span class="vendor-status-pill firmato" style="font-size:0.75rem;">${statusCounts.firmato + statusCounts.acconto + statusCounts.saldato} Conclusi</span>
+          <span class="vendor-status-pill preventivo" style="font-size:0.75rem;">${statusCounts.preventivo} Preventivi</span>
+        `;
+      }
+
+      // Filtra
+      const filtered = vendorList.filter(v => {
+        if (filterStatus !== 'all' && v.status !== filterStatus) return false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          return v.displayName.toLowerCase().includes(q) || v.service.toLowerCase().includes(q) || v.notes.toLowerCase().includes(q);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--ink-muted); background: var(--surface-pure); border-radius: var(--radius-md); border: 1px dashed var(--border-hairline);">
+            Nessun fornitore corrisponde ai criteri di ricerca.
+          </div>
+        `;
+        return;
+      }
+
+      const statusLabels = {
+        da_contattare: 'Da Contattare',
+        preventivo: 'Preventivo Richiesto',
+        firmato: 'Contratto Firmato',
+        acconto: 'Acconto Versato',
+        saldato: 'Completamente Saldato'
+      };
+
+      let html = '';
+      filtered.forEach(v => {
+        const safeName = SecurityService.escapeHtml(v.displayName);
+        const safeService = SecurityService.escapeHtml(v.service);
+        const safeNotes = SecurityService.escapeHtml(v.notes);
+        const safePhone = SecurityService.escapeHtml(v.phone);
+        const cleanPhone = v.phone ? v.phone.replace(/[^0-9+]/g, '') : '';
+        const remaining = Math.max(0, v.budget - v.paid);
+
+        html += `
+          <div class="vendor-card" data-id="${v.expenseId}">
+            <div>
+              <div class="vendor-card-header">
+                <div>
+                  <h3 class="vendor-name">${safeName}</h3>
+                  <div class="vendor-service-tag">${safeService}</div>
+                </div>
+                <span class="vendor-status-pill ${v.status}">${statusLabels[v.status] || v.status}</span>
+              </div>
+
+              <div class="vendor-financial-row" style="margin: 14px 0 10px 0;">
+                <div>
+                  <div style="font-size:0.72rem; color: var(--ink-muted); text-transform: uppercase;">Investimento</div>
+                  <div class="amount" style="font-weight: 700; color: var(--ink-primary);">${CurrencyFormatter.format(v.budget)}</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color: var(--ink-muted); text-transform: uppercase;">Versato</div>
+                  <div class="amount" style="font-weight: 700; color: var(--accent-sage);">${CurrencyFormatter.format(v.paid)}</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color: var(--ink-muted); text-transform: uppercase;">Rimanente</div>
+                  <div class="amount" style="font-weight: 700; color: ${remaining === 0 ? 'var(--accent-sage)' : 'var(--accent-terracotta)'};">
+                    ${remaining === 0 ? 'Saldato' : CurrencyFormatter.format(remaining)}
+                  </div>
+                </div>
+              </div>
+
+              ${v.notes ? `<div class="vendor-notes-box">« ${safeNotes} »</div>` : ''}
+            </div>
+
+            <div class="vendor-actions-row">
+              ${cleanPhone ? `
+                <a href="tel:${cleanPhone}" class="btn-vendor-action call" title="Chiama subito">
+                  📞 Chiama (${safePhone})
+                </a>
+              ` : `
+                <button type="button" class="btn-vendor-action edit-vendor-btn" data-id="${v.expenseId}">
+                  + Aggiungi Telefono
+                </button>
+              `}
+              <button type="button" class="btn-vendor-action edit-vendor-btn" data-id="${v.expenseId}">
+                Modifica
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+
+      // Collega click pulsanti modifica
+      if (onEditExpense) {
+        grid.querySelectorAll('.edit-vendor-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            if (id) onEditExpense(id);
+          });
+        });
+      }
+    }
+  }
+
   return {
     HeaderView,
     FinancialHeroView,
@@ -1504,6 +1849,8 @@ window.WeddingApp.UI = (function () {
     TimelineView,
     GuestsView,
     GuestModalView,
+    ScheduleView,
+    VendorHubView,
     ToastView
   };
 })();

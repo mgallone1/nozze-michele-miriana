@@ -46,10 +46,21 @@
               <span id="countdown-mins">—</span><small>min</small>
             </div>
           </div>
-          <button type="button" class="btn-sync-badge" id="btn-manual-cloud-sync" title="Tocca per aggiornare subito dal Cloud">
-            <span class="sync-dot" id="sync-status-dot"></span>
-            <span id="sync-status-text">Sincronizzato</span>
-          </button>
+          <div class="header-actions-row">
+            <button type="button" class="btn-privacy-toggle" id="btn-privacy-toggle" title="Nascondi o mostra importi sensibili">
+              <span id="privacy-icon-wrap">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </span>
+              <span id="privacy-label">Offusca Importi</span>
+            </button>
+            <button type="button" class="btn-sync-badge" id="btn-manual-cloud-sync" title="Tocca per aggiornare subito dal Cloud">
+              <span class="sync-dot" id="sync-status-dot"></span>
+              <span id="sync-status-text">Sincronizzato</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -75,6 +86,14 @@
           <button class="nav-link-btn" data-tab="guests">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Ospiti &<br>Doni</span>
+          </button>
+          <button class="nav-link-btn" data-tab="schedule">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Scadenze &<br>Cash Flow</span>
+          </button>
+          <button class="nav-link-btn" data-tab="vendors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Fornitori &<br>Contratti</span>
           </button>
         </nav>
       </div>
@@ -577,6 +596,106 @@
       </div>
     </div>
 
+    <!-- ======================================================================
+         VISTA 6: SCADENZIARIO & CASH FLOW (CALENDARIO PAGAMENTI)
+         ====================================================================== -->
+    <div id="view-schedule" class="app-view-tab is-hidden">
+      <!-- HERO SCADENZIARIO -->
+      <section class="schedule-hero-panel">
+        <div class="schedule-stat-card">
+          <span class="stat-eyebrow">Scadenze Imminenti (30 gg)</span>
+          <div class="stat-hero-number amount text-accent-terracotta" id="schedule-urgent-amount">0 €</div>
+          <div class="stat-caption">
+            <span id="schedule-urgent-count">0 pagamenti</span> in scadenza a breve
+          </div>
+        </div>
+
+        <div class="schedule-stat-card">
+          <span class="stat-eyebrow">Totale da Saldare Entro il Matrimonio</span>
+          <div class="stat-hero-number amount" id="schedule-total-pending">0 €</div>
+          <div class="stat-caption">
+            Distribuiti sui mesi fino al 2 Luglio 2027
+          </div>
+        </div>
+
+        <div class="schedule-stat-card">
+          <span class="stat-eyebrow">Stato Copertura Mese Corrente</span>
+          <div class="stat-hero-number text-accent-sage" id="schedule-month-status">Regolare</div>
+          <div class="stat-caption" id="schedule-month-desc">
+            Pianificazione allineata con l'accumulo mensile
+          </div>
+        </div>
+      </section>
+
+      <!-- BARRA FILTRI SCADENZIARIO -->
+      <div class="schedule-toolbar">
+        <div class="filter-controls-group">
+          <select id="filter-schedule-time" class="filter-select-noble">
+            <option value="all">Tutte le Scadenze</option>
+            <option value="upcoming">Prossimi 30 giorni</option>
+            <option value="overdue">Scadute / In ritardo</option>
+            <option value="settled">Già saldate</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TIMELINE / LISTA SCADENZE PER MESE -->
+      <div class="schedule-timeline-container" id="schedule-timeline-container">
+        <!-- Generato dinamicamente -->
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         VISTA 7: FORNITORI & CONTRATTI (VENDOR HUB DEDICATO)
+         ====================================================================== -->
+    <div id="view-vendors" class="app-view-tab is-hidden">
+      <!-- HERO VENDOR HUB -->
+      <section class="vendors-hero-panel">
+        <div class="vendors-stat-card">
+          <span class="stat-eyebrow">Atelier & Partner Registrati</span>
+          <div class="stat-hero-number" id="vendors-total-count">0</div>
+          <div class="stat-caption">Fornitori e professionisti coinvolti</div>
+        </div>
+
+        <div class="vendors-stat-card">
+          <span class="stat-eyebrow">Stato Accordi Contrattuali</span>
+          <div class="vendors-pipeline-summary" id="vendors-pipeline-summary">
+            <!-- Badges pipeline contratti -->
+          </div>
+          <div class="stat-caption">Dalla ricerca iniziale al saldo completo</div>
+        </div>
+
+        <div class="vendors-stat-card">
+          <span class="stat-eyebrow">Importo Contrattualizzato</span>
+          <div class="stat-hero-number amount" id="vendors-contract-amount">0 €</div>
+          <div class="stat-caption">Copertura contrattuale garantita</div>
+        </div>
+      </section>
+
+      <!-- BARRA FILTRI FORNITORI -->
+      <div class="vendors-toolbar">
+        <div class="filter-controls-group">
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-vendors" class="search-field" placeholder="Cerca fornitore o servizio...">
+          </div>
+          <select id="filter-vendors-status" class="filter-select-noble">
+            <option value="all">Tutti gli Stati Contratto</option>
+            <option value="da_contattare">Da Contattare</option>
+            <option value="preventivo">In Preventivo</option>
+            <option value="firmato">Contratto Firmato</option>
+            <option value="acconto">Acconto Versato</option>
+            <option value="saldato">Completamente Saldato</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- GRIGLIA SCHEDE FORNITORI CON CALL / EMAIL RAPIDA -->
+      <div class="vendors-grid" id="vendors-grid-container">
+        <!-- Generato dinamicamente -->
+      </div>
+    </div>
+
     <!-- ARCHIVIO PERSONALE & SINCRONIZZAZIONE -->
     <div class="archive-vault-card">
       <div>
@@ -775,6 +894,30 @@
                 <option value="pianificato">In pianificazione</option>
                 <option value="acconto">Acconto versato</option>
                 <option value="saldato">Completamente saldato</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dettagli Fornitore & Scadenziario -->
+          <div class="form-grid-3">
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-due-date">Data Scadenza / Saldo</label>
+              <input type="date" id="expense-due-date" class="form-input-noble">
+            </div>
+
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-supplier-phone">Telefono Fornitore</label>
+              <input type="tel" id="expense-supplier-phone" class="form-input-noble" placeholder="Es. +39 340 1234567">
+            </div>
+
+            <div class="form-group-noble">
+              <label class="form-label-noble" for="expense-contract-status">Fase Contratto</label>
+              <select id="expense-contract-status" class="form-select-noble">
+                <option value="da_contattare">Da Contattare</option>
+                <option value="preventivo">In Preventivo</option>
+                <option value="firmato">Contratto Firmato</option>
+                <option value="acconto">Acconto Versato</option>
+                <option value="saldato">Completamente Saldato</option>
               </select>
             </div>
           </div>

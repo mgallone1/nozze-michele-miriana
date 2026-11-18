@@ -37,6 +37,8 @@
     TimelineView,
     GuestsView,
     GuestModalView,
+    ScheduleView,
+    VendorHubView,
     ToastView
   } = window.WeddingApp.UI;
 
@@ -53,13 +55,21 @@
     searchGuestsQuery: '',
     filterGuestsParty: 'all',
     filterGuestsGift: 'all',
+    // Filtri Scadenziario & Fornitori
+    filterScheduleTime: 'all',
+    filterVendorsStatus: 'all',
+    searchVendorsQuery: '',
+    // Stato Privacy Bancaria (Offuscamento Cifre)
+    isPrivacyMasked: localStorage.getItem('matrimonio_mm_privacy_masked') === 'true',
     // Posizioni di scorrimento indipendenti per ciascuna tab
     scrollPositions: {
       overview: 0,
       expenses: 0,
       savings: 0,
       balance: 0,
-      guests: 0
+      guests: 0,
+      schedule: 0,
+      vendors: 0
     }
   };
 
@@ -136,8 +146,17 @@
     // 6. Aggiorna Ospiti & Doni
     renderGuestsList(data.guests || [], summary.finances);
 
-    // 7. Aggiorna Countdown e Dettagli Intestazione
+    // 7. Aggiorna Scadenziario & Cash Flow (Calendario Pagamenti)
+    ScheduleView.render(data.expenses, uiState.filterScheduleTime, (id) => openExpenseModal(id));
+
+    // 8. Aggiorna Fornitori & Contratti (Vendor Hub)
+    VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
+
+    // 9. Aggiorna Countdown e Dettagli Intestazione
     updateCountdownTick(summary.details, summary.finances.timeline.currentDate);
+
+    // 10. Applica Stato Privacy Bancaria (Offuscamento Cifre)
+    applyPrivacyMask();
   }
 
   function renderGuestsList(guests = [], finances = null) {
@@ -213,7 +232,9 @@
       expenses: document.getElementById('view-expenses'),
       savings: document.getElementById('view-savings'),
       balance: document.getElementById('view-balance'),
-      guests: document.getElementById('view-guests')
+      guests: document.getElementById('view-guests'),
+      schedule: document.getElementById('view-schedule'),
+      vendors: document.getElementById('view-vendors')
     };
 
     tabs.forEach(tab => {
@@ -306,6 +327,15 @@
         staffInput.value = exp.staffCount ?? 0;
       }
 
+      const dueDateInput = document.getElementById('expense-due-date');
+      if (dueDateInput) dueDateInput.value = exp.dueDate || '';
+      const phoneInput = document.getElementById('expense-supplier-phone');
+      if (phoneInput) phoneInput.value = exp.supplierPhone || '';
+      const contractStatusSelect = document.getElementById('expense-contract-status');
+      if (contractStatusSelect) {
+        contractStatusSelect.value = exp.supplierContractStatus || (exp.status === 'saldato' ? 'saldato' : (exp.status === 'acconto' ? 'acconto' : (exp.isEstimate ? 'preventivo' : 'firmato')));
+      }
+
       recalculateVatEquation();
     } else {
       title.textContent = 'Nuova Voce';
@@ -332,6 +362,13 @@
       if (staffInput) {
         staffInput.value = 0;
       }
+      const dueDateInput = document.getElementById('expense-due-date');
+      if (dueDateInput) dueDateInput.value = '';
+      const phoneInput = document.getElementById('expense-supplier-phone');
+      if (phoneInput) phoneInput.value = '';
+      const contractStatusSelect = document.getElementById('expense-contract-status');
+      if (contractStatusSelect) contractStatusSelect.value = 'da_contattare';
+
       if (data.categories.length > 0) {
         document.getElementById('expense-category').value = data.categories[0].id;
       }
@@ -374,6 +411,9 @@
     const splitType = document.getElementById('expense-split-type').value || 'equal';
     const isEstimate = document.getElementById('expense-is-estimate')?.value === 'true';
     const staffCount = parseInt(document.getElementById('expense-staff-count')?.value, 10) || 0;
+    const dueDate = document.getElementById('expense-due-date')?.value || '';
+    const supplierPhone = document.getElementById('expense-supplier-phone')?.value.trim() || '';
+    const supplierContractStatus = document.getElementById('expense-contract-status')?.value || 'da_contattare';
 
     const hasVat = document.getElementById('expense-has-vat')?.checked || false;
     const netAmount = parseFloat(document.getElementById('expense-net-amount')?.value) || 0;
@@ -394,6 +434,9 @@
       paidFamilyMiriana,
       supplier,
       notes,
+      dueDate,
+      supplierPhone,
+      supplierContractStatus,
       status,
       splitType,
       isEstimate,
@@ -829,8 +872,83 @@
       });
     }
 
+    // Intercettazione filtri Scadenziario
+    const filterSched = document.getElementById('filter-schedule-time');
+    if (filterSched) {
+      filterSched.addEventListener('change', (e) => {
+        uiState.filterScheduleTime = e.target.value;
+        const data = repository.load();
+        ScheduleView.render(data.expenses, uiState.filterScheduleTime, (id) => openExpenseModal(id));
+      });
+    }
+
+    // Intercettazione filtri e ricerca Fornitori & Contratti
+    const searchVendors = document.getElementById('search-vendors');
+    if (searchVendors) {
+      searchVendors.addEventListener('input', (e) => {
+        uiState.searchVendorsQuery = e.target.value;
+        const data = repository.load();
+        VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
+      });
+    }
+
+    const filterVendorsStatus = document.getElementById('filter-vendors-status');
+    if (filterVendorsStatus) {
+      filterVendorsStatus.addEventListener('change', (e) => {
+        uiState.filterVendorsStatus = e.target.value;
+        const data = repository.load();
+        VendorHubView.render(data.expenses, uiState.filterVendorsStatus, uiState.searchVendorsQuery, (id) => openExpenseModal(id));
+      });
+    }
+
+    // Pulsante Modalità Privacy Bancaria (Offusca Cifre)
+    const btnPrivacy = document.getElementById('btn-privacy-toggle');
+    if (btnPrivacy) {
+      btnPrivacy.addEventListener('click', togglePrivacyMask);
+    }
+
     setupSplitShortcuts();
     setupPinGate();
+  }
+
+  // Gestione Privacy Bancaria (Offuscamento Cifre e Importi)
+  function applyPrivacyMask() {
+    const btn = document.getElementById('btn-privacy-toggle');
+    const label = document.getElementById('privacy-label');
+    const iconWrap = document.getElementById('privacy-icon-wrap');
+
+    if (uiState.isPrivacyMasked) {
+      document.body.classList.add('privacy-masked');
+      if (btn) btn.classList.add('is-active');
+      if (label) label.textContent = 'Mostra Importi';
+      if (iconWrap) {
+        iconWrap.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        `;
+      }
+    } else {
+      document.body.classList.remove('privacy-masked');
+      if (btn) btn.classList.remove('is-active');
+      if (label) label.textContent = 'Offusca Importi';
+      if (iconWrap) {
+        iconWrap.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="3" r="3"></circle>
+          </svg>
+        `;
+      }
+    }
+  }
+
+  function togglePrivacyMask() {
+    uiState.isPrivacyMasked = !uiState.isPrivacyMasked;
+    localStorage.setItem('matrimonio_mm_privacy_masked', String(uiState.isPrivacyMasked));
+    applyPrivacyMask();
+    ToastView.show(uiState.isPrivacyMasked ? 'Modalità riservata attiva: cifre offuscate' : 'Cifre e importi visibili');
   }
 
   // Cortina di Sicurezza e Tastierino PIN (6 Cifre) & Face ID

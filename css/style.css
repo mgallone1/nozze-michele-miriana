@@ -3863,3 +3863,390 @@ button.btn-editable-val:hover {
   font-weight: 700;
   color: var(--accent-sage);
 }
+
+/* ==========================================================================
+   MODALITÀ PRIVACY BANCARIA (OFFUSCAMENTO CIFRE & IMPORTI)
+   ========================================================================== */
+.header-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-privacy-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-privacy-toggle:hover {
+  background: var(--surface-tint);
+  border-color: var(--accent-bronze);
+  color: var(--ink-primary);
+}
+
+.btn-privacy-toggle.is-active {
+  background: var(--accent-bronze-light);
+  border-color: var(--accent-bronze);
+  color: var(--accent-bronze);
+  font-weight: 600;
+}
+
+/* Regole di offuscamento attivo per tutte le cifre */
+body.privacy-masked .amount,
+body.privacy-masked .num,
+body.privacy-masked .currency,
+body.privacy-masked .col-investment,
+body.privacy-masked .col-remaining,
+body.privacy-masked .stat-hero-number,
+body.privacy-masked .cat-card-amounts,
+body.privacy-masked .balance-chip-amount,
+body.privacy-masked .balance-hero-amount,
+body.privacy-masked .gift-amount,
+body.privacy-masked .pricing-total-number,
+body.privacy-masked .statement-footer-amount,
+body.privacy-masked .settlement-amount {
+  filter: blur(7px);
+  user-select: none;
+  cursor: pointer;
+  transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover temporaneo su desktop se l'utente vuole sbirciare un singolo valore */
+body.privacy-masked .amount:hover,
+body.privacy-masked .num:hover,
+body.privacy-masked .stat-hero-number:hover,
+body.privacy-masked .balance-chip-amount:hover {
+  filter: blur(0px);
+}
+
+/* Griglia form a 3 colonne per dettagli fornitore e scadenze */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   VISTA SCADENZIARIO & CASH FLOW (CALENDARIO PAGAMENTI)
+   ========================================================================== */
+.schedule-hero-panel,
+.vendors-hero-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 840px) {
+  .schedule-hero-panel,
+  .vendors-hero-panel {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.schedule-stat-card,
+.vendors-stat-card {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.schedule-toolbar,
+.vendors-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.schedule-timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.schedule-month-group {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.schedule-month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-hairline);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.schedule-month-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-month-total {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent-bronze);
+}
+
+.schedule-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface-tint);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  border-left: 4px solid var(--accent-bronze);
+  transition: all 0.2s ease;
+}
+
+.schedule-item-card:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-item-card.is-settled {
+  border-left-color: var(--accent-sage);
+  opacity: 0.85;
+}
+
+.schedule-item-card.is-urgent {
+  border-left-color: var(--accent-terracotta);
+  background: var(--accent-terracotta-soft);
+}
+
+.schedule-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.schedule-item-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink-primary);
+}
+
+.schedule-item-meta {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.schedule-item-amounts {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.schedule-due-tag {
+  font-size: 0.76rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.schedule-due-tag.urgent {
+  background: #FFE8E5;
+  color: var(--accent-terracotta);
+}
+
+.schedule-due-tag.upcoming {
+  background: var(--accent-bronze-light);
+  color: var(--accent-bronze);
+}
+
+.schedule-due-tag.settled {
+  background: var(--accent-sage-soft);
+  color: var(--accent-sage);
+}
+
+/* ==========================================================================
+   VISTA FORNITORI & CONTRATTI (VENDOR HUB)
+   ========================================================================== */
+.vendors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 600px) {
+  .vendors-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vendor-card {
+  background: var(--surface-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vendor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.vendor-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vendor-name {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  line-height: 1.25;
+}
+
+.vendor-service-tag {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+.vendor-status-pill {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.vendor-status-pill.da_contattare {
+  background: var(--surface-warm);
+  color: var(--ink-muted);
+}
+
+.vendor-status-pill.preventivo {
+  background: #FFF3DB;
+  color: #B58500;
+}
+
+.vendor-status-pill.firmato {
+  background: var(--accent-bronze-light);
+  color: var(--accent-bronze);
+}
+
+.vendor-status-pill.acconto {
+  background: #E8F0FE;
+  color: #1A73E8;
+}
+
+.vendor-status-pill.saldato {
+  background: var(--accent-sage-soft);
+  color: var(--accent-sage);
+}
+
+.vendor-financial-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--surface-tint);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.vendor-notes-box {
+  font-size: 0.82rem;
+  color: var(--ink-secondary);
+  background: var(--surface-warm);
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.vendor-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-vendor-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface-pure);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-vendor-action:hover {
+  background: var(--accent-bronze-light);
+  border-color: var(--accent-bronze);
+  color: var(--accent-bronze);
+}
+
+.btn-vendor-action.call {
+  color: var(--accent-sage);
+  border-color: rgba(69, 97, 81, 0.3);
+}
+
+.btn-vendor-action.call:hover {
+  background: var(--accent-sage-soft);
+  border-color: var(--accent-sage);
+}
