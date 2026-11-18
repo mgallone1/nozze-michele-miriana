@@ -202,10 +202,17 @@ window.WeddingApp.Services = (function () {
   }
 
   class SecurityService {
-    static PIN_STORAGE_KEY = 'matrimonio_mm_pin_hash';
+    static PIN_STORAGE_KEY = 'matrimonio_mm_pin_pbkdf2_v2';
     static SESSION_AUTH_KEY = 'matrimonio_mm_auth_active';
-    // Hash SHA-256 predefinito per il PIN iniziale di sicurezza "0207" (data nozze 2 Luglio)
-    static DEFAULT_HASH = '2e3c969e2e9b367ade00279743f88ea0e32f283152223e3d9aaf1c14669d7cbe';
+    static WEBAUTHN_ID_KEY = 'matrimonio_mm_webauthn_cred_id';
+    static RATE_LIMIT_STORAGE_KEY = 'matrimonio_mm_auth_attempts';
+
+    // Salt crittografico dedicato e deterministico per l'Atelier
+    static CRYPTO_SALT = new TextEncoder().encode('nozze_mm_atelier_salt_2027');
+    static PBKDF2_ITERATIONS = 600000; // Standard OWASP Password Hashing Check 05
+
+    // Hash PBKDF2-HMAC-SHA256 (600.000 iterazioni) per il PIN predefinito a 6 cifre "020727" (2 Luglio 2027)
+    static DEFAULT_HASH = 'a9391465d635a6a0949970493bbf9357db9804e0432ce426b668b402dca19c97';
 
     static escapeHtml(str) {
       if (str === null || str === undefined) return '';
@@ -226,10 +233,28 @@ window.WeddingApp.Services = (function () {
       return '#';
     }
 
+    // Derivazione crittografica PBKDF2-HMAC-SHA256 a 600.000 iterazioni
     static async hashPin(pin) {
-      const msgBuffer = new TextEncoder().encode(String(pin).trim());
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const pinStr = String(pin).trim();
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(pinStr),
+        'PBKDF2',
+        false,
+        ['deriveBits']
+      );
+      const derivedBits = await crypto.subtle.deriveBits(
+        {
+          name: 'PBKDF2',
+          salt: this.CRYPTO_SALT,
+          iterations: this.PBKDF2_ITERATIONS,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        256
+      );
+      const hashArray = Array.from(new Uint8Array(derivedBits));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
@@ -241,13 +266,65 @@ window.WeddingApp.Services = (function () {
       return localStorage.getItem(this.PIN_STORAGE_KEY) || this.DEFAULT_HASH;
     }
 
+    // Rate Limiting & Anti-Bruteforce Defense (Check 08 & Check 12)
+    static getAttemptsState() {
+      try {
+        const raw = localStorage.getItem(this.RATE_LIMIT_STORAGE_KEY);
+        if (!raw) return { count: 0, lockUntil: 0 };
+        return JSON.parse(raw);
+      } catch (e) {
+        return { count: 0, lockUntil: 0 };
+      }
+    }
+
+    static isLocked() {
+      const state = this.getAttemptsState();
+      const now = Date.now();
+      if (state.lockUntil && now < state.lockUntil) {
+        const remainingMinutes = Math.ceil((state.lockUntil - now) / 60000);
+        return { locked: true, remainingMinutes };
+      }
+      return { locked: false, remainingMinutes: 0 };
+    }
+
+    static registerFailedAttempt() {
+      const state = this.getAttemptsState();
+      state.count = (state.count || 0) + 1;
+      // Al 5° tentativo fallito blocco per 15 minuti (Check 08)
+      if (state.count >= 5) {
+        state.lockUntil = Date.now() + (15 * 60 * 1000);
+        console.warn(`[SECURITY ALERT] 5 tentativi PIN errati consecutivi. Blocco temporaneo attivato per 15 minuti.`);
+      }
+      localStorage.setItem(this.RATE_LIMIT_STORAGE_KEY, JSON.stringify(state));
+      return state;
+    }
+
+    static resetAttempts() {
+      localStorage.removeItem(this.RATE_LIMIT_STORAGE_KEY);
+    }
+
     static async verify(enteredPin) {
+      const lockCheck = this.isLocked();
+      if (lockCheck.locked) {
+        return { success: false, locked: true, remainingMinutes: lockCheck.remainingMinutes };
+      }
+
       const enteredHash = await this.hashPin(enteredPin);
       const isValid = (enteredHash === this.getExpectedHash());
       if (isValid) {
+        this.resetAttempts();
         sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+        return { success: true };
+      } else {
+        const state = this.registerFailedAttempt();
+        const isNowLocked = (state.count >= 5);
+        return { 
+          success: false, 
+          locked: isNowLocked, 
+          remainingMinutes: isNowLocked ? 15 : 0, 
+          attemptsLeft: Math.max(0, 5 - state.count) 
+        };
       }
-      return isValid;
     }
 
     static isAuthenticated() {
@@ -259,10 +336,109 @@ window.WeddingApp.Services = (function () {
     }
 
     static async changePin(newPin) {
-      const newHash = await this.hashPin(newPin);
+      const clean = String(newPin).trim();
+      if (clean.length !== 6 || !/^\d{6}$/.test(clean)) {
+        throw new Error('Il PIN deve essere esattamente di 6 cifre numeriche.');
+      }
+      const newHash = await this.hashPin(clean);
       localStorage.setItem(this.PIN_STORAGE_KEY, newHash);
+      this.resetAttempts();
       sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
       return true;
+    }
+
+    // Supporto Biometrico WebAuthn / Face ID / Touch ID
+    static async isBiometricsAvailable() {
+      if (typeof window === 'undefined' || !window.PublicKeyCredential) {
+        return false;
+      }
+      try {
+        if (typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
+          return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        }
+        return false;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    static isBiometricsEnrolled() {
+      return !!localStorage.getItem(this.WEBAUTHN_ID_KEY);
+    }
+
+    static async enrollBiometrics() {
+      const available = await this.isBiometricsAvailable();
+      if (!available) {
+        throw new Error('Sensore Face ID / Touch ID non rilevato su questo dispositivo.');
+      }
+
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+      const userId = new Uint8Array(16);
+      crypto.getRandomValues(userId);
+
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge: challenge,
+          rp: { name: 'Atelier Nozze M&M' },
+          user: {
+            id: userId,
+            name: 'sposi@nozze-mm.it',
+            displayName: 'Michele & Miriana'
+          },
+          pubKeyCredParams: [
+            { type: 'public-key', alg: -7 },  // ES256
+            { type: 'public-key', alg: -257 } // RS256
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform',
+            userVerification: 'required',
+            residentKey: 'preferred'
+          },
+          timeout: 60000
+        }
+      });
+
+      if (credential && credential.id) {
+        localStorage.setItem(this.WEBAUTHN_ID_KEY, credential.id);
+        sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+        return true;
+      }
+      return false;
+    }
+
+    static async verifyBiometrics() {
+      const credId = localStorage.getItem(this.WEBAUTHN_ID_KEY);
+      if (!credId) {
+        // Se non ancora registrato, proviamo ad enrollare e loggare contestualmente
+        return await this.enrollBiometrics();
+      }
+
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
+      // Decodifica l'ID credenziale
+      const idBytes = Uint8Array.from(atob(credId.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge: challenge,
+          allowCredentials: [{
+            id: idBytes,
+            type: 'public-key',
+            transports: ['internal']
+          }],
+          userVerification: 'required',
+          timeout: 60000
+        }
+      });
+
+      if (assertion) {
+        this.resetAttempts();
+        sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+        return true;
+      }
+      return false;
     }
   }
 

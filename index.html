@@ -1023,14 +1023,16 @@
   <!-- TOAST SHELF -->
   <div class="toast-shelf" id="toast-container"></div>
 
-  <!-- CORTINA DI SICUREZZA PIN SARTORIALE -->
+  <!-- CORTINA DI SICUREZZA PIN SARTORIALE & BIOMETRIA -->
   <div class="pin-gate-overlay is-hidden" id="pin-gate-overlay">
     <div class="pin-gate-card">
       <div class="pin-gate-monogram">M&M</div>
       <h2 class="pin-gate-title">Atelier Privato</h2>
-      <p class="pin-gate-sub">Inserisci il codice di sicurezza per consultare o modificare il piano nozze</p>
+      <p class="pin-gate-sub">Inserisci il codice di sicurezza a 6 cifre o accedi con Face ID</p>
 
       <div class="pin-dots-display" id="pin-dots-display">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
         <span class="pin-dot"></span>
         <span class="pin-dot"></span>
         <span class="pin-dot"></span>
@@ -1052,6 +1054,17 @@
         <button type="button" class="pin-key pin-key-action" id="btn-pin-clear" title="Cancella">C</button>
         <button type="button" class="pin-key" data-key="0">0</button>
         <button type="button" class="pin-key pin-key-action" id="btn-pin-back" title="Indietro">⌫</button>
+      </div>
+
+      <!-- Pulsante Alternativo Face ID / Touch ID Biometrico -->
+      <div class="pin-biometrics-container" id="pin-biometrics-container">
+        <button type="button" class="btn-biometrics-touch" id="btn-biometrics-trigger">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            <path d="M9 9h.01M15 9h.01M10 13c.5.5 1.5.5 2 0m-2 4h4"/>
+          </svg>
+          <span id="biometrics-btn-label">Accedi con Face ID</span>
+        </button>
       </div>
     </div>
   </div>

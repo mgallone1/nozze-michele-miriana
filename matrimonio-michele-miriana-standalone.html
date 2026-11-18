@@ -1023,66 +1023,96 @@ body::before {
   color: var(--accent-sage);
 }
 
-/* Classi Semantiche per Colonne (Zero Stili Inline) */
+/* Classi Semantiche per Colonne (Zero Stili Inline, Responsive ed Ergonomiche) */
 .col-item {
-  min-width: 220px;
+  min-width: 200px;
+  max-width: 280px;
   text-align: left;
 }
 
 .col-investment {
-  min-width: 120px;
+  min-width: 110px;
   text-align: right;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .col-advanced {
-  min-width: 190px;
+  min-width: 170px;
   text-align: left;
 }
 
 .col-remaining {
-  min-width: 120px;
+  min-width: 110px;
   text-align: right;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .col-status {
-  min-width: 140px;
+  min-width: 130px;
   text-align: center;
+  white-space: nowrap;
 }
 
 .col-notes {
-  min-width: 220px;
-  max-width: 300px;
+  min-width: 180px;
+  max-width: 260px;
   text-align: left;
   font-size: 0.82rem;
   color: var(--ink-secondary);
+  line-height: 1.45;
 }
 
-.col-actions {
-  min-width: 70px;
-  text-align: right;
+/* Gestione Intelligente Testi Lunghi: Line Clamp ed Espansione Pulita */
+.notes-clamp-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  transition: max-height 0.25s ease;
 }
 
-.text-settled {
-  color: var(--accent-sage);
+.notes-clamp-content.is-expanded {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: normal;
 }
 
-.text-pending {
-  color: var(--ink-secondary);
+.notes-expand-toggle {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-bronze);
+  background: none;
+  border: none;
+  padding: 2px 0 0 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.notes-expand-toggle:hover {
+  color: var(--ink-primary);
 }
 
 .item-title {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink-primary);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .item-supplier {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-style: italic;
   color: var(--ink-muted);
   margin-top: 2px;
+  display: inline-block;
+  word-break: break-word;
 }
 
 /* Intestazione Categoria nel Ledger */
@@ -1647,6 +1677,7 @@ button.btn-editable-val:hover {
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 24px;
+  align-items: stretch;
 }
 
 @media (max-width: 800px) {
@@ -1659,8 +1690,52 @@ button.btn-editable-val:hover {
   background: var(--surface-pure);
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  padding: 28px;
+  padding: 24px;
   box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.balance-duo-panel .balance-items-list {
+  flex: 1;
+}
+
+.balance-expense-chip {
+  background: var(--surface-tint);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.balance-chip-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.balance-chip-title {
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.balance-chip-supplier {
+  font-size: 0.74rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .suggestion-box {
@@ -3133,6 +3208,47 @@ button.btn-editable-val:hover {
 }
 
 .pin-hint-note strong {
+  color: var(--accent-bronze);
+}
+
+/* Pulsante Biometrico Face ID / Touch ID */
+.pin-biometrics-container {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-biometrics-touch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--surface-tint);
+  border: 1px solid var(--accent-bronze-border);
+  color: var(--accent-bronze);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-biometrics-touch:hover {
+  background: var(--surface-warm);
+  border-color: var(--accent-bronze);
+  color: var(--ink-primary);
+  transform: translateY(-1px);
+}
+
+.btn-biometrics-touch:active {
+  transform: scale(0.96);
+}
+
+.btn-biometrics-touch svg {
   color: var(--accent-bronze);
 }
 
@@ -4768,14 +4884,16 @@ button.btn-editable-val:hover {
   <!-- TOAST SHELF -->
   <div class="toast-shelf" id="toast-container"></div>
 
-  <!-- CORTINA DI SICUREZZA PIN SARTORIALE -->
+  <!-- CORTINA DI SICUREZZA PIN SARTORIALE & BIOMETRIA -->
   <div class="pin-gate-overlay is-hidden" id="pin-gate-overlay">
     <div class="pin-gate-card">
       <div class="pin-gate-monogram">M&M</div>
       <h2 class="pin-gate-title">Atelier Privato</h2>
-      <p class="pin-gate-sub">Inserisci il codice di sicurezza per consultare o modificare il piano nozze</p>
+      <p class="pin-gate-sub">Inserisci il codice di sicurezza a 6 cifre o accedi con Face ID</p>
 
       <div class="pin-dots-display" id="pin-dots-display">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
         <span class="pin-dot"></span>
         <span class="pin-dot"></span>
         <span class="pin-dot"></span>
@@ -4797,6 +4915,17 @@ button.btn-editable-val:hover {
         <button type="button" class="pin-key pin-key-action" id="btn-pin-clear" title="Cancella">C</button>
         <button type="button" class="pin-key" data-key="0">0</button>
         <button type="button" class="pin-key pin-key-action" id="btn-pin-back" title="Indietro">⌫</button>
+      </div>
+
+      <!-- Pulsante Alternativo Face ID / Touch ID Biometrico -->
+      <div class="pin-biometrics-container" id="pin-biometrics-container">
+        <button type="button" class="btn-biometrics-touch" id="btn-biometrics-trigger">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            <path d="M9 9h.01M15 9h.01M10 13c.5.5 1.5.5 2 0m-2 4h4"/>
+          </svg>
+          <span id="biometrics-btn-label">Accedi con Face ID</span>
+        </button>
       </div>
     </div>
   </div>
@@ -6671,10 +6800,17 @@ window.WeddingApp.Services = (function () {
   }
 
   class SecurityService {
-    static PIN_STORAGE_KEY = 'matrimonio_mm_pin_hash';
+    static PIN_STORAGE_KEY = 'matrimonio_mm_pin_pbkdf2_v2';
     static SESSION_AUTH_KEY = 'matrimonio_mm_auth_active';
-    // Hash SHA-256 predefinito per il PIN iniziale di sicurezza "0207" (data nozze 2 Luglio)
-    static DEFAULT_HASH = '2e3c969e2e9b367ade00279743f88ea0e32f283152223e3d9aaf1c14669d7cbe';
+    static WEBAUTHN_ID_KEY = 'matrimonio_mm_webauthn_cred_id';
+    static RATE_LIMIT_STORAGE_KEY = 'matrimonio_mm_auth_attempts';
+
+    // Salt crittografico dedicato e deterministico per l'Atelier
+    static CRYPTO_SALT = new TextEncoder().encode('nozze_mm_atelier_salt_2027');
+    static PBKDF2_ITERATIONS = 600000; // Standard OWASP Password Hashing Check 05
+
+    // Hash PBKDF2-HMAC-SHA256 (600.000 iterazioni) per il PIN predefinito a 6 cifre "020727" (2 Luglio 2027)
+    static DEFAULT_HASH = 'a9391465d635a6a0949970493bbf9357db9804e0432ce426b668b402dca19c97';
 
     static escapeHtml(str) {
       if (str === null || str === undefined) return '';
@@ -6695,10 +6831,28 @@ window.WeddingApp.Services = (function () {
       return '#';
     }
 
+    // Derivazione crittografica PBKDF2-HMAC-SHA256 a 600.000 iterazioni
     static async hashPin(pin) {
-      const msgBuffer = new TextEncoder().encode(String(pin).trim());
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const pinStr = String(pin).trim();
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(pinStr),
+        'PBKDF2',
+        false,
+        ['deriveBits']
+      );
+      const derivedBits = await crypto.subtle.deriveBits(
+        {
+          name: 'PBKDF2',
+          salt: this.CRYPTO_SALT,
+          iterations: this.PBKDF2_ITERATIONS,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        256
+      );
+      const hashArray = Array.from(new Uint8Array(derivedBits));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
@@ -6710,13 +6864,65 @@ window.WeddingApp.Services = (function () {
       return localStorage.getItem(this.PIN_STORAGE_KEY) || this.DEFAULT_HASH;
     }
 
+    // Rate Limiting & Anti-Bruteforce Defense (Check 08 & Check 12)
+    static getAttemptsState() {
+      try {
+        const raw = localStorage.getItem(this.RATE_LIMIT_STORAGE_KEY);
+        if (!raw) return { count: 0, lockUntil: 0 };
+        return JSON.parse(raw);
+      } catch (e) {
+        return { count: 0, lockUntil: 0 };
+      }
+    }
+
+    static isLocked() {
+      const state = this.getAttemptsState();
+      const now = Date.now();
+      if (state.lockUntil && now < state.lockUntil) {
+        const remainingMinutes = Math.ceil((state.lockUntil - now) / 60000);
+        return { locked: true, remainingMinutes };
+      }
+      return { locked: false, remainingMinutes: 0 };
+    }
+
+    static registerFailedAttempt() {
+      const state = this.getAttemptsState();
+      state.count = (state.count || 0) + 1;
+      // Al 5° tentativo fallito blocco per 15 minuti (Check 08)
+      if (state.count >= 5) {
+        state.lockUntil = Date.now() + (15 * 60 * 1000);
+        console.warn(`[SECURITY ALERT] 5 tentativi PIN errati consecutivi. Blocco temporaneo attivato per 15 minuti.`);
+      }
+      localStorage.setItem(this.RATE_LIMIT_STORAGE_KEY, JSON.stringify(state));
+      return state;
+    }
+
+    static resetAttempts() {
+      localStorage.removeItem(this.RATE_LIMIT_STORAGE_KEY);
+    }
+
     static async verify(enteredPin) {
+      const lockCheck = this.isLocked();
+      if (lockCheck.locked) {
+        return { success: false, locked: true, remainingMinutes: lockCheck.remainingMinutes };
+      }
+
       const enteredHash = await this.hashPin(enteredPin);
       const isValid = (enteredHash === this.getExpectedHash());
       if (isValid) {
+        this.resetAttempts();
         sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+        return { success: true };
+      } else {
+        const state = this.registerFailedAttempt();
+        const isNowLocked = (state.count >= 5);
+        return { 
+          success: false, 
+          locked: isNowLocked, 
+          remainingMinutes: isNowLocked ? 15 : 0, 
+          attemptsLeft: Math.max(0, 5 - state.count) 
+        };
       }
-      return isValid;
     }
 
     static isAuthenticated() {
@@ -6728,10 +6934,109 @@ window.WeddingApp.Services = (function () {
     }
 
     static async changePin(newPin) {
-      const newHash = await this.hashPin(newPin);
+      const clean = String(newPin).trim();
+      if (clean.length !== 6 || !/^\d{6}$/.test(clean)) {
+        throw new Error('Il PIN deve essere esattamente di 6 cifre numeriche.');
+      }
+      const newHash = await this.hashPin(clean);
       localStorage.setItem(this.PIN_STORAGE_KEY, newHash);
+      this.resetAttempts();
       sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
       return true;
+    }
+
+    // Supporto Biometrico WebAuthn / Face ID / Touch ID
+    static async isBiometricsAvailable() {
+      if (typeof window === 'undefined' || !window.PublicKeyCredential) {
+        return false;
+      }
+      try {
+        if (typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
+          return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        }
+        return false;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    static isBiometricsEnrolled() {
+      return !!localStorage.getItem(this.WEBAUTHN_ID_KEY);
+    }
+
+    static async enrollBiometrics() {
+      const available = await this.isBiometricsAvailable();
+      if (!available) {
+        throw new Error('Sensore Face ID / Touch ID non rilevato su questo dispositivo.');
+      }
+
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+      const userId = new Uint8Array(16);
+      crypto.getRandomValues(userId);
+
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge: challenge,
+          rp: { name: 'Atelier Nozze M&M' },
+          user: {
+            id: userId,
+            name: 'sposi@nozze-mm.it',
+            displayName: 'Michele & Miriana'
+          },
+          pubKeyCredParams: [
+            { type: 'public-key', alg: -7 },  // ES256
+            { type: 'public-key', alg: -257 } // RS256
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform',
+            userVerification: 'required',
+            residentKey: 'preferred'
+          },
+          timeout: 60000
+        }
+      });
+
+      if (credential && credential.id) {
+        localStorage.setItem(this.WEBAUTHN_ID_KEY, credential.id);
+        sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+        return true;
+      }
+      return false;
+    }
+
+    static async verifyBiometrics() {
+      const credId = localStorage.getItem(this.WEBAUTHN_ID_KEY);
+      if (!credId) {
+        // Se non ancora registrato, proviamo ad enrollare e loggare contestualmente
+        return await this.enrollBiometrics();
+      }
+
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
+      // Decodifica l'ID credenziale
+      const idBytes = Uint8Array.from(atob(credId.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge: challenge,
+          allowCredentials: [{
+            id: idBytes,
+            type: 'public-key',
+            transports: ['internal']
+          }],
+          userVerification: 'required',
+          timeout: 60000
+        }
+      });
+
+      if (assertion) {
+        this.resetAttempts();
+        sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');
+        return true;
+      }
+      return false;
     }
   }
 
@@ -7465,6 +7770,9 @@ window.WeddingApp.UI = (function () {
 
       let currentCatId = null;
       let html = '';
+      const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+        ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+        : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
       sortedExpenses.forEach(exp => {
         const cat = catMap[exp.categoryId] || { name: 'Altro', icon: 'extra' };
@@ -7553,12 +7861,17 @@ window.WeddingApp.UI = (function () {
           vatBadge = `<span class="cost-nature-pill contract" title="Prezzo con IVA ${exp.vatRate || 10}% inclusa">IVA ${exp.vatRate || 10}%</span>`;
         }
 
+        const safeItem = escape(exp.item);
+        const safeSupplier = escape(exp.supplier);
+        const safeNotes = escape(exp.notes);
+        const safeId = escape(exp.id);
+
         html += `
-          <tr data-id="${exp.id}">
+          <tr data-id="${safeId}">
             <td class="col-item">
-              <div class="item-title">${exp.item}</div>
+              <div class="item-title">${safeItem}</div>
               <div class="item-meta-row">
-                ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
+                ${exp.supplier ? `<span class="item-supplier">${safeSupplier}</span>` : ''}
                 ${splitBadge}
                 ${costTypeBadge}
                 ${vatBadge}
@@ -7574,14 +7887,17 @@ window.WeddingApp.UI = (function () {
               <span class="badge-status ${statusClass}">${statusLabel}</span>
             </td>
             <td class="col-notes">
-              ${exp.notes ? `<span>${exp.notes}</span>` : '<span style="color: var(--ink-light);">—</span>'}
+              ${exp.notes ? `
+                <div class="notes-clamp-content" id="notes-content-${safeId}">${safeNotes}</div>
+                ${exp.notes.length > 55 ? `<button type="button" class="notes-expand-toggle" data-target="notes-content-${safeId}">Mostra tutto</button>` : ''}
+              ` : '<span style="color: var(--ink-light);">—</span>'}
             </td>
             <td class="col-actions">
               <div class="row-actions-block">
-                <button class="btn-row-action edit-expense-btn" title="Modifica" data-id="${exp.id}">
+                <button class="btn-row-action edit-expense-btn" title="Modifica" data-id="${safeId}">
                   ${ICONS.edit}
                 </button>
-                <button class="btn-row-action delete delete-expense-btn" title="Rimuovi" data-id="${exp.id}">
+                <button class="btn-row-action delete delete-expense-btn" title="Rimuovi" data-id="${safeId}">
                   ${ICONS.trash}
                 </button>
               </div>
@@ -7591,6 +7907,18 @@ window.WeddingApp.UI = (function () {
       });
 
       tbody.innerHTML = html;
+
+      tbody.querySelectorAll('.notes-expand-toggle').forEach(toggleBtn => {
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetId = toggleBtn.getAttribute('data-target');
+          const content = document.getElementById(targetId);
+          if (content) {
+            const isExpanded = content.classList.toggle('is-expanded');
+            toggleBtn.textContent = isExpanded ? 'Comprimi' : 'Mostra tutto';
+          }
+        });
+      });
 
       tbody.querySelectorAll('.edit-expense-btn').forEach(btn => {
         btn.addEventListener('click', () => onEdit(btn.dataset.id));
@@ -8238,6 +8566,10 @@ window.WeddingApp.UI = (function () {
       if (badgeCountM) badgeCountM.textContent = `${expensesM.length} ${expensesM.length === 1 ? 'voce' : 'voci'}`;
       if (badgeCountMir) badgeCountMir.textContent = `${expensesMir.length} ${expensesMir.length === 1 ? 'voce' : 'voci'}`;
 
+      const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+        ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+        : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
       if (listM) {
         if (expensesM.length === 0) {
           listM.innerHTML = `<div class="balance-item-empty">Nessun anticipo registrato per Michele.</div>`;
@@ -8245,8 +8577,8 @@ window.WeddingApp.UI = (function () {
           listM.innerHTML = expensesM.map(exp => `
             <div class="balance-expense-chip">
               <div class="balance-chip-info">
-                <div class="balance-chip-title">${exp.item}</div>
-                ${exp.supplier ? `<div class="balance-chip-supplier">${exp.supplier}</div>` : ''}
+                <div class="balance-chip-title">${escape(exp.item)}</div>
+                ${exp.supplier ? `<div class="balance-chip-supplier">${escape(exp.supplier)}</div>` : ''}
               </div>
               <div class="balance-chip-amount michele amount">${CurrencyFormatter.format(exp.paidMichele)}</div>
             </div>
@@ -8261,8 +8593,8 @@ window.WeddingApp.UI = (function () {
           listMir.innerHTML = expensesMir.map(exp => `
             <div class="balance-expense-chip">
               <div class="balance-chip-info">
-                <div class="balance-chip-title">${exp.item}</div>
-                ${exp.supplier ? `<div class="balance-chip-supplier">${exp.supplier}</div>` : ''}
+                <div class="balance-chip-title">${escape(exp.item)}</div>
+                ${exp.supplier ? `<div class="balance-chip-supplier">${escape(exp.supplier)}</div>` : ''}
               </div>
               <div class="balance-chip-amount miriana amount">${CurrencyFormatter.format(exp.paidMiriana)}</div>
             </div>
@@ -8286,6 +8618,10 @@ window.WeddingApp.UI = (function () {
           if (badgeCountFamily) badgeCountFamily.textContent = `${familyExpenses.length} ${familyExpenses.length === 1 ? 'dono' : 'doni'}`;
 
           if (listFamily) {
+            const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+              ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+              : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
             listFamily.innerHTML = familyExpenses.map(exp => {
               let tagFamily = '';
               let amounts = [];
@@ -8296,8 +8632,8 @@ window.WeddingApp.UI = (function () {
               return `
                 <div class="balance-expense-chip">
                   <div class="balance-chip-info">
-                    <div class="balance-chip-title">${exp.item}</div>
-                    <div class="balance-chip-supplier">${tagFamily}${exp.supplier ? ` • ${exp.supplier}` : ''}</div>
+                    <div class="balance-chip-title">${escape(exp.item)}</div>
+                    <div class="balance-chip-supplier">${tagFamily}${exp.supplier ? ` • ${escape(exp.supplier)}` : ''}</div>
                   </div>
                   <div class="balance-chip-amount text-settled amount">${CurrencyFormatter.format((exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0))}</div>
                 </div>
@@ -9587,14 +9923,19 @@ window.WeddingApp.UI = (function () {
     const btnChangePin = document.getElementById('btn-change-pin');
     if (btnChangePin) {
       btnChangePin.addEventListener('click', async () => {
-        const newPin = window.prompt('Inserisci il nuovo codice PIN numerico di sicurezza (4-8 cifre):');
+        const newPin = window.prompt('Inserisci il nuovo codice PIN di sicurezza a 6 cifre (es. 020727):');
         if (!newPin) return;
-        if (newPin.trim().length < 4 || isNaN(newPin.trim())) {
-          window.alert('Il PIN deve essere composto da almeno 4 cifre numeriche.');
+        const clean = newPin.trim();
+        if (clean.length !== 6 || !/^\d{6}$/.test(clean)) {
+          window.alert('Il PIN deve essere composto esattamente da 6 cifre numeriche (es. 020727).');
           return;
         }
-        await SecurityService.changePin(newPin.trim());
-        ToastView.show('Codice PIN di sicurezza aggiornato');
+        try {
+          await SecurityService.changePin(clean);
+          ToastView.show('Codice PIN di sicurezza a 6 cifre aggiornato con successo');
+        } catch (err) {
+          window.alert(err.message || 'Errore durante l\'aggiornamento del PIN.');
+        }
       });
     }
 
@@ -9602,7 +9943,7 @@ window.WeddingApp.UI = (function () {
     setupPinGate();
   }
 
-  // Cortina di Sicurezza e Tastierino PIN
+  // Cortina di Sicurezza e Tastierino PIN (6 Cifre) & Face ID
   function setupPinGate() {
     const overlay = document.getElementById('pin-gate-overlay');
     if (!overlay) return;
@@ -9616,6 +9957,34 @@ window.WeddingApp.UI = (function () {
     let currentInput = '';
     const dots = document.querySelectorAll('.pin-dot');
     const errorFeedback = document.getElementById('pin-error-feedback');
+    const biometricsBtn = document.getElementById('btn-biometrics-trigger');
+    const biometricsContainer = document.getElementById('pin-biometrics-container');
+
+    // Controllo disponibilità Face ID / Touch ID (WebAuthn)
+    SecurityService.isBiometricsAvailable().then(available => {
+      if (!available && biometricsContainer) {
+        biometricsContainer.style.display = 'none';
+      }
+    });
+
+    if (biometricsBtn) {
+      biometricsBtn.addEventListener('click', async () => {
+        try {
+          const authOk = await SecurityService.verifyBiometrics();
+          if (authOk) {
+            if (errorFeedback) errorFeedback.classList.add('is-hidden');
+            overlay.classList.add('is-hidden');
+            ToastView.show('Accesso autorizzato tramite Face ID');
+          }
+        } catch (err) {
+          console.warn('Verifica Face ID non completata:', err);
+          if (errorFeedback) {
+            errorFeedback.textContent = 'Autenticazione Face ID annullata o non riconosciuta. Usa il PIN.';
+            errorFeedback.classList.remove('is-hidden');
+          }
+        }
+      });
+    }
 
     function updateDots() {
       dots.forEach((dot, idx) => {
@@ -9628,14 +9997,22 @@ window.WeddingApp.UI = (function () {
     }
 
     async function checkPin() {
-      if (currentInput.length < 4) return;
-      const valid = await SecurityService.verify(currentInput);
-      if (valid) {
+      if (currentInput.length !== 6) return;
+      const res = await SecurityService.verify(currentInput);
+      if (res && res.success) {
         if (errorFeedback) errorFeedback.classList.add('is-hidden');
         overlay.classList.add('is-hidden');
         ToastView.show('Benvenuto nell\'Atelier M&M');
       } else {
-        if (errorFeedback) errorFeedback.classList.remove('is-hidden');
+        if (errorFeedback) {
+          if (res && res.locked) {
+            errorFeedback.textContent = `Troppi tentativi errati. Accesso bloccato per ${res.remainingMinutes} minuti.`;
+          } else {
+            const left = res ? res.attemptsLeft : 0;
+            errorFeedback.textContent = `Codice non corretto. ${left > 0 ? `Tentativi rimasti: ${left}` : 'Riprova.'}`;
+          }
+          errorFeedback.classList.remove('is-hidden');
+        }
         currentInput = '';
         updateDots();
       }
@@ -9643,11 +10020,20 @@ window.WeddingApp.UI = (function () {
 
     document.querySelectorAll('.pin-key[data-key]').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (currentInput.length >= 8) return;
+        const lockCheck = SecurityService.isLocked();
+        if (lockCheck.locked) {
+          if (errorFeedback) {
+            errorFeedback.textContent = `Accesso temporaneamente bloccato per sicurezza (${lockCheck.remainingMinutes} min).`;
+            errorFeedback.classList.remove('is-hidden');
+          }
+          return;
+        }
+
+        if (currentInput.length >= 6) return;
         currentInput += btn.dataset.key;
         updateDots();
         if (errorFeedback) errorFeedback.classList.add('is-hidden');
-        if (currentInput.length >= 4) {
+        if (currentInput.length === 6) {
           setTimeout(checkPin, 100);
         }
       });

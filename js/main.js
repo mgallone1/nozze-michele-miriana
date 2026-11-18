@@ -813,14 +813,19 @@
     const btnChangePin = document.getElementById('btn-change-pin');
     if (btnChangePin) {
       btnChangePin.addEventListener('click', async () => {
-        const newPin = window.prompt('Inserisci il nuovo codice PIN numerico di sicurezza (4-8 cifre):');
+        const newPin = window.prompt('Inserisci il nuovo codice PIN di sicurezza a 6 cifre (es. 020727):');
         if (!newPin) return;
-        if (newPin.trim().length < 4 || isNaN(newPin.trim())) {
-          window.alert('Il PIN deve essere composto da almeno 4 cifre numeriche.');
+        const clean = newPin.trim();
+        if (clean.length !== 6 || !/^\d{6}$/.test(clean)) {
+          window.alert('Il PIN deve essere composto esattamente da 6 cifre numeriche (es. 020727).');
           return;
         }
-        await SecurityService.changePin(newPin.trim());
-        ToastView.show('Codice PIN di sicurezza aggiornato');
+        try {
+          await SecurityService.changePin(clean);
+          ToastView.show('Codice PIN di sicurezza a 6 cifre aggiornato con successo');
+        } catch (err) {
+          window.alert(err.message || 'Errore durante l\'aggiornamento del PIN.');
+        }
       });
     }
 
@@ -828,7 +833,7 @@
     setupPinGate();
   }
 
-  // Cortina di Sicurezza e Tastierino PIN
+  // Cortina di Sicurezza e Tastierino PIN (6 Cifre) & Face ID
   function setupPinGate() {
     const overlay = document.getElementById('pin-gate-overlay');
     if (!overlay) return;
@@ -842,6 +847,34 @@
     let currentInput = '';
     const dots = document.querySelectorAll('.pin-dot');
     const errorFeedback = document.getElementById('pin-error-feedback');
+    const biometricsBtn = document.getElementById('btn-biometrics-trigger');
+    const biometricsContainer = document.getElementById('pin-biometrics-container');
+
+    // Controllo disponibilità Face ID / Touch ID (WebAuthn)
+    SecurityService.isBiometricsAvailable().then(available => {
+      if (!available && biometricsContainer) {
+        biometricsContainer.style.display = 'none';
+      }
+    });
+
+    if (biometricsBtn) {
+      biometricsBtn.addEventListener('click', async () => {
+        try {
+          const authOk = await SecurityService.verifyBiometrics();
+          if (authOk) {
+            if (errorFeedback) errorFeedback.classList.add('is-hidden');
+            overlay.classList.add('is-hidden');
+            ToastView.show('Accesso autorizzato tramite Face ID');
+          }
+        } catch (err) {
+          console.warn('Verifica Face ID non completata:', err);
+          if (errorFeedback) {
+            errorFeedback.textContent = 'Autenticazione Face ID annullata o non riconosciuta. Usa il PIN.';
+            errorFeedback.classList.remove('is-hidden');
+          }
+        }
+      });
+    }
 
     function updateDots() {
       dots.forEach((dot, idx) => {
@@ -854,14 +887,22 @@
     }
 
     async function checkPin() {
-      if (currentInput.length < 4) return;
-      const valid = await SecurityService.verify(currentInput);
-      if (valid) {
+      if (currentInput.length !== 6) return;
+      const res = await SecurityService.verify(currentInput);
+      if (res && res.success) {
         if (errorFeedback) errorFeedback.classList.add('is-hidden');
         overlay.classList.add('is-hidden');
         ToastView.show('Benvenuto nell\'Atelier M&M');
       } else {
-        if (errorFeedback) errorFeedback.classList.remove('is-hidden');
+        if (errorFeedback) {
+          if (res && res.locked) {
+            errorFeedback.textContent = `Troppi tentativi errati. Accesso bloccato per ${res.remainingMinutes} minuti.`;
+          } else {
+            const left = res ? res.attemptsLeft : 0;
+            errorFeedback.textContent = `Codice non corretto. ${left > 0 ? `Tentativi rimasti: ${left}` : 'Riprova.'}`;
+          }
+          errorFeedback.classList.remove('is-hidden');
+        }
         currentInput = '';
         updateDots();
       }
@@ -869,11 +910,20 @@
 
     document.querySelectorAll('.pin-key[data-key]').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (currentInput.length >= 8) return;
+        const lockCheck = SecurityService.isLocked();
+        if (lockCheck.locked) {
+          if (errorFeedback) {
+            errorFeedback.textContent = `Accesso temporaneamente bloccato per sicurezza (${lockCheck.remainingMinutes} min).`;
+            errorFeedback.classList.remove('is-hidden');
+          }
+          return;
+        }
+
+        if (currentInput.length >= 6) return;
         currentInput += btn.dataset.key;
         updateDots();
         if (errorFeedback) errorFeedback.classList.add('is-hidden');
-        if (currentInput.length >= 4) {
+        if (currentInput.length === 6) {
           setTimeout(checkPin, 100);
         }
       });

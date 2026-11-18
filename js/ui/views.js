@@ -172,6 +172,9 @@ window.WeddingApp.UI = (function () {
 
       let currentCatId = null;
       let html = '';
+      const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+        ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+        : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
       sortedExpenses.forEach(exp => {
         const cat = catMap[exp.categoryId] || { name: 'Altro', icon: 'extra' };
@@ -260,12 +263,17 @@ window.WeddingApp.UI = (function () {
           vatBadge = `<span class="cost-nature-pill contract" title="Prezzo con IVA ${exp.vatRate || 10}% inclusa">IVA ${exp.vatRate || 10}%</span>`;
         }
 
+        const safeItem = escape(exp.item);
+        const safeSupplier = escape(exp.supplier);
+        const safeNotes = escape(exp.notes);
+        const safeId = escape(exp.id);
+
         html += `
-          <tr data-id="${exp.id}">
+          <tr data-id="${safeId}">
             <td class="col-item">
-              <div class="item-title">${exp.item}</div>
+              <div class="item-title">${safeItem}</div>
               <div class="item-meta-row">
-                ${exp.supplier ? `<span class="item-supplier">${exp.supplier}</span>` : ''}
+                ${exp.supplier ? `<span class="item-supplier">${safeSupplier}</span>` : ''}
                 ${splitBadge}
                 ${costTypeBadge}
                 ${vatBadge}
@@ -281,14 +289,17 @@ window.WeddingApp.UI = (function () {
               <span class="badge-status ${statusClass}">${statusLabel}</span>
             </td>
             <td class="col-notes">
-              ${exp.notes ? `<span>${exp.notes}</span>` : '<span style="color: var(--ink-light);">—</span>'}
+              ${exp.notes ? `
+                <div class="notes-clamp-content" id="notes-content-${safeId}">${safeNotes}</div>
+                ${exp.notes.length > 55 ? `<button type="button" class="notes-expand-toggle" data-target="notes-content-${safeId}">Mostra tutto</button>` : ''}
+              ` : '<span style="color: var(--ink-light);">—</span>'}
             </td>
             <td class="col-actions">
               <div class="row-actions-block">
-                <button class="btn-row-action edit-expense-btn" title="Modifica" data-id="${exp.id}">
+                <button class="btn-row-action edit-expense-btn" title="Modifica" data-id="${safeId}">
                   ${ICONS.edit}
                 </button>
-                <button class="btn-row-action delete delete-expense-btn" title="Rimuovi" data-id="${exp.id}">
+                <button class="btn-row-action delete delete-expense-btn" title="Rimuovi" data-id="${safeId}">
                   ${ICONS.trash}
                 </button>
               </div>
@@ -298,6 +309,18 @@ window.WeddingApp.UI = (function () {
       });
 
       tbody.innerHTML = html;
+
+      tbody.querySelectorAll('.notes-expand-toggle').forEach(toggleBtn => {
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetId = toggleBtn.getAttribute('data-target');
+          const content = document.getElementById(targetId);
+          if (content) {
+            const isExpanded = content.classList.toggle('is-expanded');
+            toggleBtn.textContent = isExpanded ? 'Comprimi' : 'Mostra tutto';
+          }
+        });
+      });
 
       tbody.querySelectorAll('.edit-expense-btn').forEach(btn => {
         btn.addEventListener('click', () => onEdit(btn.dataset.id));
@@ -945,6 +968,10 @@ window.WeddingApp.UI = (function () {
       if (badgeCountM) badgeCountM.textContent = `${expensesM.length} ${expensesM.length === 1 ? 'voce' : 'voci'}`;
       if (badgeCountMir) badgeCountMir.textContent = `${expensesMir.length} ${expensesMir.length === 1 ? 'voce' : 'voci'}`;
 
+      const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+        ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+        : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
       if (listM) {
         if (expensesM.length === 0) {
           listM.innerHTML = `<div class="balance-item-empty">Nessun anticipo registrato per Michele.</div>`;
@@ -952,8 +979,8 @@ window.WeddingApp.UI = (function () {
           listM.innerHTML = expensesM.map(exp => `
             <div class="balance-expense-chip">
               <div class="balance-chip-info">
-                <div class="balance-chip-title">${exp.item}</div>
-                ${exp.supplier ? `<div class="balance-chip-supplier">${exp.supplier}</div>` : ''}
+                <div class="balance-chip-title">${escape(exp.item)}</div>
+                ${exp.supplier ? `<div class="balance-chip-supplier">${escape(exp.supplier)}</div>` : ''}
               </div>
               <div class="balance-chip-amount michele amount">${CurrencyFormatter.format(exp.paidMichele)}</div>
             </div>
@@ -968,8 +995,8 @@ window.WeddingApp.UI = (function () {
           listMir.innerHTML = expensesMir.map(exp => `
             <div class="balance-expense-chip">
               <div class="balance-chip-info">
-                <div class="balance-chip-title">${exp.item}</div>
-                ${exp.supplier ? `<div class="balance-chip-supplier">${exp.supplier}</div>` : ''}
+                <div class="balance-chip-title">${escape(exp.item)}</div>
+                ${exp.supplier ? `<div class="balance-chip-supplier">${escape(exp.supplier)}</div>` : ''}
               </div>
               <div class="balance-chip-amount miriana amount">${CurrencyFormatter.format(exp.paidMiriana)}</div>
             </div>
@@ -993,6 +1020,10 @@ window.WeddingApp.UI = (function () {
           if (badgeCountFamily) badgeCountFamily.textContent = `${familyExpenses.length} ${familyExpenses.length === 1 ? 'dono' : 'doni'}`;
 
           if (listFamily) {
+            const escape = (str) => (window.WeddingApp && window.WeddingApp.Services && window.WeddingApp.Services.SecurityService) 
+              ? window.WeddingApp.Services.SecurityService.escapeHtml(str) 
+              : String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
             listFamily.innerHTML = familyExpenses.map(exp => {
               let tagFamily = '';
               let amounts = [];
@@ -1003,8 +1034,8 @@ window.WeddingApp.UI = (function () {
               return `
                 <div class="balance-expense-chip">
                   <div class="balance-chip-info">
-                    <div class="balance-chip-title">${exp.item}</div>
-                    <div class="balance-chip-supplier">${tagFamily}${exp.supplier ? ` • ${exp.supplier}` : ''}</div>
+                    <div class="balance-chip-title">${escape(exp.item)}</div>
+                    <div class="balance-chip-supplier">${tagFamily}${exp.supplier ? ` • ${escape(exp.supplier)}` : ''}</div>
                   </div>
                   <div class="balance-chip-amount text-settled amount">${CurrencyFormatter.format((exp.paidFamilyMichele || 0) + (exp.paidFamilyMiriana || 0))}</div>
                 </div>
