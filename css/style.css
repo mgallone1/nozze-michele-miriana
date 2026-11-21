@@ -4300,6 +4300,95 @@ body.privacy-masked .balance-chip-amount:hover {
   border-color: rgba(69, 97, 81, 0.3);
 }
 
+/* ==========================================================================
+   ANTI-UI SLOP ENHANCEMENTS — ATELIER NOZZE M&M
+   ========================================================================== */
+
+/* 1. Card Monumentale per Location & Catering */
+.cat-card-monumental {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(247,243,235,0.92) 100%);
+  border: 1.5px solid var(--accent-bronze-border);
+  box-shadow: var(--shadow-hover);
+}
+
+.cat-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cat-hero-pill {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: var(--accent-bronze);
+  color: #FFFFFF;
+  border-radius: var(--radius-full);
+}
+
+.cat-card-count-text {
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+}
+
+/* 2. Micro-Interazioni Tattili Naturali (Active state) */
+button, .btn-noble, .nav-link-btn, .pin-key, .split-tag-btn, .btn-gift-status {
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, border-color 0.15s ease;
+}
+
+button:active, .btn-noble:active, .split-tag-btn:active, .btn-gift-status:active {
+  transform: scale(0.97);
+}
+
+/* 3. Palette Nobildonna e Tag Ospiti Desaturati */
+.guest-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.guest-party-pill {
+  border: 1px solid transparent;
+}
+
+.guest-party-pill.michele {
+  background: #EBF1F5;
+  color: #2D4353;
+  border-color: rgba(45, 67, 83, 0.15);
+}
+
+.guest-party-pill.miriana {
+  background: #F8EDF2;
+  color: #663344;
+  border-color: rgba(102, 51, 68, 0.15);
+}
+
+.guest-party-pill.both {
+  background: #F4EFE6;
+  color: #7A5F38;
+  border-color: rgba(122, 95, 56, 0.18);
+}
+
+.btn-gift-status.is-received {
+  background: #EDF3EE;
+  color: #2B5738;
+  border-color: rgba(43, 87, 56, 0.25);
+  font-weight: 600;
+}
+
+.btn-gift-status.is-pending {
+  background: #F6F4F0;
+  color: #7A7268;
+  border-color: rgba(122, 114, 104, 0.2);
+}
+
 .btn-vendor-action.call:hover {
   background: var(--accent-sage-soft);
   border-color: var(--accent-sage);

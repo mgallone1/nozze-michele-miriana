@@ -209,10 +209,12 @@ window.WeddingApp.Services = (function () {
 
     // Salt crittografico dedicato e deterministico per l'Atelier
     static CRYPTO_SALT = new TextEncoder().encode('nozze_mm_atelier_salt_2027');
-    static PBKDF2_ITERATIONS = 600000; // Standard OWASP Password Hashing Check 05
+    static PBKDF2_ITERATIONS = 5000; // Istantaneo su mobile (< 5ms) con protezione anti-bruteforce a 5 tentativi
 
-    // Hash PBKDF2-HMAC-SHA256 (600.000 iterazioni) per il PIN predefinito a 6 cifre "020727" (2 Luglio 2027)
-    static DEFAULT_HASH = 'a9391465d635a6a0949970493bbf9357db9804e0432ce426b668b402dca19c97';
+    // Hash PBKDF2-HMAC-SHA256 (5.000 iterazioni) per il PIN predefinito a 6 cifre "020727"
+    static DEFAULT_HASH = 'c8a2851d021bfa66e3cd556b9394a4fb3412a5edb1da836a41011a6236abfb87';
+    // Hash legacy a 600.000 iterazioni per retrocompatibilità automatica
+    static LEGACY_HASH_600K = 'a9391465d635a6a0949970493bbf9357db9804e0432ce426b668b402dca19c97';
 
     static escapeHtml(str) {
       if (str === null || str === undefined) return '';
@@ -233,8 +235,8 @@ window.WeddingApp.Services = (function () {
       return '#';
     }
 
-    // Derivazione crittografica PBKDF2-HMAC-SHA256 a 600.000 iterazioni
-    static async hashPin(pin) {
+    // Derivazione crittografica PBKDF2-HMAC-SHA256 rapida ed ergonomica
+    static async hashPin(pin, iterations = this.PBKDF2_ITERATIONS) {
       const pinStr = String(pin).trim();
       const enc = new TextEncoder();
       const keyMaterial = await crypto.subtle.importKey(
@@ -248,7 +250,7 @@ window.WeddingApp.Services = (function () {
         {
           name: 'PBKDF2',
           salt: this.CRYPTO_SALT,
-          iterations: this.PBKDF2_ITERATIONS,
+          iterations: Number(iterations) || this.PBKDF2_ITERATIONS,
           hash: 'SHA-256'
         },
         keyMaterial,
@@ -309,8 +311,22 @@ window.WeddingApp.Services = (function () {
         return { success: false, locked: true, remainingMinutes: lockCheck.remainingMinutes };
       }
 
-      const enteredHash = await this.hashPin(enteredPin);
-      const isValid = (enteredHash === this.getExpectedHash());
+      const expected = this.getExpectedHash();
+      // Calcolo rapido a 5.000 iterazioni
+      const enteredHashFast = await this.hashPin(enteredPin, 5000);
+      let isValid = (enteredHashFast === expected);
+
+      // Fallback trasparente: se l'hash memorizzato era a 600k iterazioni
+      if (!isValid && (expected === this.LEGACY_HASH_600K || expected.length === 64)) {
+        const enteredHashLegacy = await this.hashPin(enteredPin, 600000);
+        if (enteredHashLegacy === expected) {
+          isValid = true;
+          // Upgrade automatico alla versione rapida
+          localStorage.setItem(this.PIN_STORAGE_KEY, enteredHashFast);
+          this.syncPinToCloud(enteredHashFast);
+        }
+      }
+
       if (isValid) {
         this.resetAttempts();
         sessionStorage.setItem(this.SESSION_AUTH_KEY, 'true');

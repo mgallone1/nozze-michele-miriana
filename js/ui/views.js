@@ -105,10 +105,14 @@ window.WeddingApp.UI = (function () {
           statusClass = 'acconto';
         }
 
+        const isMonumental = (cat.id === 'location_catering');
         return `
-          <div class="cat-atelier-card" data-cat-id="${cat.id}">
+          <div class="cat-atelier-card ${isMonumental ? 'cat-card-monumental' : ''}" data-cat-id="${cat.id}">
             <div class="cat-card-top">
-              <div class="cat-card-name">${cat.name}</div>
+              <div class="cat-card-title-group">
+                <div class="cat-card-name">${cat.name}</div>
+                ${isMonumental ? '<span class="cat-hero-pill">Cuore del Ricevimento</span>' : ''}
+              </div>
               <div class="cat-card-icon-wrap">${ICONS[cat.icon] || ICONS.extra}</div>
             </div>
             <div>
@@ -121,7 +125,7 @@ window.WeddingApp.UI = (function () {
               </div>
               <div class="cat-card-footer">
                 <span class="badge-status ${statusClass}">${statusLabel}</span>
-                <span>${item.count} ${item.count === 1 ? 'voce' : 'voci'}</span>
+                <span class="cat-card-count-text">${item.count} ${item.count === 1 ? 'voce attiva' : 'voci attive'}</span>
               </div>
             </div>
           </div>
@@ -146,14 +150,27 @@ window.WeddingApp.UI = (function () {
       if (expenses.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="col-item" style="text-align: center; padding: 48px 20px; color: var(--ink-muted);">
-              <div style="font-family: var(--font-serif); font-size: 1.3rem; margin-bottom: 6px; color: var(--ink-secondary);">
-                Nessun servizio corrispondente
+            <td colspan="7" class="col-item" style="text-align: center; padding: 56px 20px;">
+              <div class="empty-state-card" style="max-width: 440px; margin: 0 auto; background: var(--surface-tint); border: 1px dashed var(--border-hairline); border-radius: var(--radius-md); padding: 32px 24px;">
+                <div style="font-family: var(--font-serif); font-size: 1.35rem; color: var(--ink-primary); margin-bottom: 8px;">
+                  Nessuna voce trovata
+                </div>
+                <p style="font-size: 0.85rem; color: var(--ink-secondary); margin-bottom: 18px; line-height: 1.5;">
+                  Non ci sono servizi registrati per i filtri selezionati. Modifica la ricerca o inserisci una nuova voce per iniziare.
+                </p>
+                <button type="button" class="btn-noble btn-noble-primary" id="btn-empty-add-expense" style="min-height: 40px; font-size: 0.82rem;">
+                  + Registra Nuovo Servizio
+                </button>
               </div>
-              <p>Verifica i criteri di ricerca o inserisci una nuova voce.</p>
             </td>
           </tr>
         `;
+        const emptyBtn = tbody.querySelector('#btn-empty-add-expense');
+        if (emptyBtn) {
+          emptyBtn.addEventListener('click', () => {
+            if (typeof onEdit === 'function') onEdit(null);
+          });
+        }
         return;
       }
 
@@ -1261,8 +1278,10 @@ window.WeddingApp.UI = (function () {
           <div class="guest-card" data-id="${safeId}">
             <div class="guest-card-header">
               <div>
-                <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
-                ${compositionBadge}
+                <div class="guest-tags-row">
+                  <span class="guest-party-pill ${partyClass}">${partyLabel}</span>
+                  ${compositionBadge}
+                </div>
                 <h4 class="guest-name">${safeName}</h4>
               </div>
               <div class="guest-count-badge">${totalPeople} ${totalPeople === 1 ? 'coperto' : 'coperti'}</div>
@@ -1275,10 +1294,10 @@ window.WeddingApp.UI = (function () {
                   <strong class="gift-amount amount">${CurrencyFormatter.format(giftVal)}</strong>
                 </div>
                 <button type="button" class="btn-gift-status ${isReceived ? 'is-received' : 'is-pending'}" data-action="toggle-gift" data-id="${safeId}">
-                  ${isReceived ? '✓ Ricevuto' : 'In Sospeso'}
+                  ${isReceived ? '✓ Dono Ricevuto' : 'In Sospeso'}
                 </button>
               </div>
-              ${safeNotes ? `<div class="guest-notes-line">${safeNotes}</div>` : ''}
+              ${safeNotes ? `<div class="guest-notes-line">« ${safeNotes} »</div>` : ''}
             </div>
 
             <div class="guest-card-actions">

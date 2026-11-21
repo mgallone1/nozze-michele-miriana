@@ -983,7 +983,9 @@
     }
 
     document.querySelectorAll('.pin-key[data-key]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      // Feedback immediato al tocco (pointerdown / touchstart) senza attendere il click sintetico del browser
+      const handleInput = (e) => {
+        if (e.cancelable) e.preventDefault();
         const lockCheck = SecurityService.isLocked();
         if (lockCheck.locked) {
           if (errorFeedback) {
@@ -998,14 +1000,18 @@
         updateDots();
         if (errorFeedback) errorFeedback.classList.add('is-hidden');
         if (currentInput.length === 6) {
-          setTimeout(checkPin, 100);
+          // Zero ritardi artificiali: validazione istantanea
+          checkPin();
         }
-      });
+      };
+
+      btn.addEventListener('pointerdown', handleInput);
     });
 
     const btnClear = document.getElementById('btn-pin-clear');
     if (btnClear) {
-      btnClear.addEventListener('click', () => {
+      btnClear.addEventListener('pointerdown', (e) => {
+        if (e.cancelable) e.preventDefault();
         currentInput = '';
         updateDots();
         if (errorFeedback) errorFeedback.classList.add('is-hidden');
@@ -1014,7 +1020,8 @@
 
     const btnBack = document.getElementById('btn-pin-back');
     if (btnBack) {
-      btnBack.addEventListener('click', () => {
+      btnBack.addEventListener('pointerdown', (e) => {
+        if (e.cancelable) e.preventDefault();
         if (currentInput.length > 0) {
           currentInput = currentInput.slice(0, -1);
           updateDots();
